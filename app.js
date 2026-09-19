@@ -1,6 +1,8 @@
 let answerBuffer = '';
 let answerPauseTimer;
 let isSubmittingAnswer = false;
+let mediaRecorder;
+let recordedChunks = [];
 const questions = [
   {
     type: 'Product thinking',
@@ -106,6 +108,48 @@ function finishAnswer() {
   recognition?.stop();
   setListening(false);
   submitAnswer(answer);
+}
+
+async function startMobileRecording() {
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  recordedChunks = [];
+  const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+    ? 'audio/webm;codecs=opus'
+    : 'audio/mp4';
+  mediaRecorder = new MediaRecorder(stream, { mimeType });
+  mediaRecorder.ondataavailable = (event) => {
+    if (event.data.size) recordedChunks.push(event.data);
+  };
+  mediaRecorder.onstop = async () => {
+    stream.getTracks().forEach((track) => track.stop());
+    if (!recordedChunks.length) {
+      setListening(false);
+      answerState.textContent = 'No answer heard';
+      return;
+    }
+    answerState.textContent = 'Transcribing your answer';
+    try {
+      const audioBlob = new Blob(recordedChunks, { type: mimeType });
+      const response = await fetch('/api/transcribe', {
+        method: 'POST',
+        headers: { 'Content-Type': mimeType },
+        body: audioBlob
+      });
+      if (!response.ok) throw new Error('Transcription request failed');
+      const result = await response.json();
+      transcriptText.textContent = result.text || 'No words detected';
+      await submitAnswer(result.text || '');
+    } catch {
+      isSubmittingAnswer = false;
+      setListening(false);
+      answerState.textContent = 'Transcription unavailable';
+      showToast('Could not transcribe the recording. Try again.');
+    }
+  };
+  mediaRecorder.start();
+  setListening(true);
+  answerState.textContent = 'Recording... tap Stop answer when finished';
+  transcriptText.textContent = 'Listening to your answer...';
 }
 
 async function submitAnswer(answer) {
@@ -261,13 +305,16 @@ micButton.addEventListener('click', async () => {
   if (isAnswering) {
     window.clearTimeout(answerPauseTimer);
     answerBuffer = '';
-    recognition.stop();
+    if (mediaRecorder?.state === 'recording') mediaRecorder.stop();
+    else recognition?.stop();
     setListening(false);
     return;
   }
   try {
     await requestMicrophonePermission();
-    recognition.start();
+    if (recognition) recognition.start();
+    else if (window.MediaRecorder) await startMobileRecording();
+    else throw new Error('Speech input is not supported in this browser');
   } catch (error) {
     answerState.textContent = 'Microphone permission required';
     showToast(error.name === 'NotAllowedError'
