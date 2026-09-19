@@ -292,10 +292,19 @@ function showToast(message) {
 
 playButton.addEventListener('click', () => speak(questionText.textContent));
 testVoice.addEventListener('click', () => speak('Hello, I am your Bridgework interview coach. Take your time and answer with a real example.'));
-nextQuestion.addEventListener('click', () => {
+function advanceQuestion() {
+  window.clearTimeout(answerPauseTimer);
+  answerBuffer = '';
+  isSubmittingAnswer = false;
+  if (mediaRecorder?.state === 'recording') mediaRecorder.stop();
+  if (isAnswering) recognition?.stop();
+  setListening(false);
   currentQuestion = (currentQuestion + 1) % questions.length;
   renderQuestion();
-});
+  speak(questionText.textContent);
+}
+
+nextQuestion.addEventListener('click', advanceQuestion);
 micButton.addEventListener('click', async () => {
   if (!recognition) {
     showToast('Speech recognition is not supported in this browser. Try Chrome or Edge.');
