@@ -120,9 +120,10 @@ class InterviewEngine:
         candidate = _as_dict(payload.get("candidate"), MOCK_CANDIDATE)
         role = _as_dict(payload.get("role"), MOCK_ROLE)
         history = _clean_history(payload.get("history"))
+        session_state = _as_dict(payload.get("session_state"), {})
         if self.client is None:
             if os.environ.get("INTERVIEW_MOCK_MODE", "").lower() == "true":
-                return self._mock_turn(candidate, role, history)
+                return self._mock_turn(candidate, role, history, session_state)
             raise RuntimeError("GROQ_API_KEY is not configured")
 
         user_prompt = json.dumps(
@@ -130,6 +131,7 @@ class InterviewEngine:
                 "candidate": candidate,
                 "role": role,
                 "conversation_history": history,
+                "session_state": session_state,
                 "instruction": "Generate the opening question." if not history else "Evaluate the latest candidate answer and generate the next question.",
             },
             ensure_ascii=True,
@@ -160,6 +162,7 @@ class InterviewEngine:
         state["interview_complete"] = bool(state.get("interview_complete", False))
         state["progress"] = max(0.0, min(1.0, float(state.get("progress", 0.0))))
         return {
+            "status": "complete" if state["interview_complete"] else "continue",
             "question": str(result.get("question", "")).strip(),
             "competency": str(result.get("competency", "")).strip(),
             "question_type": str(result.get("question_type", "follow_up")).strip(),
@@ -169,18 +172,54 @@ class InterviewEngine:
             "role": {"company": role.get("company", ""), "title": role.get("title", "")},
         }
 
-    def _mock_turn(self, candidate: dict[str, Any], role: dict[str, Any], history: list[dict[str, str]]) -> dict[str, Any]:
+    def _mock_turn(self, candidate: dict[str, Any], role: dict[str, Any], history: list[dict[str, str]], session_state: dict[str, Any]) -> dict[str, Any]:
         del candidate
         answers = [item["content"] for item in history if item["role"] == "user"]
+        competencies = _as_list(role.get("competencies")) or ["ownership", "problem_solving", "communication"]
+        if len(answers) >= len(competencies):
+            state = dict(session_state)
+            state.update({
+                "status": "complete",
+                "questions_asked": [item["content"] for item in history if item["role"] == "assistant"],
+                "candidate_answers": answers,
+                "competencies_assessed": competencies,
+                "evidence_discovered": [],
+                "weak_areas": [],
+                "claims_needing_follow_up": [],
+                "current_competency": competencies[-1],
+                "remaining_competencies": [],
+                "progress": 1.0,
+                "interview_complete": True,
+            })
+            debrief = {
+                "overall_summary": "The candidate completed the evidence-gathering interview.",
+                "strengths": ["Provided answers across the target competencies."],
+                "weaknesses": [],
+                "evidence_discovered": [],
+                "competency_assessments": [{"competency": item, "assessment": "Needs review"} for item in competencies],
+                "specific_coaching": ["Make each answer concrete by naming your action and outcome."],
+                "practice_next": ["Prepare one evidence-based story for each competency."],
+            }
+            return {"status": "complete", "question": "", "competency": "", "question_type": "completion", "evaluation": {}, "session_state": state, "debrief": debrief}
         if not answers:
-            question = f"Tell me about a product decision you made in your work at {role.get('company', 'your last company')} and why you made it."
+            competency = competencies[0]
+            question = f"Tell me about a time you demonstrated {competency.replace('_', ' ')} in your work at {role.get('company', 'your last company')}."
             question_type = "opening"
-            competency = "product_thinking"
+        elif any(word in answers[-1].lower() for word in ("customer", "user", "research", "interview")) and "customer_empathy" in competencies:
+            question = "What did you personally change after learning that, and how did you know it worked?"
+            question_type = "probe"
+            competency = "customer_empathy"
+        elif any(word in answers[-1].lower() for word in ("backend", "technical", "system", "code", "architecture")) and "problem_solving" in competencies:
+            question = "What was the hardest technical trade-off you made, and what was the outcome?"
+            question_type = "probe"
+            competency = "problem_solving"
         else:
             question = "What was the specific outcome of that decision, and what would you change now?"
             question_type = "follow_up"
-            competency = "product_thinking"
-        state = {
+            competency = competencies[min(len(answers), len(competencies) - 1)]
+        state = dict(session_state)
+        state.update({
+            "status": "active",
             "questions_asked": [item["content"] for item in history if item["role"] == "assistant"],
             "candidate_answers": answers,
             "competencies_assessed": [competency] if answers else [],
@@ -188,11 +227,11 @@ class InterviewEngine:
             "weak_areas": [],
             "claims_needing_follow_up": [],
             "current_competency": competency,
-            "remaining_competencies": [item for item in _as_list(role.get("competencies")) if item != competency],
+            "remaining_competencies": [item for item in competencies if item != competency],
             "progress": 0.2 if answers else 0.0,
             "interview_complete": False,
-        }
-        return {"question": question, "competency": competency, "question_type": question_type, "evaluation": {}, "session_state": state, "debrief": None}
+        })
+        return {"status": "continue", "question": question, "competency": competency, "question_type": question_type, "evaluation": {}, "session_state": state, "debrief": None}
 
 
 app = FastAPI()
@@ -211,7 +250,7 @@ async def interview(payload: dict[str, Any]) -> JSONResponse:
         result = InterviewEngine().next_turn(payload)
     except Exception as error:
         return JSONResponse(
-            {"error": "Interview generation failed", "detail": str(error)},
+            {"error": {"code": "MODEL_FAILURE", "message": "Interview generation failed", "retryable": True, "detail": str(error)}},
             status_code=502,
         )
     return JSONResponse(result)
