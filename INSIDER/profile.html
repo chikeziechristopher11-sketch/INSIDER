@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="icon" type="image/png" href="insider-logo.png" />
+    <link rel="stylesheet" href="profile.css" />
+
+    <title>My Profile | Insider</title>
+  </head>
+
+  <body>
+    <!-- =========================================
+         MOBILE HEADER
+    ========================================== -->
+
+    <header class="mobile-header">
+      <img src="insider-logo.png" alt="Insider" />
+
+      <button id="menuBtn" aria-label="Open menu">☰</button>
+    </header>
+
+    <!-- =========================================
+         SIDEBAR
+    ========================================== -->
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <img src="insider-logo.png" alt="Insider" />
+
+        <span>Insider</span>
+      </div>
+
+      <nav>
+        <a href="dashboard.html" class="nav-item">
+          <span>⌂</span>
+          Home
+        </a>
+
+        <a href="profile.html" class="nav-item active">
+          <span>👤</span>
+          My Profile
+        </a>
+
+        <a href="opportunities.html" class="nav-item">
+          <span>💼</span>
+          Opportunities
+        </a>
+
+        <a href="interview.html" class="nav-item">
+          <span>🎤</span>
+          Interview Practice
+        </a>
+
+        <a href="#" class="nav-item">
+          <span>📚</span>
+          Assessment
+        </a>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <a href="#" class="nav-item">
+          <span>⚙</span>
+          Settings
+        </a>
+
+        <button class="logout-btn" id="logoutBtn" type="button">
+          <span>↪</span>
+          Log Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- =========================================
+         MAIN CONTENT
+    ========================================== -->
+
+    <main class="main-content">
+      <!-- =========================================
+             TOPBAR
+        ========================================== -->
+
+      <header class="topbar">
+        <div>
+          <p class="small-label">MY PROFILE</p>
+
+          <h1>Your Professional Profile</h1>
+
+          <p class="top-description">
+            This is what Insider knows about you and uses to prepare you for
+            opportunities.
+          </p>
+        </div>
+
+        <div class="user-area">
+          <div class="notification">
+            🔔
+            <span></span>
+          </div>
+
+          <div class="avatar" id="topAvatar">C</div>
+        </div>
+      </header>
+
+      <!-- =========================================
+             PROFILE HERO
+        ========================================== -->
+
+      <section class="profile-hero">
+        <div class="profile-identity">
+          <div class="large-avatar" id="profileAvatar">C</div>
+
+          <div>
+            <h2 id="profileName">Your Name</h2>
+
+            <p id="profileRole">Add your professional role</p>
+
+            <span class="location" id="profileLocation">
+              📍 Add your location
+            </span>
+          </div>
+        </div>
+
+        <button class="edit-profile-btn" id="editProfileBtn" type="button">
+          ✏ Edit Profile
+        </button>
+      </section>
+
+      <!-- =========================================
+             PROFILE GRID
+        ========================================== -->
+
+      <div class="profile-grid">
+        <!-- ABOUT -->
+
+        <section class="profile-card about-card">
+          <div class="card-heading">
+            <div>
+              <h2>About Me</h2>
+
+              <p>Your professional introduction</p>
+            </div>
+          </div>
+
+          <p id="profileAbout" class="about-text">
+            Tell employers who you are, what you do and what you're passionate
+            about.
+          </p>
+        </section>
+
+        <!-- PROFILE STRENGTH -->
+
+        <section class="profile-card">
+          <div class="card-heading">
+            <div>
+              <h2>Profile Strength</h2>
+
+              <p>How complete your profile is</p>
+            </div>
+          </div>
+
+          <div class="strength-number">
+            <strong id="profilePercentage"> 0% </strong>
+
+            <span> Complete </span>
+          </div>
+
+          <div class="strength-bar">
+            <div id="strengthBar"></div>
+          </div>
+
+          <p class="strength-message" id="strengthMessage">
+            Complete your profile to improve your opportunities.
+          </p>
+        </section>
+
+        <!-- SKILLS -->
+
+        <section class="profile-card full-width">
+          <div class="card-heading">
+            <div>
+              <h2>Skills</h2>
+
+              <p>Technical and professional skills</p>
+            </div>
+          </div>
+
+          <div class="skill-list" id="skillList">
+            <span> Add your skills </span>
+          </div>
+        </section>
+
+        <!-- EXPERIENCE -->
+
+        <section class="profile-card">
+          <div class="card-heading">
+            <div>
+              <h2>Experience</h2>
+
+              <p>Your professional experience</p>
+            </div>
+          </div>
+
+          <div id="experienceContent">
+            <div class="empty-state">
+              <div>💼</div>
+
+              <p>No experience added yet.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- PROJECTS -->
+
+        <section class="profile-card">
+          <div class="card-heading">
+            <div>
+              <h2>Projects</h2>
+
+              <p>Things you've built</p>
+            </div>
+          </div>
+
+          <div id="projectsContent">
+            <div class="empty-state">
+              <div>🚀</div>
+
+              <p>No projects added yet.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ACHIEVEMENTS -->
+
+        <section class="profile-card">
+          <div class="card-heading">
+            <div>
+              <h2>Achievements</h2>
+
+              <p>Things you're proud of</p>
+            </div>
+          </div>
+
+          <div id="achievementsContent">
+            <div class="empty-state">
+              <div>🏆</div>
+
+              <p>No achievements added yet.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- EDUCATION -->
+
+        <section class="profile-card">
+          <div class="card-heading">
+            <div>
+              <h2>Certifications & Education</h2>
+
+              <p>Your academic and professional qualifications</p>
+            </div>
+          </div>
+
+          <div id="educationContent">
+            <div class="empty-state">
+              <div>🎓</div>
+
+              <p>No certifications added yet.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- PROFESSIONAL LINKS -->
+
+        <section class="profile-card full-width">
+          <div class="card-heading">
+            <div>
+              <h2>Professional Links</h2>
+
+              <p>Where employers can learn more about you</p>
+            </div>
+          </div>
+
+          <div class="links-grid">
+            <a
+              href="#"
+              id="githubLink"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span> ◉ </span>
+
+              <div>
+                <strong> GitHub </strong>
+
+                <small id="githubText"> Not added </small>
+              </div>
+            </a>
+
+            <a
+              href="#"
+              id="linkedinLink"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span> in </span>
+
+              <div>
+                <strong> LinkedIn </strong>
+
+                <small id="linkedinText"> Not added </small>
+              </div>
+            </a>
+
+            <a
+              href="#"
+              id="portfolioLink"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span> 🌐 </span>
+
+              <div>
+                <strong> Portfolio </strong>
+
+                <small id="portfolioText"> Not added </small>
+              </div>
+            </a>
+          </div>
+        </section>
+
+        <!-- =====================================
+                 CV
+            ====================================== -->
+
+        <section class="profile-card full-width cv-card">
+          <div class="cv-icon">📄</div>
+
+          <div class="cv-info">
+            <h2>Your CV</h2>
+
+            <p id="cvStatus">
+              Upload your CV so Insider can understand your experience and use
+              it as evidence during interview preparation.
+            </p>
+
+            <div class="cv-file-info" id="cvFileInfo" style="display: none">
+              <span> 📎 </span>
+
+              <strong id="cvFileName"> CV uploaded </strong>
+            </div>
+          </div>
+
+          <div class="cv-actions">
+            <button class="secondary-btn" id="cvButton" type="button">
+              Upload CV
+            </button>
+
+            <button
+              class="secondary-btn"
+              id="removeCvButton"
+              type="button"
+              style="display: none"
+            >
+              Remove CV
+            </button>
+          </div>
+
+          <input type="file" id="cvInput" accept=".pdf,.doc,.docx" hidden />
+        </section>
+      </div>
+    </main>
+
+    <!-- =========================================
+         EDIT PROFILE MODAL
+    ========================================== -->
+
+    <div class="modal-overlay" id="editModal">
+      <div class="modal">
+        <div class="modal-header">
+          <div>
+            <p class="small-label">EDIT PROFILE</p>
+
+            <h2>Update your profile</h2>
+          </div>
+
+          <button id="closeModal" type="button" aria-label="Close">×</button>
+        </div>
+
+        <form id="profileForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="fullName"> Full Name </label>
+
+              <input type="text" id="fullName" placeholder="Your full name" />
+            </div>
+
+            <div class="form-group">
+              <label for="professionalRole"> Professional Role </label>
+
+              <input
+                type="text"
+                id="professionalRole"
+                placeholder="e.g. Software Developer"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="location"> Location </label>
+
+              <input
+                type="text"
+                id="location"
+                placeholder="e.g. Lagos, Nigeria"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="email"> Email </label>
+
+              <input type="email" id="email" placeholder="you@example.com" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="about"> About Me </label>
+
+            <textarea
+              id="about"
+              rows="5"
+              placeholder="Tell us about yourself..."
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="skills"> Skills </label>
+
+            <input
+              type="text"
+              id="skills"
+              placeholder="JavaScript, Node.js, HTML, CSS"
+            />
+
+            <small> Separate each skill with a comma. </small>
+          </div>
+
+          <div class="form-group">
+            <label for="experience"> Experience </label>
+
+            <textarea
+              id="experience"
+              rows="4"
+              placeholder="Describe your work experience..."
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="projects"> Projects </label>
+
+            <textarea
+              id="projects"
+              rows="4"
+              placeholder="Tell us about projects you've built..."
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="achievements"> Achievements </label>
+
+            <textarea
+              id="achievements"
+              rows="4"
+              placeholder="Hackathons, awards, accomplishments..."
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="education"> Certifications & Education </label>
+
+            <textarea
+              id="education"
+              rows="4"
+              placeholder="Degrees, certifications, courses..."
+            ></textarea>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="github"> GitHub </label>
+
+              <input
+                type="url"
+                id="github"
+                placeholder="https://github.com/..."
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="linkedin"> LinkedIn </label>
+
+              <input
+                type="url"
+                id="linkedin"
+                placeholder="https://linkedin.com/in/..."
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="portfolio"> Portfolio </label>
+
+            <input
+              type="url"
+              id="portfolio"
+              placeholder="https://yourportfolio.com"
+            />
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="cancel-btn" id="cancelModal">
+              Cancel
+            </button>
+
+            <button type="submit" class="save-btn">Save Profile</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- =========================================
+         CUSTOM REMOVE CV ALERT
+    ========================================== -->
+
+    <div class="confirm-overlay" id="confirmOverlay">
+      <div class="confirm-modal">
+        <div class="confirm-icon">🗑️</div>
+
+        <h2>Remove CV?</h2>
+
+        <p>
+          Are you sure you want to remove your CV from your Insider profile?
+        </p>
+
+        <div class="confirm-actions">
+          <button type="button" class="confirm-cancel" id="confirmCancel">
+            Cancel
+          </button>
+
+          <button type="button" class="confirm-delete" id="confirmDelete">
+            Remove CV
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="profile.js"></script>
+  </body>
+</html>

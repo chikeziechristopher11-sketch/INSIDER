@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="icon" type="image/png" href="insider-logo.png" />
+    <link rel="stylesheet" href="dashboard.css" />
+
+    <title>Dashboard | Insider</title>
+  </head>
+
+  <body>
+    <!-- MOBILE HEADER -->
+    <header class="mobile-header">
+      <img src="insider-logo.png" alt="Insider" />
+
+      <button id="menuBtn">☰</button>
+    </header>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <img src="insider-logo.png" alt="Insider" />
+
+        <span>Insider</span>
+      </div>
+
+      <nav>
+        <a href="#" class="nav-item active">
+          <span>⌂</span>
+          Home
+        </a>
+
+        <a href="profile.html" class="nav-item">
+          <span>👤</span>
+          My Profile
+        </a>
+
+        <a href="#" class="nav-item">
+          <span>💼</span>
+          Opportunities
+        </a>
+
+        <a href="interview.html" class="nav-item">
+          <span>🎤</span>
+          Interview Practice
+        </a>
+
+        <a href="#" class="nav-item">
+          <span>📊</span>
+          My Progress
+        </a>
+
+        <a href="#" class="nav-item">
+          <span>📚</span>
+          Resources
+        </a>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <a href="#" class="nav-item">
+          <span>⚙</span>
+          Settings
+        </a>
+
+        <button class="logout-btn" id="logoutBtn">
+          <span>↪</span>
+          Log Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+      <!-- TOP BAR -->
+      <header class="topbar">
+        <div>
+          <p class="small-label">YOUR DASHBOARD</p>
+
+          <h1>Welcome back, <span>Chris</span> 👋</h1>
+        </div>
+
+        <div class="user-area">
+          <div class="notification">
+            🔔
+            <span></span>
+          </div>
+
+          <div class="avatar">C</div>
+        </div>
+      </header>
+
+      <!-- PROFILE COMPLETION -->
+      <section class="profile-card">
+        <div class="profile-info">
+          <div class="profile-icon">👤</div>
+
+          <div>
+            <h2>Complete your profile</h2>
+
+            <p>
+              A complete profile helps Insider prepare you better for
+              opportunities.
+            </p>
+          </div>
+        </div>
+
+        <div class="profile-progress">
+          <div class="progress-number">
+            <strong>40%</strong>
+            <span>Complete</span>
+          </div>
+
+          <div class="progress-bar">
+            <div></div>
+          </div>
+
+          <a href="profile.html"> Complete Profile → </a>
+        </div>
+      </section>
+
+      <!-- QUICK ACTIONS -->
+      <section class="section">
+        <div class="section-heading">
+          <div>
+            <h2>What do you want to do?</h2>
+
+            <p>Continue building your career with Insider.</p>
+          </div>
+        </div>
+
+        <div class="quick-grid">
+          <a href="#" class="quick-card">
+            <div class="quick-icon green">👤</div>
+
+            <div>
+              <h3>Build My Profile</h3>
+
+              <p>Add your skills, projects, experience and achievements.</p>
+            </div>
+
+            <span class="arrow">→</span>
+          </a>
+
+          <a href="#" class="quick-card">
+            <div class="quick-icon blue">🎤</div>
+
+            <div>
+              <h3>Practice an Interview</h3>
+
+              <p>Practice with an AI interviewer tailored to your role.</p>
+            </div>
+
+            <span class="arrow">→</span>
+          </a>
+
+          <a href="#" class="quick-card">
+            <div class="quick-icon purple">💼</div>
+
+            <div>
+              <h3>Find Opportunities</h3>
+
+              <p>Explore roles and discover what employers are looking for.</p>
+            </div>
+
+            <span class="arrow">→</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- OPPORTUNITIES -->
+      <section class="section">
+        <div class="section-heading">
+          <div>
+            <h2>Recommended Opportunities</h2>
+
+            <p>Based on your profile and interests.</p>
+          </div>
+
+          <a href="#" class="view-all"> View all → </a>
+        </div>
+
+        <div class="opportunity-grid">
+          <!-- CARD -->
+          <div class="opportunity-card">
+            <div class="company-row">
+              <div class="company-logo">T</div>
+
+              <div>
+                <h3>Software Engineer</h3>
+                <p>Technology Company</p>
+              </div>
+            </div>
+
+            <div class="tags">
+              <span>JavaScript</span>
+              <span>Node.js</span>
+              <span>Backend</span>
+            </div>
+
+            <div class="opportunity-bottom">
+              <span> 📍 Lagos </span>
+
+              <a href="#"> Prepare → </a>
+            </div>
+          </div>
+
+          <!-- CARD -->
+          <div class="opportunity-card">
+            <div class="company-row">
+              <div class="company-logo second">F</div>
+
+              <div>
+                <h3>Frontend Developer</h3>
+                <p>Fintech Company</p>
+              </div>
+            </div>
+
+            <div class="tags">
+              <span>HTML</span>
+              <span>CSS</span>
+              <span>JavaScript</span>
+            </div>
+
+            <div class="opportunity-bottom">
+              <span> 📍 Lagos </span>
+
+              <a href="#"> Prepare → </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROGRESS -->
+      <section class="bottom-grid">
+        <div class="progress-card">
+          <div class="section-heading">
+            <div>
+              <h2>Your Progress</h2>
+
+              <p>Keep improving your readiness.</p>
+            </div>
+          </div>
+
+          <div class="progress-items">
+            <div class="progress-item">
+              <span class="check">✓</span>
+
+              <div>
+                <strong>Account created</strong>
+                <small>Completed</small>
+              </div>
+            </div>
+
+            <div class="progress-item">
+              <span class="check">✓</span>
+
+              <div>
+                <strong>Basic profile</strong>
+                <small>Completed</small>
+              </div>
+            </div>
+
+            <div class="progress-item">
+              <span class="pending">○</span>
+
+              <div>
+                <strong>Add your projects</strong>
+                <small>Not completed</small>
+              </div>
+            </div>
+
+            <div class="progress-item">
+              <span class="pending">○</span>
+
+              <div>
+                <strong>Practice an interview</strong>
+                <small>Not completed</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI CARD -->
+        <div class="ai-card">
+          <div class="ai-icon">✨</div>
+
+          <h2>Your AI Coach</h2>
+
+          <p>
+            Ready to help you understand your strengths, identify gaps and
+            prepare for your next interview.
+          </p>
+
+          <button>Start Coaching →</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="dashboard.js"></script>
+  </body>
+</html>
