@@ -480,20 +480,52 @@
             // Trigger Loading State
             setLoadingState(true);
 
-            // Simulate API Network Delay and Redirect
-            setTimeout(() => {
-                setLoadingState(false);
-                if (currentMode === 'signup') {
-                    showToast('Account Created!', `Welcome aboard, ${fullname || 'User'}! Redirecting...`, 'success');
-                } else {
-                    showToast('Welcome Back!', 'Logging you into your dashboard...', 'success');
+            // Local-only account store (no backend yet — see PROFILE.js
+            // getUser()). One account per browser, keyed by email.
+            const accounts = JSON.parse(localStorage.getItem('insiderAccounts') || '{}');
+
+            if (currentMode === 'signup') {
+                if (accounts[email]) {
+                    setLoadingState(false);
+                    showToast('Account Exists', 'An account with this email already exists. Log in instead.', 'warning');
+                    return;
                 }
 
-                // Redirect to dashboard.html after 1 second
+                const user = {
+                    id: `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+                    name: fullname,
+                    email: email,
+                    role: document.getElementById('role').value,
+                    password: password,
+                    createdAt: new Date().toISOString(),
+                };
+
+                accounts[email] = user;
+                localStorage.setItem('insiderAccounts', JSON.stringify(accounts));
+                localStorage.setItem('insiderUser', JSON.stringify(user));
+
                 setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1000);
-            }, 1800);
+                    setLoadingState(false);
+                    showToast('Account Created!', `Welcome aboard, ${fullname || 'User'}! Redirecting...`, 'success');
+                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+                }, 800);
+            } else {
+                const user = accounts[email];
+
+                if (!user || user.password !== password) {
+                    setLoadingState(false);
+                    showToast('Login Failed', 'Incorrect email or password.', 'error');
+                    return;
+                }
+
+                localStorage.setItem('insiderUser', JSON.stringify(user));
+
+                setTimeout(() => {
+                    setLoadingState(false);
+                    showToast('Welcome Back!', 'Logging you into your dashboard...', 'success');
+                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+                }, 800);
+            }
         }
 
         // Button Loading State
@@ -537,8 +569,23 @@
         }
 
         // Social Login Interaction
+        // Note: no real OAuth is wired up — this creates a local-only
+        // placeholder account, same as email signup. Real Google/LinkedIn
+        // auth needs a backend provider (see auth.md in docs).
         function socialLogin(provider) {
             showToast('Connecting...', `Redirecting to ${provider} authentication.`, 'info');
+
+            const user = {
+                id: `local-${provider.toLowerCase()}-${Date.now()}`,
+                name: `${provider} User`,
+                email: `${provider.toLowerCase()}-user@example.com`,
+                role: 'Job Seeker / Candidate',
+                provider: provider,
+                createdAt: new Date().toISOString(),
+            };
+
+            localStorage.setItem('insiderUser', JSON.stringify(user));
+
             setTimeout(() => {
                 window.location.href = 'dashboard.html';
             }, 1200);
