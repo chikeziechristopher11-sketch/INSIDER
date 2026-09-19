@@ -114,7 +114,7 @@ class InterviewEngine:
             self.client = Groq(api_key=os.environ["GROQ_API_KEY"])
         else:
             self.client = None
-        self.model = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
+        self.model = os.environ.get("GROQ_MODEL", "openai/gpt-oss-20b")
 
     def next_turn(self, payload: dict[str, Any]) -> dict[str, Any]:
         candidate = _as_dict(payload.get("candidate"), MOCK_CANDIDATE)
