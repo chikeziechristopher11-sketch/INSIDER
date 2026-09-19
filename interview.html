@@ -116,24 +116,6 @@
         </div>
 
         <div class="company-grid">
-          <!-- STANBIC -->
-
-          <button
-            class="company-card"
-            data-company="Stanbic IBTC"
-            type="button"
-          >
-            <div class="company-logo stanbic">S</div>
-
-            <div class="company-info">
-              <h3>Stanbic IBTC</h3>
-
-              <p>Banking & Financial Services</p>
-            </div>
-
-            <span class="company-arrow"> → </span>
-          </button>
-
           <!-- MTN -->
 
           <button class="company-card" data-company="MTN Nigeria" type="button">
@@ -148,13 +130,13 @@
             <span class="company-arrow"> → </span>
           </button>
 
-          <!-- GTB -->
+          <!-- GTCO -->
 
-          <button class="company-card" data-company="GTB" type="button">
+          <button class="company-card" data-company="GTCO" type="button">
             <div class="company-logo gtb">GT</div>
 
             <div class="company-info">
-              <h3>GTB</h3>
+              <h3>GTCO</h3>
 
               <p>Banking & Financial Services</p>
             </div>
@@ -171,20 +153,6 @@
               <h3>Microsoft</h3>
 
               <p>Technology & Software</p>
-            </div>
-
-            <span class="company-arrow"> → </span>
-          </button>
-
-          <!-- FLUTTERWAVE -->
-
-          <button class="company-card" data-company="Flutterwave" type="button">
-            <div class="company-logo flutterwave">F</div>
-
-            <div class="company-info">
-              <h3>Flutterwave</h3>
-
-              <p>Fintech & Payments</p>
             </div>
 
             <span class="company-arrow"> → </span>
@@ -385,6 +353,39 @@
               <span id="micStatus">
                 Click the microphone and speak naturally
               </span>
+
+              <button class="type-instead-link" id="typeInsteadBtn" type="button">
+                ⌨ Type my answer instead
+              </button>
+            </div>
+
+            <!-- TYPED ANSWER -->
+
+            <div class="typed-answer-area hidden" id="typedAnswerArea">
+              <textarea
+                id="typedAnswerInput"
+                class="typed-answer-input"
+                placeholder="Type your answer here..."
+                rows="4"
+              ></textarea>
+
+              <div class="typed-answer-actions">
+                <button
+                  class="control-button"
+                  id="backToVoiceBtn"
+                  type="button"
+                >
+                  🎙️ Use voice instead
+                </button>
+
+                <button
+                  class="primary-btn"
+                  id="submitTypedAnswerBtn"
+                  type="button"
+                >
+                  Submit Answer →
+                </button>
+              </div>
             </div>
 
             <!-- LIVE EVIDENCE -->

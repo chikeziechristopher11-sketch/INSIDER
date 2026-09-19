@@ -778,14 +778,14 @@ if (cvInput) {
     }
 
     // BACKEND UPLOAD
+    // PDF/DOCX/TXT text extraction runs server-side (pypdf/python-docx).
 
-    if (user.id) {
+    {
       try {
         const formData = new FormData();
-
         formData.append("cv", file);
 
-        const response = await fetch(`/api/profile/${user.id}/cv`, {
+        const response = await fetch("/api/profile/cv/upload", {
           method: "POST",
           body: formData,
         });
@@ -799,8 +799,12 @@ if (cvInput) {
         }
 
         if (!response.ok) {
-          throw new Error(data.message || "CV upload failed.");
+          throw new Error(data.error?.message || "CV upload failed.");
         }
+
+        profile.cv.text = data.cv_text || "";
+        profile.evidence = data.evidence || profile.evidence;
+        localStorage.setItem("insiderProfile", JSON.stringify(profile));
       } catch (error) {
         console.error("CV upload error:", error);
 
@@ -818,6 +822,10 @@ if (cvInput) {
 
         return;
       }
+    } else {
+      showProfileMessage(
+        "CV saved to your profile. PDF/DOC parsing isn't wired up yet, so evidence extraction won't run for this file.",
+      );
     }
 
     // FINISH

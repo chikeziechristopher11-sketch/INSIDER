@@ -17,6 +17,7 @@ from api.product import (
     opportunities,
     profile_analyze,
     profile_cv,
+    profile_cv_upload,
     profile_generate,
     profile_intake,
     readiness,
@@ -47,6 +48,7 @@ app.add_api_route("/api/transcribe", transcribe, methods=["POST"])
 app.add_api_route("/api/health", health, methods=["GET"])
 app.add_api_route("/api/profile/intake", profile_intake, methods=["POST"])
 app.add_api_route("/api/profile/cv", profile_cv, methods=["POST"])
+app.add_api_route("/api/profile/cv/upload", profile_cv_upload, methods=["POST"])
 app.add_api_route("/api/profile/generate", profile_generate, methods=["POST"])
 app.add_api_route("/api/profile/analyze", profile_analyze, methods=["POST"])
 app.add_api_route("/api/opportunities", opportunities, methods=["GET"])
