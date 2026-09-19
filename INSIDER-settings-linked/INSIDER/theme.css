@@ -1,0 +1,165 @@
+
+/* =========================================================
+   INSIDER GLOBAL SETTINGS THEME
+   Loaded after each page's normal stylesheet.
+========================================================= */
+
+body {
+  transition: background-color .25s ease, color .25s ease;
+}
+
+body.insider-dark {
+  background: #071521 !important;
+  color: #eef7f2 !important;
+}
+
+/* Shared navigation */
+body.insider-dark .sidebar,
+body.insider-dark .mobile-header {
+  background: #0c1d2b !important;
+  border-color: #263d4b !important;
+}
+
+body.insider-dark .sidebar-logo span,
+body.insider-dark .topbar h1,
+body.insider-dark .topbar h1 span,
+body.insider-dark .profile-info h2,
+body.insider-dark .profile-identity h2,
+body.insider-dark .card-heading h2,
+body.insider-dark .section-heading h2,
+body.insider-dark .screen-heading h2,
+body.insider-dark .small-label,
+body.insider-dark .sidebar-logo,
+body.insider-dark .notification,
+body.insider-dark .avatar {
+  color: #eef7f2 !important;
+}
+
+body.insider-dark .nav-item {
+  color: #a8b9c5 !important;
+}
+
+body.insider-dark .nav-item:hover,
+body.insider-dark .nav-item.active {
+  background: #123b2a !important;
+  color: #22b866 !important;
+}
+
+body.insider-dark .logout-btn {
+  color: #a8b9c5 !important;
+}
+
+body.insider-dark .main-content {
+  background: #071521 !important;
+}
+
+body.insider-dark .profile-card,
+body.insider-dark .quick-card,
+body.insider-dark .opportunity-card,
+body.insider-dark .progress-card,
+body.insider-dark .ai-card,
+body.insider-dark .profile-hero,
+body.insider-dark .profile-card,
+body.insider-dark .cv-card,
+body.insider-dark .confirm-modal,
+body.insider-dark .modal,
+body.insider-dark .company-card,
+body.insider-dark .role-card,
+body.insider-dark .listening-card,
+body.insider-dark .voice-interview-room,
+body.insider-dark .interviewer-panel,
+body.insider-dark .conversation-panel,
+body.insider-dark .debrief-card,
+body.insider-dark .debrief-summary-card,
+body.insider-dark .stat-card,
+body.insider-dark .next-steps-card,
+body.insider-dark .competency-section,
+body.insider-dark .transcript-box,
+body.insider-dark .evidence-section,
+body.insider-dark .interview-tip {
+  background: #102635 !important;
+  border-color: #294351 !important;
+  color: #eef7f2 !important;
+}
+
+body.insider-dark .profile-icon,
+body.insider-dark .quick-icon,
+body.insider-dark .company-logo,
+body.insider-dark .role-icon,
+body.insider-dark .stat-icon {
+  background: #123b2a !important;
+  color: #42c879 !important;
+}
+
+body.insider-dark .profile-info p,
+body.insider-dark .profile-identity p,
+body.insider-dark .location,
+body.insider-dark .top-description,
+body.insider-dark .section-heading p,
+body.insider-dark .profile-card p,
+body.insider-dark .about-text,
+body.insider-dark .strength-message,
+body.insider-dark .screen-heading p,
+body.insider-dark .company-info p,
+body.insider-dark .interview-tip,
+body.insider-dark .question-label,
+body.insider-dark .transcript-placeholder {
+  color: #a8b9c5 !important;
+}
+
+body.insider-dark input,
+body.insider-dark textarea,
+body.insider-dark select {
+  background: #0b1b28 !important;
+  color: #eef7f2 !important;
+  border-color: #35505e !important;
+}
+
+body.insider-dark .modal-overlay,
+body.insider-dark .confirm-overlay {
+  background: rgba(0, 0, 0, .72) !important;
+}
+
+body.insider-dark .progress-bar,
+body.insider-dark .strength-bar {
+  background: #29404e !important;
+}
+
+/* Global accessibility settings */
+body.insider-compact .main-content {
+  padding-top: 25px !important;
+}
+
+body.insider-compact .profile-card,
+body.insider-compact .quick-card,
+body.insider-compact .opportunity-card,
+body.insider-compact .profile-hero,
+body.insider-compact .profile-card {
+  padding: 18px !important;
+}
+
+body.insider-large-text {
+  font-size: 17px !important;
+}
+
+body.insider-high-contrast {
+  --insider-border: #78909c;
+}
+
+body.insider-high-contrast .sidebar,
+body.insider-high-contrast .profile-card,
+body.insider-high-contrast .quick-card,
+body.insider-high-contrast .opportunity-card,
+body.insider-high-contrast .profile-hero,
+body.insider-high-contrast .profile-card,
+body.insider-high-contrast .company-card {
+  border-width: 2px !important;
+}
+
+body.insider-reduce-motion *,
+body.insider-reduce-motion *::before,
+body.insider-reduce-motion *::after {
+  transition: none !important;
+  animation: none !important;
+  scroll-behavior: auto !important;
+}

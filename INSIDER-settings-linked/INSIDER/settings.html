@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings | Insider</title>
+  <link rel="stylesheet" href="theme.css">
+
+  <style>
+    :root {
+      --green: #00a651;
+      --green-dark: #008f45;
+      --green-soft: #e9f8f0;
+      --navy: #09264a;
+      --text: #19324d;
+      --muted: #718196;
+      --bg: #f5f8fb;
+      --card: #fff;
+      --border: #e2e9ef;
+      --input: #f9fbfa;
+      --danger: #d92d20;
+      --shadow: 0 8px 28px rgba(9,38,74,.07);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ================= SIDEBAR ================= */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 250px;
+      background: #fff;
+      border-right: 1px solid var(--border);
+      padding: 25px 18px;
+      display: flex;
+      flex-direction: column;
+      z-index: 1000;
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 12px;
+      margin-bottom: 45px;
+    }
+
+    .sidebar-logo img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+    }
+
+    .sidebar-logo span {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--navy);
+    }
+
+    .sidebar nav {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 13px 15px;
+      border-radius: 9px;
+      color: #617287;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      transition: .2s;
+    }
+
+    .nav-item span {
+      width: 20px;
+      text-align: center;
+      font-size: 17px;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .sidebar-bottom {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .logout-btn {
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+    }
+
+    /* ================= MAIN ================= */
+    .main-content {
+      margin-left: 250px;
+      padding: 40px 48px 70px;
+      min-height: 100vh;
+    }
+
+    .mobile-header {
+      display: none;
+    }
+
+    .topbar {
+      margin-bottom: 34px;
+    }
+
+    .small-label {
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.6px;
+      margin-bottom: 8px;
+    }
+
+    .topbar h1 {
+      color: var(--navy);
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+
+    .top-description {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .settings-layout {
+      display: grid;
+      grid-template-columns: 220px minmax(0, 820px);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .settings-menu {
+      position: sticky;
+      top: 25px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      padding: 9px;
+      box-shadow: var(--shadow);
+    }
+
+    .settings-menu button {
+      display: block;
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: var(--text);
+      padding: 12px;
+      border-radius: 8px;
+      text-align: left;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+
+    .settings-menu button:hover,
+    .settings-menu button.active {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 27px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+    }
+
+    .card-title {
+      margin-bottom: 21px;
+    }
+
+    .card-title h2 {
+      color: var(--navy);
+      font-size: 21px;
+      margin-bottom: 5px;
+    }
+
+    .card-title p {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .setting-row {
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 25px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .setting-row:last-child {
+      border-bottom: 0;
+    }
+
+    .setting-info {
+      flex: 1;
+    }
+
+    .setting-info strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .setting-info span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .theme-options {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .theme-button {
+      border: 1px solid var(--border);
+      background: var(--input);
+      color: var(--text);
+      padding: 10px 13px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .theme-button.active {
+      border-color: var(--green);
+      color: var(--green);
+      background: var(--green-soft);
+    }
+
+    .switch {
+      position: relative;
+      width: 46px;
+      height: 25px;
+      flex-shrink: 0;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      background: #b9c5cc;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    .slider:before {
+      content: "";
+      width: 19px;
+      height: 19px;
+      position: absolute;
+      left: 3px;
+      top: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: .2s;
+    }
+
+    .switch input:checked + .slider {
+      background: var(--green);
+    }
+
+    .switch input:checked + .slider:before {
+      transform: translateX(21px);
+    }
+
+    .field {
+      margin-bottom: 17px;
+    }
+
+    .field label {
+      display: block;
+      font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 7px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    select {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: var(--input);
+      color: var(--text);
+      padding: 12px;
+      border-radius: 8px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--green);
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 8px;
+      padding: 12px 18px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: var(--green);
+      color: white;
+    }
+
+    .primary:hover {
+      background: var(--green-dark);
+    }
+
+    .secondary {
+      background: var(--input);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    .danger-box {
+      border: 1px solid rgba(217,45,32,.3);
+      border-radius: 10px;
+      padding: 18px;
+      margin-top: 15px;
+    }
+
+    .danger-box h3 {
+      color: var(--danger);
+      margin-bottom: 5px;
+    }
+
+    .danger-box p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+
+    .toast {
+      position: fixed;
+      right: 25px;
+      bottom: 25px;
+      background: #09264a;
+      color: white;
+      padding: 13px 18px;
+      border-radius: 9px;
+      opacity: 0;
+      transform: translateY(15px);
+      pointer-events: none;
+      transition: .25s;
+      z-index: 2000;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    body.insider-dark {
+      --bg: #071521;
+      --card: #102635;
+      --text: #eef7f2;
+      --muted: #a8b9c5;
+      --border: #294351;
+      --input: #0b1b28;
+      --green-soft: #123b2a;
+      --navy: #eef7f2;
+    }
+
+    body.insider-compact .card {
+      padding: 20px;
+    }
+
+    body.insider-compact .setting-row {
+      min-height: 55px;
+    }
+
+    body.insider-large-text {
+      font-size: 17px;
+    }
+
+    body.insider-high-contrast .card,
+    body.insider-high-contrast .settings-menu {
+      border-width: 2px;
+    }
+
+    body.insider-reduce-motion *,
+    body.insider-reduce-motion *::before,
+    body.insider-reduce-motion *::after {
+      transition: none !important;
+      animation: none !important;
+      scroll-behavior: auto !important;
+    }
+
+    @media (max-width: 850px) {
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform .25s ease;
+      }
+
+      .sidebar.show {
+        transform: translateX(0);
+      }
+
+      .mobile-header {
+        height: 75px;
+        background: #fff;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+        position: sticky;
+        top: 0;
+        z-index: 1100;
+      }
+
+      body.insider-dark .mobile-header {
+        background: #0c1d2b;
+      }
+
+      .mobile-header img {
+        width: 43px;
+        height: 43px;
+      }
+
+      .mobile-header button {
+        border: 0;
+        background: transparent;
+        color: var(--text);
+        font-size: 28px;
+        cursor: pointer;
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding: 30px 20px 60px;
+      }
+
+      .settings-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .settings-menu {
+        position: static;
+        display: flex;
+        overflow-x: auto;
+      }
+
+      .settings-menu button {
+        white-space: nowrap;
+        width: auto;
+      }
+    }
+
+    @media (max-width: 550px) {
+      .setting-row {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 17px 0;
+      }
+
+      .theme-options {
+        width: 100%;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .actions .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header class="mobile-header">
+  <img src="insider-logo.png" alt="Insider">
+  <button id="menuBtn" aria-label="Open navigation">☰</button>
+</header>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <img src="insider-logo.png" alt="Insider">
+    <span>Insider</span>
+  </div>
+
+  <nav>
+    <a href="dashboard.html" class="nav-item">
+      <span>⌂</span> Home
+    </a>
+    <a href="profile.html" class="nav-item">
+      <span>👤</span> My Profile
+    </a>
+    <a href="interview.html" class="nav-item">
+      <span>🎤</span> Interview Practice
+    </a>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <a href="settings.html" class="nav-item active">
+      <span>⚙</span> Settings
+    </a>
+    <button class="nav-item logout-btn" id="logoutBtn" type="button">
+      <span>↪</span> Log Out
+    </button>
+  </div>
+</aside>
+
+<main class="main-content">
+
+  <div class="topbar">
+    <div>
+      <div class="small-label">YOUR CAREER. YOUR EDGE.</div>
+      <h1>Settings<span style="color:var(--green)">.</span></h1>
+      <p class="top-description">
+        Manage your Insider experience, account, notifications, privacy and accessibility.
+      </p>
+    </div>
+  </div>
+
+  <div class="settings-layout">
+
+    <aside class="settings-menu">
+      <button class="tab active" data-target="appearance">🎨 Appearance</button>
+      <button class="tab" data-target="account">👤 Account</button>
+      <button class="tab" data-target="notifications">🔔 Notifications</button>
+      <button class="tab" data-target="privacy">🔒 Privacy</button>
+      <button class="tab" data-target="accessibility">♿ Accessibility</button>
+      <button class="tab" data-target="danger">⚠️ Danger Zone</button>
+    </aside>
+
+    <div>
+
+      <section class="section active" id="appearance">
+        <div class="card">
+          <div class="card-title">
+            <h2>Appearance</h2>
+            <p>Changes here are automatically used across the Insider pages.</p>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <strong>Theme</strong>
+              <span>Choose light, dark, or automatically follow your device theme.</span>
+            </div>
+
+            <div class="theme-options">
+              <button class="theme-button" data-theme="light">☀️ Light</button>
+              <button class="theme-button" data-theme="dark">🌙 Dark</button>
+              <button class="theme-button" data-theme="system">💻 System</button>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <strong>Compact interface</strong>
+              <span>Use tighter spacing across the Insider dashboard, profile and interview pages.</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="compactMode">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="account">
+        <div class="card">
+          <div class="card-title">
+            <h2>Account</h2>
+            <p>Manage your basic account and career preferences.</p>
+          </div>
+
+          <div class="field">
+            <label for="fullName">Full name</label>
+            <input id="fullName" type="text" placeholder="Enter your name">
+          </div>
+
+          <div class="field">
+            <label for="email">Email address</label>
+            <input id="email" type="email" placeholder="you@example.com">
+          </div>
+
+          <div class="field">
+            <label for="careerRole">Preferred career role</label>
+            <select id="careerRole">
+              <option>Software Engineer</option>
+              <option>Frontend Engineer</option>
+              <option>Backend Engineer</option>
+              <option>Data Analyst</option>
+              <option>Data Scientist</option>
+              <option>Product Manager</option>
+              <option>UX Designer</option>
+              <option>Business Analyst</option>
+              <option>Risk Analyst</option>
+              <option>Other</option>
+            </select>
+          </div>
+
+          <div class="actions">
+            <button class="btn primary" id="saveAccount">Save Changes</button>
+            <button class="btn secondary" id="clearAccount">Clear</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="notifications">
+        <div class="card">
+          <div class="card-title">
+            <h2>Notifications</h2>
+            <p>Choose which updates you want to receive.</p>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <strong>Interview reminders</strong>
+              <span>Receive reminders before interview sessions.</span>
+            </div>
+            <label class="switch"><input type="checkbox" id="interviewReminders" checked><span class="slider"></span></label>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <strong>Job recommendations</strong>
+              <span>Receive job opportunities based on your preferences.</span>
+            </div>
+            <label class="switch"><input type="checkbox" id="jobRecommendations" checked><span class="slider"></span></label>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <strong>Application updates</strong>
+              <span>Receive updates about applications.</span>
+            </div>
+            <label class="switch"><input type="checkbox" id="applicationUpdates" checked><span class="slider"></span></label>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <strong>Email notifications</strong>
+              <span>Allow important account notifications by email.</span>
+            </div>
+            <label class="switch"><input type="checkbox" id="emailNotifications" checked><span class="slider"></span></label>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="privacy">
+        <div class="card">
+          <div class="card-title">
+            <h2>Privacy</h2>
+            <p>Control profile visibility and saved activity.</p>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <strong>Profile visibility</strong>
+              <span>Allow your professional profile to be discoverable.</span>
+            </div>
+            <label class="switch"><input type="checkbox" id="profileVisibility" checked><span class="slider"></span></label>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <strong>Save interview history</strong>
+              <span>Keep previous interview sessions and performance results.</span>
+            </div>
+            <label class="switch"><input type="checkbox" id="saveHistory" checked><span class="slider"></span></label>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <strong>Personalized recommendations</strong>
+              <span>Use your activity to improve recommendations.</span>
+            </div>
+            <label class="switch"><input type="checkbox" id="personalized" checked><span class="slider"></span></label>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="accessibility">
+        <div class="card">
+          <div class="card-title">
+            <h2>Accessibility</h2>
+            <p>Adjust the interface for easier use. These changes apply across pages.</p>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <strong>Reduce animations</strong>
+              <span>Reduce transitions and animations throughout Insider.</span>
+            </div>
+            <label class="switch"><input type="checkbox" id="reduceMotion"><span class="slider"></span></label>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <strong>Larger text</strong>
+              <span>Increase interface text size.</span>
+            </div>
+            <label class="switch"><input type="checkbox" id="largeText"><span class="slider"></span></label>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <strong>High contrast</strong>
+              <span>Increase contrast on cards, borders and navigation.</span>
+            </div>
+            <label class="switch"><input type="checkbox" id="highContrast"><span class="slider"></span></label>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="danger">
+        <div class="card">
+          <div class="card-title">
+            <h2>Danger Zone</h2>
+            <p>Use these actions carefully.</p>
+          </div>
+
+          <div class="danger-box">
+            <h3>Reset settings</h3>
+            <p>Restore all settings to their defaults. Your profile information is not deleted.</p>
+            <button class="btn danger" id="reset">Reset Settings</button>
+          </div>
+
+          <div class="danger-box">
+            <h3>Sign out</h3>
+            <p>End your current Insider session.</p>
+            <button class="btn danger" id="logout">Sign Out</button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast">Saved.</div>
+
+<script>
+const DEFAULTS = {
+  theme: "system",
+  compactMode: false,
+  interviewReminders: true,
+  jobRecommendations: true,
+  applicationUpdates: true,
+  emailNotifications: true,
+  profileVisibility: true,
+  saveHistory: true,
+  personalized: true,
+  reduceMotion: false,
+  largeText: false,
+  highContrast: false
+};
+
+const toggleIds = [
+  "compactMode",
+  "interviewReminders",
+  "jobRecommendations",
+  "applicationUpdates",
+  "emailNotifications",
+  "profileVisibility",
+  "saveHistory",
+  "personalized",
+  "reduceMotion",
+  "largeText",
+  "highContrast"
+];
+
+function getSettings() {
+  try {
+    return { ...DEFAULTS, ...(JSON.parse(localStorage.getItem("insiderSettings")) || {}) };
+  } catch {
+    return { ...DEFAULTS };
+  }
+}
+
+function saveSettings(settings) {
+  localStorage.setItem("insiderSettings", JSON.stringify(settings));
+  window.dispatchEvent(new Event("insider-settings-changed"));
+}
+
+function applyTheme(theme) {
+  const dark = theme === "dark" ||
+    (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+  document.body.classList.toggle("insider-dark", dark);
+
+  document.querySelectorAll(".theme-button").forEach(button => {
+    button.classList.toggle("active", button.dataset.theme === theme);
+  });
+}
+
+function applyAccessibility(settings) {
+  document.body.classList.toggle("insider-compact", !!settings.compactMode);
+  document.body.classList.toggle("insider-large-text", !!settings.largeText);
+  document.body.classList.toggle("insider-high-contrast", !!settings.highContrast);
+  document.body.classList.toggle("insider-reduce-motion", !!settings.reduceMotion);
+}
+
+function updateSetting(key, value) {
+  const settings = { ...getSettings(), [key]: value };
+  saveSettings(settings);
+  applyTheme(settings.theme);
+  applyAccessibility(settings);
+  toast("Setting updated.");
+}
+
+function toast(message) {
+  const el = document.getElementById("toast");
+  el.textContent = message;
+  el.classList.add("show");
+  clearTimeout(window.toastTimer);
+  window.toastTimer = setTimeout(() => el.classList.remove("show"), 2200);
+}
+
+function loadSettings() {
+  const settings = getSettings();
+
+  applyTheme(settings.theme);
+  applyAccessibility(settings);
+
+  toggleIds.forEach(id => {
+    document.getElementById(id).checked = !!settings[id];
+  });
+
+  try {
+    const profile = JSON.parse(localStorage.getItem("insiderProfile") || "{}");
+    const user = JSON.parse(localStorage.getItem("insiderUser") || "{}");
+    const account = JSON.parse(localStorage.getItem("insiderAccount") || "{}");
+
+    document.getElementById("fullName").value =
+      account.name || profile.name || user.name || "";
+
+    document.getElementById("email").value =
+      account.email || profile.email || user.email || "";
+
+    document.getElementById("careerRole").value =
+      account.role || profile.role || "Software Engineer";
+  } catch {}
+}
+
+/* Settings tabs */
+document.querySelectorAll(".tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(item => item.classList.remove("active"));
+    document.querySelectorAll(".section").forEach(section => section.classList.remove("active"));
+
+    tab.classList.add("active");
+    document.getElementById(tab.dataset.target).classList.add("active");
+  });
+});
+
+/* Theme buttons */
+document.querySelectorAll(".theme-button").forEach(button => {
+  button.addEventListener("click", () => {
+    updateSetting("theme", button.dataset.theme);
+  });
+});
+
+/* Global toggles */
+toggleIds.forEach(id => {
+  document.getElementById(id).addEventListener("change", event => {
+    updateSetting(id, event.target.checked);
+  });
+});
+
+/* Account */
+document.getElementById("saveAccount").addEventListener("click", () => {
+  const name = document.getElementById("fullName").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const role = document.getElementById("careerRole").value;
+
+  localStorage.setItem("insiderAccount", JSON.stringify({ name, email, role }));
+
+  /* Keep the existing profile data in sync without removing other fields. */
+  try {
+    const profile = JSON.parse(localStorage.getItem("insiderProfile") || "{}");
+    profile.name = name;
+    profile.email = email;
+    profile.role = role;
+    localStorage.setItem("insiderProfile", JSON.stringify(profile));
+  } catch {}
+
+  toast("Account information saved.");
+});
+
+/* Clear only the settings form */
+document.getElementById("clearAccount").addEventListener("click", () => {
+  document.getElementById("fullName").value = "";
+  document.getElementById("email").value = "";
+  document.getElementById("careerRole").value = "Software Engineer";
+  toast("Fields cleared.");
+});
+
+/* Reset settings, not profile */
+document.getElementById("reset").addEventListener("click", () => {
+  if (!confirm("Reset all Insider settings to their defaults?")) return;
+
+  saveSettings({ ...DEFAULTS });
+  loadSettings();
+  toast("Settings reset.");
+});
+
+/* Sidebar mobile navigation */
+const menuBtn = document.getElementById("menuBtn");
+const sidebar = document.getElementById("sidebar");
+
+if (menuBtn && sidebar) {
+  menuBtn.addEventListener("click", () => {
+    sidebar.classList.toggle("show");
+    menuBtn.textContent = sidebar.classList.contains("show") ? "✕" : "☰";
+  });
+
+  sidebar.querySelectorAll("a").forEach(link => {
+    link.addEventListener("click", () => {
+      sidebar.classList.remove("show");
+      menuBtn.textContent = "☰";
+    });
+  });
+}
+
+/* Logout */
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  if (!confirm("Are you sure you want to sign out?")) return;
+
+  localStorage.removeItem("insiderUser");
+  localStorage.removeItem("insiderProfile");
+  localStorage.removeItem("insiderAccount");
+
+  window.location.href = "index.html";
+});
+
+/* Update system theme immediately when System is selected */
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+  const settings = getSettings();
+  if (settings.theme === "system") {
+    applyTheme("system");
+  }
+});
+
+loadSettings();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="icon" type="image/png" href="insider-logo.png" />
+
+    <link rel="stylesheet" href="interview.css" />
+    <link rel="stylesheet" href="theme.css" />
+
+    <title>Interview Practice | Insider</title>
+  </head>
+
+  <body>
+    <!-- =========================================
+         MOBILE HEADER
+    ========================================== -->
+
+    <header class="mobile-header">
+      <img src="insider-logo.png" alt="Insider" />
+
+      <button id="menuBtn" type="button" aria-label="Open menu">☰</button>
+    </header>
+
+    <!-- =========================================
+         SIDEBAR
+    ========================================== -->
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <img src="insider-logo.png" alt="Insider" />
+
+        <span> Insider </span>
+      </div>
+
+      <nav>
+        <a href="dashboard.html" class="nav-item">
+          <span>⌂</span>
+          Home
+        </a>
+
+        <a href="profile.html" class="nav-item">
+          <span>👤</span>
+          My Profile
+        </a>
+
+        
+
+        <a href="interview.html" class="nav-item active">
+          <span>🎤</span>
+          Interview Practice
+        </a>
+
+        
+      </nav>
+
+      <div class="sidebar-bottom">
+        <a href="settings.html" class="nav-item">
+          <span>⚙</span>
+          Settings
+        </a>
+
+        <button class="logout-btn" id="logoutBtn" type="button">
+          <span>↪</span>
+
+          Log Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- =========================================
+         MAIN
+    ========================================== -->
+
+    <main class="main-content">
+      <!-- =====================================
+             TOPBAR
+        ====================================== -->
+
+      <header class="topbar">
+        <div>
+          <p class="small-label">INTERVIEW PRACTICE</p>
+
+          <h1>Prepare for your next opportunity 🎤</h1>
+
+          <p class="top-description">
+            Practice a realistic AI-powered interview based on the company and
+            role you're targeting.
+          </p>
+        </div>
+
+        <div class="user-area">
+          <div class="notification">
+            🔔
+
+            <span></span>
+          </div>
+
+          <div class="avatar" id="userAvatar">U</div>
+        </div>
+      </header>
+
+      <!-- =========================================
+             STEP 1 — COMPANY
+        ========================================== -->
+
+      <section class="interview-screen" id="companyScreen">
+        <div class="screen-heading">
+          <p class="small-label">STEP 1</p>
+
+          <h2>Choose a company</h2>
+
+          <p>Who are you preparing to interview with?</p>
+        </div>
+
+        <div class="company-grid">
+          <!-- STANBIC -->
+
+          <button
+            class="company-card"
+            data-company="Stanbic IBTC"
+            type="button"
+          >
+            <div class="company-logo stanbic">S</div>
+
+            <div class="company-info">
+              <h3>Stanbic IBTC</h3>
+
+              <p>Banking & Financial Services</p>
+            </div>
+
+            <span class="company-arrow"> → </span>
+          </button>
+
+          <!-- MTN -->
+
+          <button class="company-card" data-company="MTN Nigeria" type="button">
+            <div class="company-logo mtn">MTN</div>
+
+            <div class="company-info">
+              <h3>MTN Nigeria</h3>
+
+              <p>Telecommunications & Technology</p>
+            </div>
+
+            <span class="company-arrow"> → </span>
+          </button>
+
+          <!-- GTB -->
+
+          <button class="company-card" data-company="GTB" type="button">
+            <div class="company-logo gtb">GT</div>
+
+            <div class="company-info">
+              <h3>GTB</h3>
+
+              <p>Banking & Financial Services</p>
+            </div>
+
+            <span class="company-arrow"> → </span>
+          </button>
+
+          <!-- MICROSOFT -->
+
+          <button class="company-card" data-company="Microsoft" type="button">
+            <div class="company-logo microsoft">M</div>
+
+            <div class="company-info">
+              <h3>Microsoft</h3>
+
+              <p>Technology & Software</p>
+            </div>
+
+            <span class="company-arrow"> → </span>
+          </button>
+
+          <!-- FLUTTERWAVE -->
+
+          <button class="company-card" data-company="Flutterwave" type="button">
+            <div class="company-logo flutterwave">F</div>
+
+            <div class="company-info">
+              <h3>Flutterwave</h3>
+
+              <p>Fintech & Payments</p>
+            </div>
+
+            <span class="company-arrow"> → </span>
+          </button>
+        </div>
+      </section>
+
+      <!-- =========================================
+             STEP 2 — ROLE
+        ========================================== -->
+
+      <section class="interview-screen hidden" id="roleScreen">
+        <button class="back-btn" id="backToCompanies" type="button">
+          ← Back to Companies
+        </button>
+
+        <div class="screen-heading">
+          <p class="small-label">STEP 2</p>
+
+          <h2>Choose your role</h2>
+
+          <p>
+            Select the role you're preparing for at
+
+            <strong id="selectedCompanyName"> Company </strong>.
+          </p>
+        </div>
+
+        <div class="role-grid" id="roleGrid"></div>
+      </section>
+
+      <!-- =========================================
+             STEP 3 — VOICE INTERVIEW
+        ========================================== -->
+
+      <section class="interview-screen hidden" id="interviewScreen">
+        <!-- INTERVIEW TOP -->
+
+        <div class="live-interview-top">
+          <div>
+            <div class="live-badge">
+              <span></span>
+
+              LIVE AI INTERVIEW
+            </div>
+
+            <h2 id="interviewTitle">Software Engineer</h2>
+
+            <p id="interviewCompany">Company</p>
+          </div>
+
+          <div class="question-progress">
+            Question
+
+            <strong id="questionNumber"> 1 </strong>
+
+            <span> / </span>
+
+            <strong id="totalQuestions"> 5 </strong>
+          </div>
+        </div>
+
+        <!-- =====================================
+                 VOICE INTERVIEW ROOM
+            ====================================== -->
+
+        <div class="voice-interview-room">
+          <!-- =================================
+                     AI INTERVIEWER
+                ================================== -->
+
+          <div class="interviewer-panel">
+            <div class="interviewer-status">
+              <span class="status-dot"></span>
+
+              AI Interviewer
+            </div>
+
+            <!-- PERSON -->
+
+            <div class="interviewer-image-container">
+              <div class="image-glow"></div>
+
+              <div class="speaking-ring" id="speakingRing"></div>
+
+              <img
+                src="interviewer.png"
+                alt="Insider AI Interviewer"
+                class="interviewer-image"
+                id="interviewerImage"
+              />
+            </div>
+
+            <div class="interviewer-name">
+              <strong> Insider AI </strong>
+
+              <span id="speakingStatus"> Interviewer </span>
+            </div>
+
+            <!-- VOICE WAVE -->
+
+            <div class="voice-wave" id="voiceWave">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+
+            <p class="voice-status" id="voiceStatus">AI is ready</p>
+          </div>
+
+          <!-- =================================
+                     CONVERSATION
+                ================================== -->
+
+          <div class="conversation-panel">
+            <div class="question-label">
+              <span> AI INTERVIEWER </span>
+
+              <button
+                class="speaker-button"
+                id="hearQuestionBtn"
+                type="button"
+                title="Hear question"
+              >
+                🔊
+              </button>
+            </div>
+
+            <!-- QUESTION -->
+
+            <div class="question-text" id="questionText">
+              Your interview question will appear here.
+            </div>
+
+            <p class="question-prompt">
+              Listen carefully and answer naturally.
+            </p>
+
+            <!-- WHAT AI LISTENS FOR -->
+
+            <div class="listening-card">
+              <div class="listening-header">
+                <div class="listening-icon">🎧</div>
+
+                <div>
+                  <h3>What I'm listening for</h3>
+
+                  <p>The AI uses these criteria to evaluate your answer.</p>
+                </div>
+              </div>
+
+              <p class="listening-text" id="listeningFor">
+                Evidence relevant to this question.
+              </p>
+            </div>
+
+            <!-- TRANSCRIPT -->
+
+            <div class="answer-area">
+              <div class="answer-heading">
+                <span> Live transcript </span>
+
+                <span id="answerState"> Ready when you are </span>
+              </div>
+
+              <div class="transcript-box" id="transcriptText">
+                <div class="transcript-placeholder">
+                  🎙️
+
+                  <span>
+                    Your answer will appear here when you start speaking.
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- MICROPHONE -->
+
+            <div class="microphone-area">
+              <button class="voice-answer-btn" id="micButton" type="button">
+                <span class="mic-pulse" id="micPulse"></span>
+
+                <span class="mic-icon"> 🎙️ </span>
+              </button>
+
+              <strong id="micLabel"> Start Answer </strong>
+
+              <span id="micStatus">
+                Click the microphone and speak naturally
+              </span>
+            </div>
+
+            <!-- LIVE EVIDENCE -->
+
+            <div class="live-evidence hidden" id="liveEvidence">
+              <div class="evidence-title">🔎 Evidence detected</div>
+
+              <div id="evidenceText"></div>
+            </div>
+
+            <!-- CONTROLS -->
+
+            <div class="voice-controls">
+              <button class="control-button" id="muteButton" type="button">
+                🔇 Mute AI
+              </button>
+
+              <button
+                class="control-button end"
+                id="endInterviewBtn"
+                type="button"
+              >
+                End Interview
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TIP -->
+
+        <div class="interview-tip">
+          <span> 💡 </span>
+
+          <p>
+            <strong>Tip:</strong>
+
+            Give a real example. Explain what
+            <strong>you</strong> did, why you did it, and what happened as a
+            result.
+          </p>
+        </div>
+      </section>
+
+      <!-- =========================================
+             STEP 4 — DEBRIEF
+        ========================================== -->
+
+      <section class="interview-screen hidden" id="debriefScreen">
+        <div class="debrief-header">
+          <div class="debrief-icon">✨</div>
+
+          <p class="small-label">INTERVIEW COMPLETE</p>
+
+          <h2>Your interview debrief</h2>
+
+          <p>
+            Insider analyzed your answers, evidence and areas that still need
+            proof.
+          </p>
+        </div>
+
+        <!-- STATS -->
+
+        <div class="debrief-stats">
+          <div class="stat-card">
+            <span class="stat-icon"> 🎯 </span>
+
+            <strong id="performanceScore"> — </strong>
+
+            <p>Overall Performance</p>
+          </div>
+
+          <div class="stat-card">
+            <span class="stat-icon"> 🔎 </span>
+
+            <strong id="evidenceCount"> 0 </strong>
+
+            <p>Evidence Discovered</p>
+          </div>
+
+          <div class="stat-card">
+            <span class="stat-icon"> 📈 </span>
+
+            <strong id="progressScore"> 0% </strong>
+
+            <p>Interview Progress</p>
+          </div>
+        </div>
+
+        <!-- SUMMARY -->
+
+        <div class="debrief-summary-card">
+          <div class="debrief-card-header">
+            <span> 🧠 </span>
+
+            <h3>Overall assessment</h3>
+          </div>
+
+          <p id="overallSummary">Your interview summary will appear here.</p>
+        </div>
+
+        <!-- STRENGTHS / GAPS / COACHING -->
+
+        <div class="debrief-grid">
+          <div class="debrief-card">
+            <div class="debrief-card-header">
+              <span> 💪 </span>
+
+              <h3>Strengths</h3>
+            </div>
+
+            <ul id="strengthsList">
+              <li>Your strengths will appear here.</li>
+            </ul>
+          </div>
+
+          <div class="debrief-card">
+            <div class="debrief-card-header">
+              <span> 🎯 </span>
+
+              <h3>Evidence Gaps</h3>
+            </div>
+
+            <ul id="gapsList">
+              <li>Areas needing more evidence will appear here.</li>
+            </ul>
+          </div>
+
+          <div class="debrief-card">
+            <div class="debrief-card-header">
+              <span> 🧑‍🏫 </span>
+
+              <h3>Coaching</h3>
+            </div>
+
+            <ul id="coachingList">
+              <li>Personalized coaching will appear here.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- EVIDENCE -->
+
+        <div class="evidence-section">
+          <div class="section-title">
+            <p class="small-label">NEW PROFILE EVIDENCE</p>
+
+            <h3>What the interview discovered</h3>
+
+            <p>Concrete evidence from your answers.</p>
+          </div>
+
+          <div class="evidence-list" id="evidenceList">
+            <div class="empty-evidence">
+              Evidence discovered during the interview will appear here.
+            </div>
+          </div>
+        </div>
+
+        <!-- COMPETENCY -->
+
+        <div class="competency-section">
+          <div class="section-title">
+            <p class="small-label">READINESS</p>
+
+            <h3>Competency assessment</h3>
+          </div>
+
+          <div class="competency-list" id="competencyList"></div>
+        </div>
+
+        <!-- NEXT STEPS -->
+
+        <div class="next-steps-card">
+          <div class="debrief-card-header">
+            <span> 🚀 </span>
+
+            <h3>Recommended next steps</h3>
+          </div>
+
+          <ul id="nextStepsList">
+            <li>Your recommended next steps will appear here.</li>
+          </ul>
+        </div>
+
+        <!-- ACTIONS -->
+
+        <div class="debrief-actions">
+          <button class="primary-btn" id="anotherInterviewBtn" type="button">
+            Practice Another Interview →
+          </button>
+
+          <a href="dashboard.html" class="secondary-btn"> Back to Dashboard </a>
+        </div>
+      </section>
+    </main>
+
+    <!-- =========================================
+         EXIT CONFIRMATION
+    ========================================== -->
+
+    <div class="confirm-overlay" id="exitConfirm">
+      <div class="confirm-modal">
+        <div class="confirm-icon">⚠️</div>
+
+        <h2>End this interview?</h2>
+
+        <p>Your current interview progress will be saved before you leave.</p>
+
+        <div class="confirm-actions">
+          <button type="button" class="cancel-confirm" id="cancelExit">
+            Continue Interview
+          </button>
+
+          <button type="button" class="danger-confirm" id="confirmExit">
+            End Interview
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="theme.js"></script>
+    <script src="interview.js"></script>
+  </body>
+</html>

@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insider - Know. Prepare. Get Hired. | Sign Up</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Custom Gradients matching the logo */
+        .bg-brand-dark {
+            background-color: #060913;
+        }
+
+        .gradient-logo-blue {
+            background: linear-gradient(135deg, #0052D4, #0072FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gradient-logo-green {
+            background: linear-gradient(135deg, #00C853, #00E676);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gradient-btn {
+            background: linear-gradient(135deg, #0052D4 0%, #0072FF 40%, #00C853 100%);
+            background-size: 200% auto;
+            transition: all 0.4s ease;
+        }
+
+        .gradient-btn:hover {
+            background-position: right center;
+            box-shadow: 0 10px 25px -5px rgba(0, 200, 83, 0.4), 0 8px 10px -6px rgba(0, 82, 212, 0.4);
+        }
+
+        /* Glassmorphism Styles */
+        .glass-card {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        }
+
+        .glass-input {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .glass-input:focus-within {
+            border-color: #0072FF;
+            box-shadow: 0 0 0 3px rgba(0, 114, 255, 0.25);
+            background: rgba(30, 41, 59, 0.9);
+        }
+
+        /* Background glow elements */
+        .glow-orb-blue {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(0, 82, 212, 0.25) 0%, rgba(0, 0, 0, 0) 70%);
+            filter: blur(50px);
+            pointer-events: none;
+        }
+
+        .glow-orb-green {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(0, 200, 83, 0.2) 0%, rgba(0, 0, 0, 0) 70%);
+            filter: blur(50px);
+            pointer-events: none;
+        }
+
+        /* Password strength meter transition */
+        .strength-bar {
+            height: 4px;
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+
+        /* Checkbox styling */
+        .custom-checkbox:checked {
+            background-color: #00C853;
+            border-color: #00C853;
+        }
+
+        /* Hide scrollbars for slick look */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #060913;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="bg-brand-dark text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden relative select-none">
+
+    <!-- Ambient Glow Orbs -->
+    <div class="glow-orb-blue -top-20 -left-20"></div>
+    <div class="glow-orb-green -bottom-20 -right-20"></div>
+
+    <!-- Top Navigation Header -->
+    <header class="w-full max-w-7xl mx-auto px-6 py-6 flex justify-between items-center z-10">
+        <!-- Logo SVG + Text -->
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="resetFormState()">
+            <div class="relative w-10 h-10 flex items-center justify-center">
+                <!-- Custom SVG recreating the Insider brand logo icon -->
+                <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md">
+                    <defs>
+                        <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#0052D4" />
+                            <stop offset="100%" stop-color="#0072FF" />
+                        </linearGradient>
+                        <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#00C853" />
+                            <stop offset="100%" stop-color="#00E676" />
+                        </linearGradient>
+                    </defs>
+                    <!-- Base 'I' Left Part -->
+                    <path d="M 25 20 H 55 V 40 C 55 50 45 55 40 60 L 25 80 Z" fill="url(#blueGrad)" />
+                    <!-- Base 'I' Right Green Part -->
+                    <path d="M 45 55 C 55 50 75 50 75 80 H 35 L 45 55 Z" fill="url(#greenGrad)" />
+                    <!-- Tie outline shape inside -->
+                    <path d="M 45 35 L 53 45 L 49 70 L 45 75 L 41 70 L 37 45 Z" fill="#FFFFFF" opacity="0.95"/>
+                    <!-- Speech Bubble Top Right -->
+                    <path d="M 58 12 Q 58 5 65 5 L 85 5 Q 92 5 92 12 L 92 25 Q 92 32 85 32 L 72 32 L 64 38 L 66 32 Q 58 32 58 25 Z" fill="url(#greenGrad)"/>
+                    <circle cx="68" cy="18" r="2.5" fill="#FFFFFF"/>
+                    <circle cx="75" cy="18" r="2.5" fill="#FFFFFF"/>
+                    <circle cx="82" cy="18" r="2.5" fill="#FFFFFF"/>
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-2xl font-extrabold tracking-tight flex items-center">
+                    <span class="gradient-logo-blue">In</span>
+                    <span class="gradient-logo-green">sider</span>
+                </h1>
+                <p class="text-[10px] text-slate-400 font-semibold tracking-widest uppercase">Know. Prepare. Get Hired.</p>
+            </div>
+        </div>
+
+        <!-- Help Link -->
+        <a href="#help" class="text-sm text-slate-400 hover:text-slate-200 transition-colors flex items-center space-x-1">
+            <i class="far fa-question-circle"></i>
+            <span>Need Help?</span>
+        </a>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow flex items-center justify-center p-4 sm:p-6 z-10">
+        <div class="w-full max-w-xl glass-card rounded-3xl p-6 sm:p-10 relative overflow-hidden">
+            
+            <!-- Header Text -->
+            <div class="text-center mb-8">
+                <h2 id="form-title" class="text-2xl sm:text-3xl font-bold text-white tracking-tight mb-2">Create Your Account</h2>
+                <p id="form-subtitle" class="text-slate-400 text-sm">Join thousands of professionals getting hired faster with Insider.</p>
+            </div>
+
+            <!-- Mode Switcher Tabs (Sign Up / Log In) -->
+            <div class="flex bg-slate-900/80 p-1.5 rounded-2xl mb-8 border border-slate-800">
+                <button id="tab-signup" onclick="switchMode('signup')" class="flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all duration-300 bg-slate-800 text-white shadow-lg">
+                    Sign Up
+                </button>
+                <button id="tab-login" onclick="switchMode('login')" class="flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all duration-300 text-slate-400 hover:text-white">
+                    Log In
+                </button>
+            </div>
+
+            <!-- Social Sign In Options -->
+            <div id="social-buttons" class="grid grid-cols-2 gap-4 mb-6">
+                <button type="button" onclick="socialLogin('Google')" class="flex items-center justify-center space-x-2 py-3 px-4 glass-input rounded-xl hover:bg-slate-800/80 transition-all text-sm font-medium text-slate-200">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24">
+                        <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.2 9 5 12 5z"/>
+                        <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.7-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/>
+                        <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 10.8 0 12.5s.7 2.8 1.9 5.2l3.7-2.9z"/>
+                        <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.2-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/>
+                    </svg>
+                    <span>Google</span>
+                </button>
+                <button type="button" onclick="socialLogin('LinkedIn')" class="flex items-center justify-center space-x-2 py-3 px-4 glass-input rounded-xl hover:bg-slate-800/80 transition-all text-sm font-medium text-slate-200">
+                    <i class="fab fa-linkedin text-blue-500 text-lg"></i>
+                    <span>LinkedIn</span>
+                </button>
+            </div>
+
+            <!-- Divider -->
+            <div class="relative flex py-2 items-center mb-6">
+                <div class="flex-grow border-t border-slate-800"></div>
+                <span class="flex-shrink mx-4 text-xs uppercase text-slate-500 font-semibold tracking-wider">Or continue with email</span>
+                <div class="flex-grow border-t border-slate-800"></div>
+            </div>
+
+            <!-- Form -->
+            <form id="auth-form" onsubmit="handleFormSubmit(event)" class="space-y-4">
+                
+                <!-- Full Name Input (Sign Up Only) -->
+                <div id="field-fullname" class="space-y-1.5">
+                    <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Full Name</label>
+                    <div class="glass-input flex items-center px-4 py-3 rounded-xl">
+                        <i class="far fa-user text-slate-400 mr-3"></i>
+                        <input type="text" id="fullname" placeholder="Alex Morgan" class="bg-transparent w-full focus:outline-none text-white placeholder-slate-500 text-sm">
+                    </div>
+                    <p id="error-fullname" class="text-xs text-red-400 hidden mt-1"><i class="fas fa-exclamation-circle mr-1"></i>Please enter your full name.</p>
+                </div>
+
+                <!-- Email Input -->
+                <div class="space-y-1.5">
+                    <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Email Address</label>
+                    <div class="glass-input flex items-center px-4 py-3 rounded-xl">
+                        <i class="far fa-envelope text-slate-400 mr-3"></i>
+                        <input type="email" id="email" required placeholder="alex@example.com" class="bg-transparent w-full focus:outline-none text-white placeholder-slate-500 text-sm">
+                    </div>
+                    <p id="error-email" class="text-xs text-red-400 hidden mt-1"><i class="fas fa-exclamation-circle mr-1"></i>Please enter a valid email address.</p>
+                </div>
+
+                <!-- Role Selection Dropdown (Sign Up Only) -->
+                <div id="field-role" class="space-y-1.5">
+                    <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider">I am joining as a</label>
+                    <div class="glass-input flex items-center px-4 py-3 rounded-xl relative">
+                        <i class="fas fa-user-tie text-slate-400 mr-3"></i>
+                        <select id="role" class="bg-transparent w-full focus:outline-none text-white text-sm cursor-pointer appearance-none">
+                            <option value="candidate" class="bg-slate-900 text-white">Job Seeker / Candidate</option>
+                            <option value="recruiter" class="bg-slate-900 text-white">Recruiter / Employer</option>
+                            <option value="coach" class="bg-slate-900 text-white">Career Coach / Mentor</option>
+                        </select>
+                        <i class="fas fa-chevron-down text-slate-400 absolute right-4 pointer-events-none text-xs"></i>
+                    </div>
+                </div>
+
+                <!-- Password Input -->
+                <div class="space-y-1.5">
+                    <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Password</label>
+                    <div class="glass-input flex items-center px-4 py-3 rounded-xl relative">
+                        <i class="fas fa-lock text-slate-400 mr-3"></i>
+                        <input type="password" id="password" required placeholder="••••••••" oninput="checkPasswordStrength()" class="bg-transparent w-full focus:outline-none text-white placeholder-slate-500 text-sm pr-10">
+                        <button type="button" onclick="togglePasswordVisibility('password', 'toggle-icon-1')" class="absolute right-4 text-slate-400 hover:text-white transition-colors focus:outline-none">
+                            <i id="toggle-icon-1" class="far fa-eye"></i>
+                        </button>
+                    </div>
+                    <!-- Password Strength Meter (Sign Up Only) -->
+                    <div id="password-strength-container" class="mt-2 hidden">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-[11px] text-slate-400">Password Strength:</span>
+                            <span id="strength-text" class="text-[11px] font-semibold text-slate-400">Too Short</span>
+                        </div>
+                        <div class="w-full bg-slate-800 rounded-full overflow-hidden h-1">
+                            <div id="strength-bar" class="strength-bar w-0 bg-red-500"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Confirm Password Input (Sign Up Only) -->
+                <div id="field-confirm-password" class="space-y-1.5">
+                    <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Confirm Password</label>
+                    <div class="glass-input flex items-center px-4 py-3 rounded-xl relative">
+                        <i class="fas fa-shield-alt text-slate-400 mr-3"></i>
+                        <input type="password" id="confirm-password" placeholder="••••••••" class="bg-transparent w-full focus:outline-none text-white placeholder-slate-500 text-sm pr-10">
+                        <button type="button" onclick="togglePasswordVisibility('confirm-password', 'toggle-icon-2')" class="absolute right-4 text-slate-400 hover:text-white transition-colors focus:outline-none">
+                            <i id="toggle-icon-2" class="far fa-eye"></i>
+                        </button>
+                    </div>
+                    <p id="error-confirm-password" class="text-xs text-red-400 hidden mt-1"><i class="fas fa-exclamation-circle mr-1"></i>Passwords do not match.</p>
+                </div>
+
+                <!-- Terms and Conditions Checkbox (Sign Up Only) -->
+                <div id="field-terms" class="flex items-start space-x-3 pt-2">
+                    <input type="checkbox" id="terms" class="custom-checkbox mt-1 w-4 h-4 rounded border-slate-700 bg-slate-900 focus:ring-0 focus:ring-offset-0 cursor-pointer">
+                    <label for="terms" class="text-xs text-slate-400 leading-relaxed cursor-pointer">
+                        I agree to Insider's <a href="#terms" class="text-emerald-400 hover:underline">Terms of Service</a> and <a href="#privacy" class="text-emerald-400 hover:underline">Privacy Policy</a>.
+                    </label>
+                </div>
+
+                <!-- Forgot Password Link (Log In Only) -->
+                <div id="field-forgot" class="hidden text-right">
+                    <a href="#forgot" class="text-xs text-blue-400 hover:text-blue-300 transition-colors">Forgot Password?</a>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="submit-btn" class="w-full mt-6 py-4 rounded-xl text-white font-bold text-sm tracking-wide gradient-btn shadow-lg flex items-center justify-center space-x-2 focus:outline-none">
+                    <span id="btn-text">CREATE ACCOUNT</span>
+                    <i id="btn-icon" class="fas fa-arrow-right text-xs"></i>
+                    <!-- Spinner Icon for Loading State -->
+                    <svg id="btn-spinner" class="animate-spin h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </button>
+            </form>
+
+            <!-- Bottom Redirect Link -->
+            <div class="mt-8 text-center">
+                <p id="bottom-text" class="text-xs text-slate-400">
+                    Already have an account? 
+                    <button onclick="switchMode('login')" class="text-emerald-400 font-semibold hover:underline focus:outline-none ml-1">Log In</button>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Notification Overlay -->
+    <div id="toast" class="fixed top-5 right-5 transform translate-x-full transition-transform duration-300 z-50 flex items-center space-x-3 bg-slate-900 border border-emerald-500/30 text-white px-5 py-4 rounded-2xl shadow-2xl">
+        <div class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-check text-sm"></i>
+        </div>
+        <div>
+            <h4 id="toast-title" class="text-sm font-bold">Success!</h4>
+            <p id="toast-message" class="text-xs text-slate-300">Welcome to Insider. Preparing your profile...</p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="w-full text-center py-6 text-xs text-slate-500 z-10">
+        <p>&copy; 2026 Insider Inc. All rights reserved. Built for candidates worldwide.</p>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        let currentMode = 'signup';
+
+        // Toggle between Sign Up and Log In modes
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            const title = document.getElementById('form-title');
+            const subtitle = document.getElementById('form-subtitle');
+            const tabSignup = document.getElementById('tab-signup');
+            const tabLogin = document.getElementById('tab-login');
+            const fullnameField = document.getElementById('field-fullname');
+            const roleField = document.getElementById('field-role');
+            const confirmPassField = document.getElementById('field-confirm-password');
+            const termsField = document.getElementById('field-terms');
+            const forgotField = document.getElementById('field-forgot');
+            const strengthMeter = document.getElementById('password-strength-container');
+            const btnText = document.getElementById('btn-text');
+            const bottomText = document.getElementById('bottom-text');
+
+            if (mode === 'signup') {
+                title.innerText = 'Create Your Account';
+                subtitle.innerText = 'Join thousands of professionals getting hired faster with Insider.';
+                
+                tabSignup.className = 'flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all duration-300 bg-slate-800 text-white shadow-lg';
+                tabLogin.className = 'flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all duration-300 text-slate-400 hover:text-white';
+                
+                fullnameField.classList.remove('hidden');
+                roleField.classList.remove('hidden');
+                confirmPassField.classList.remove('hidden');
+                termsField.classList.remove('hidden');
+                forgotField.classList.add('hidden');
+                
+                btnText.innerText = 'CREATE ACCOUNT';
+                bottomText.innerHTML = 'Already have an account? <button onclick="switchMode(\'login\')" class="text-emerald-400 font-semibold hover:underline focus:outline-none ml-1">Log In</button>';
+            } else {
+                title.innerText = 'Welcome Back';
+                subtitle.innerText = 'Log in to access your interview prep and applications.';
+                
+                tabLogin.className = 'flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all duration-300 bg-slate-800 text-white shadow-lg';
+                tabSignup.className = 'flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all duration-300 text-slate-400 hover:text-white';
+                
+                fullnameField.classList.add('hidden');
+                roleField.classList.add('hidden');
+                confirmPassField.classList.add('hidden');
+                termsField.classList.add('hidden');
+                strengthMeter.classList.add('hidden');
+                forgotField.classList.remove('hidden');
+                
+                btnText.innerText = 'LOG IN';
+                bottomText.innerHTML = 'Don\'t have an account? <button onclick="switchMode(\'signup\')" class="text-emerald-400 font-semibold hover:underline focus:outline-none ml-1">Sign Up</button>';
+            }
+        }
+
+        // Password Show/Hide Toggle
+        function togglePasswordVisibility(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'far fa-eye-slash text-emerald-400';
+            } else {
+                input.type = 'password';
+                icon.className = 'far fa-eye';
+            }
+        }
+
+        // Live Password Strength Indicator
+        function checkPasswordStrength() {
+            if (currentMode !== 'signup') return;
+            
+            const password = document.getElementById('password').value;
+            const container = document.getElementById('password-strength-container');
+            const bar = document.getElementById('strength-bar');
+            const text = document.getElementById('strength-text');
+
+            if (password.length === 0) {
+                container.classList.add('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+
+            let strength = 0;
+            if (password.length >= 8) strength += 25;
+            if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength += 25;
+            if (password.match(/\d/)) strength += 25;
+            if (password.match(/[^a-zA-Z0-9]/)) strength += 25;
+
+            bar.style.width = strength + '%';
+
+            if (strength <= 25) {
+                bar.className = 'strength-bar bg-red-500';
+                text.innerText = 'Weak';
+                text.className = 'text-[11px] font-semibold text-red-400';
+            } else if (strength <= 50) {
+                bar.className = 'strength-bar bg-amber-500';
+                text.innerText = 'Medium';
+                text.className = 'text-[11px] font-semibold text-amber-400';
+            } else if (strength <= 75) {
+                bar.className = 'strength-bar bg-blue-500';
+                text.innerText = 'Good';
+                text.className = 'text-[11px] font-semibold text-blue-400';
+            } else {
+                bar.className = 'strength-bar bg-emerald-500';
+                text.innerText = 'Strong';
+                text.className = 'text-[11px] font-semibold text-emerald-400';
+            }
+        }
+
+        // Handle Form Submission
+        function handleFormSubmit(event) {
+            event.preventDefault();
+
+            const fullname = document.getElementById('fullname').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const terms = document.getElementById('terms').checked;
+
+            // Simple Client Validation
+            let isValid = true;
+
+            if (currentMode === 'signup') {
+                if (!fullname) {
+                    document.getElementById('error-fullname').classList.remove('hidden');
+                    isValid = false;
+                } else {
+                    document.getElementById('error-fullname').classList.add('hidden');
+                }
+
+                if (password !== confirmPassword) {
+                    document.getElementById('error-confirm-password').classList.remove('hidden');
+                    isValid = false;
+                } else {
+                    document.getElementById('error-confirm-password').classList.add('hidden');
+                }
+
+                if (!terms) {
+                    showToast('Action Required', 'Please accept the Terms & Conditions.', 'warning');
+                    return;
+                }
+            }
+
+            if (!isValid) return;
+
+            // Trigger Loading State
+            setLoadingState(true);
+
+            // Simulate API Network Delay
+            setTimeout(() => {
+                setLoadingState(false);
+                if (currentMode === 'signup') {
+                    showToast('Account Created!', `Welcome aboard, ${fullname || 'User'}! Redirecting...`, 'success');
+                } else {
+                    showToast('Welcome Back!', 'Logging you into your dashboard...', 'success');
+                }
+            }, 1800);
+        }
+
+        // Button Loading State
+        function setLoadingState(isLoading) {
+            const btnText = document.getElementById('btn-text');
+            const btnIcon = document.getElementById('btn-icon');
+            const btnSpinner = document.getElementById('btn-spinner');
+            const submitBtn = document.getElementById('submit-btn');
+
+            if (isLoading) {
+                btnText.innerText = 'PROCESSING...';
+                btnIcon.classList.add('hidden');
+                btnSpinner.classList.remove('hidden');
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-80', 'cursor-not-allowed');
+            } else {
+                btnText.innerText = currentMode === 'signup' ? 'CREATE ACCOUNT' : 'LOG IN';
+                btnIcon.classList.remove('hidden');
+                btnSpinner.classList.add('hidden');
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-80', 'cursor-not-allowed');
+            }
+        }
+
+        // Display Toast Overlay Notification
+        function showToast(title, message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastTitle = document.getElementById('toast-title');
+            const toastMessage = document.getElementById('toast-message');
+
+            toastTitle.innerText = title;
+            toastMessage.innerText = message;
+
+            // Slide in toast
+            toast.classList.remove('translate-x-full');
+
+            // Slide out after 4 seconds
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+            }, 4000);
+        }
+
+        // Social Login Placeholder Interaction
+        function socialLogin(provider) {
+            showToast('Connecting...', `Redirecting to ${provider} authentication.`, 'info');
+        }
+
+        function resetFormState() {
+            document.getElementById('auth-form').reset();
+            switchMode('signup');
+        }
+    </script>
+</body>
+</html>
