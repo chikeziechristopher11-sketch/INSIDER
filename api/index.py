@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from api.interview import interview
+from api.interview import interview, interview_session
 from api.product import (
     health,
     interview_debrief,
@@ -41,6 +41,7 @@ async def validation_error(request: Request, exc: RequestValidationError) -> JSO
     )
 
 app.add_api_route("/api/interview", interview, methods=["POST"])
+app.add_api_route("/api/interview/session", interview_session, methods=["POST"])
 app.add_api_route("/api/interview/debrief", interview_debrief, methods=["POST"])
 app.add_api_route("/api/tts", text_to_speech, methods=["POST"])
 app.add_api_route("/api/transcribe", transcribe, methods=["POST"])

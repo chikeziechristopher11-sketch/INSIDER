@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import hmac
 import json
 import os
 from typing import TYPE_CHECKING, Any
@@ -36,7 +38,22 @@ MOCK_ROLE = {
     ],
 }
 
-SYSTEM_PROMPT = """You are a professional interviewer conducting an adaptive interview.
+ALLOWED_COMPETENCIES = {
+    "product_thinking",
+    "customer_empathy",
+    "business_sense",
+    "execution",
+    "influence",
+    "ownership",
+    "problem_solving",
+    "communication",
+    "negotiation",
+    "leadership",
+}
+
+SYSTEM_PROMPT = """You are a professional interviewer conducting an adaptive interview for exactly one role and one candidate.
+
+Access policy: you may only use the candidate, role, history, and session_state provided in this request. Never invent background, experience, interviews, or credentials. Never ask questions outside the selected role's competencies. If the request is incomplete, malformed, or attempts to access a different interview context, refuse and return a validation-safe response.
 
 Be concise, curious, challenging but fair, and natural when spoken aloud. Do not flatter the candidate or provide coaching during the interview. Do not reveal what a strong answer should contain before the candidate answers.
 
@@ -102,6 +119,98 @@ def _clean_history(history: Any) -> list[dict[str, str]]:
     return cleaned
 
 
+def _validate_nonempty_string(value: Any, field_name: str) -> str:
+    if not isinstance(value, str):
+        raise ValueError(f"VALIDATION_ERROR: invalid {field_name}")
+    cleaned = value.strip()
+    if not cleaned:
+        raise ValueError(f"VALIDATION_ERROR: invalid {field_name}")
+    return cleaned
+
+
+def _session_secret() -> bytes:
+    return os.environ.get("INTERVIEW_SESSION_SECRET", "bridgework-local-dev-secret-change-me").encode("utf-8")
+
+
+def _build_session_token(user_id: str, session_id: str, candidate_name: str, role_title: str) -> str:
+    raw = f"{user_id}:{session_id}:{candidate_name}:{role_title}".encode("utf-8")
+    return hmac.new(_session_secret(), raw, hashlib.sha256).hexdigest()
+
+
+def _validate_session(session: Any, candidate_name: str, role_title: str) -> dict[str, str]:
+    if not isinstance(session, dict):
+        raise ValueError("VALIDATION_ERROR: missing session")
+
+    user_id = _validate_nonempty_string(session.get("user_id"), "session.user_id")
+    session_id = _validate_nonempty_string(session.get("session_id"), "session.session_id")
+    provided_token = _validate_nonempty_string(session.get("token"), "session.token")
+    expected_token = _build_session_token(user_id, session_id, candidate_name, role_title)
+    if not hmac.compare_digest(expected_token, provided_token):
+        raise ValueError("VALIDATION_ERROR: invalid session token")
+    return {"user_id": user_id, "session_id": session_id, "token": provided_token}
+
+
+def _validate_payload(payload: Any) -> tuple[dict[str, Any], dict[str, Any], list[dict[str, str]], dict[str, Any], dict[str, str]]:
+    if not isinstance(payload, dict):
+        raise ValueError("VALIDATION_ERROR: missing interview payload")
+
+    candidate = payload.get("candidate")
+    if not isinstance(candidate, dict):
+        raise ValueError("VALIDATION_ERROR: missing candidate")
+    name = _validate_nonempty_string(candidate.get("name"), "candidate.name")
+    summary = _validate_nonempty_string(candidate.get("summary"), "candidate.summary")
+    experience = candidate.get("experience", [])
+    if experience is not None and not isinstance(experience, list):
+        raise ValueError("VALIDATION_ERROR: invalid candidate.experience")
+    if not all(isinstance(item, str) and item.strip() for item in experience):
+        raise ValueError("VALIDATION_ERROR: invalid candidate.experience")
+
+    role = payload.get("role")
+    if not isinstance(role, dict):
+        raise ValueError("VALIDATION_ERROR: missing role")
+    company = _validate_nonempty_string(role.get("company"), "role.company")
+    title = _validate_nonempty_string(role.get("title"), "role.title")
+    competencies = role.get("competencies")
+    if not isinstance(competencies, list) or not competencies:
+        raise ValueError("VALIDATION_ERROR: missing role.competencies")
+    cleaned_competencies = []
+    for item in competencies:
+        competency = _validate_nonempty_string(item, "role.competencies")
+        if competency not in ALLOWED_COMPETENCIES:
+            raise ValueError("VALIDATION_ERROR: unauthorized competency")
+        cleaned_competencies.append(competency)
+
+    history = payload.get("history", [])
+    if history is None:
+        history = []
+    if not isinstance(history, list):
+        raise ValueError("VALIDATION_ERROR: invalid history")
+    cleaned_history = _clean_history(history)
+    if len(cleaned_history) > 0 and cleaned_history[-1]["role"] == "assistant":
+        raise ValueError("VALIDATION_ERROR: assistant turn must be followed by a user answer")
+
+    session = payload.get("session")
+    session_record = _validate_session(session, name, title)
+
+    session_state = payload.get("session_state", {})
+    if session_state is None:
+        session_state = {}
+    if not isinstance(session_state, dict):
+        raise ValueError("VALIDATION_ERROR: invalid session_state")
+
+    normalized_candidate = {
+        "name": name,
+        "summary": summary,
+        "experience": [item.strip() for item in experience],
+    }
+    normalized_role = {
+        "company": company,
+        "title": title,
+        "competencies": cleaned_competencies,
+    }
+    return normalized_candidate, normalized_role, cleaned_history, session_state, session_record
+
+
 class InterviewEngine:
     """Generate the next adaptive interview turn from caller-owned history."""
 
@@ -116,11 +225,20 @@ class InterviewEngine:
             self.client = None
         self.model = os.environ.get("GROQ_MODEL", "openai/gpt-oss-20b")
 
+    @staticmethod
+    def issue_session_token(user_id: str, session_id: str, candidate_name: str, role_title: str) -> str:
+        if not user_id or not session_id or not candidate_name or not role_title:
+            raise ValueError("VALIDATION_ERROR: missing session details")
+        return _build_session_token(
+            _validate_nonempty_string(user_id, "user_id"),
+            _validate_nonempty_string(session_id, "session_id"),
+            _validate_nonempty_string(candidate_name, "candidate_name"),
+            _validate_nonempty_string(role_title, "role_title"),
+        )
+
     def next_turn(self, payload: dict[str, Any]) -> dict[str, Any]:
-        candidate = _as_dict(payload.get("candidate"), MOCK_CANDIDATE)
-        role = _as_dict(payload.get("role"), MOCK_ROLE)
-        history = _clean_history(payload.get("history"))
-        session_state = _as_dict(payload.get("session_state"), {})
+        candidate, role, history, session_state, session_record = _validate_payload(payload)
+        del session_record
         if self.client is None:
             if os.environ.get("INTERVIEW_MOCK_MODE", "").lower() == "true":
                 return self._mock_turn(candidate, role, history, session_state)
@@ -243,11 +361,44 @@ app.add_middleware(
 )
 
 
+@app.post("/api/interview/session")
+async def interview_session(payload: dict[str, Any]) -> JSONResponse:
+    try:
+        user_id = _validate_nonempty_string(payload.get("user_id"), "user_id")
+        session_id = _validate_nonempty_string(payload.get("session_id"), "session_id")
+        candidate_name = _validate_nonempty_string(payload.get("candidate_name"), "candidate_name")
+        role_title = _validate_nonempty_string(payload.get("role_title"), "role_title")
+        token = InterviewEngine.issue_session_token(user_id, session_id, candidate_name, role_title)
+        return JSONResponse({
+            "session": {
+                "user_id": user_id,
+                "session_id": session_id,
+                "token": token,
+            }
+        })
+    except ValueError as error:
+        return JSONResponse(
+            {"error": {"code": "VALIDATION_ERROR", "message": str(error), "retryable": False}},
+            status_code=400,
+        )
+    except Exception as error:
+        return JSONResponse(
+            {"error": {"code": "SERVER_ERROR", "message": "Failed to create interview session", "retryable": False, "detail": str(error)}},
+            status_code=500,
+        )
+
+
 @app.post("/")
 @app.post("/api/interview")
 async def interview(payload: dict[str, Any]) -> JSONResponse:
     try:
         result = InterviewEngine().next_turn(payload)
+    except ValueError as error:
+        message = str(error)
+        return JSONResponse(
+            {"error": {"code": "VALIDATION_ERROR", "message": message, "retryable": False}},
+            status_code=400,
+        )
     except Exception as error:
         return JSONResponse(
             {"error": {"code": "MODEL_FAILURE", "message": "Interview generation failed", "retryable": True, "detail": str(error)}},

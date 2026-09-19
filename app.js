@@ -35,6 +35,7 @@ let audio;
 let isAnswering = false;
 let recognition;
 let conversationHistory = [];
+let interviewSession = null;
 
 const questionText = document.querySelector('#question-text');
 const questionPrompt = document.querySelector('#question-prompt');
@@ -152,6 +153,34 @@ async function startMobileRecording() {
   transcriptText.textContent = 'Listening to your answer...';
 }
 
+async function ensureInterviewSession() {
+  if (interviewSession) return interviewSession;
+
+  const userId = localStorage.getItem('bridgework-user-id') || `user-${crypto.randomUUID()}`;
+  const sessionId = localStorage.getItem('bridgework-session-id') || `session-${crypto.randomUUID()}`;
+  localStorage.setItem('bridgework-user-id', userId);
+  localStorage.setItem('bridgework-session-id', sessionId);
+
+  const response = await fetch('/api/interview/session', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      user_id: userId,
+      session_id: sessionId,
+      candidate_name: 'Amaka Okafor',
+      role_title: 'Product Designer, Digital Channels'
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error('Could not create a secure interview session');
+  }
+
+  const data = await response.json();
+  interviewSession = data.session;
+  return interviewSession;
+}
+
 async function submitAnswer(answer) {
   const cleanAnswer = answer.trim();
   if (!cleanAnswer) {
@@ -161,6 +190,7 @@ async function submitAnswer(answer) {
 
   answerState.textContent = 'Thinking about your answer';
   try {
+    const session = await ensureInterviewSession();
     conversationHistory.push({ role: 'assistant', content: questionText.textContent });
     conversationHistory.push({ role: 'user', content: cleanAnswer });
     const response = await fetch('/api/interview', {
@@ -176,7 +206,8 @@ async function submitAnswer(answer) {
           title: 'Product Designer, Digital Channels',
           competencies: ['product_thinking', 'customer_empathy', 'business_sense', 'execution', 'influence']
         },
-        history: conversationHistory
+        history: conversationHistory,
+        session
       })
     });
     if (!response.ok) throw new Error('Interview request failed');
