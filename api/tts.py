@@ -31,6 +31,7 @@ async def synthesize(text: str, voice: str) -> bytes:
     return b"".join(chunks)
 
 
+@app.post("/")
 @app.post("/api/tts")
 async def text_to_speech(request: Request) -> Response:
     try:

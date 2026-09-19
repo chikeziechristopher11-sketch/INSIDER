@@ -204,6 +204,7 @@ app.add_middleware(
 )
 
 
+@app.post("/")
 @app.post("/api/interview")
 async def interview(payload: dict[str, Any]) -> JSONResponse:
     try:

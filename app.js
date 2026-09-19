@@ -1,3 +1,6 @@
+let answerBuffer = '';
+let answerPauseTimer;
+let isSubmittingAnswer = false;
 const questions = [
   {
     type: 'Product thinking',
@@ -28,6 +31,8 @@ const questions = [
 let currentQuestion = 0;
 let audio;
 let isAnswering = false;
+let recognition;
+let conversationHistory = [];
 
 const questionText = document.querySelector('#question-text');
 const questionPrompt = document.querySelector('#question-prompt');
@@ -47,6 +52,23 @@ const micLabel = document.querySelector('#mic-label');
 const answerState = document.querySelector('#answer-state');
 const transcriptText = document.querySelector('#transcript-text');
 const toast = document.querySelector('#toast');
+const themeToggle = document.querySelector('#theme-toggle');
+
+function applyTheme(theme) {
+  const dark = theme === 'dark';
+  document.body.dataset.theme = dark ? 'dark' : 'light';
+  themeToggle?.setAttribute('aria-pressed', String(dark));
+  themeToggle?.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+  if (themeToggle) {
+    themeToggle.querySelector('.theme-label').textContent = dark ? 'Light mode' : 'Dark mode';
+  }
+  localStorage.setItem('bridgework-theme', dark ? 'dark' : 'light');
+}
+
+applyTheme(localStorage.getItem('bridgework-theme') || 'light');
+themeToggle?.addEventListener('click', () => {
+  applyTheme(document.body.dataset.theme === 'dark' ? 'light' : 'dark');
+});
 
 function renderQuestion() {
   const question = questions[currentQuestion];
@@ -58,11 +80,134 @@ function renderQuestion() {
   questionCount.textContent = `${number} / ${String(questions.length).padStart(2, '0')}`;
   progressBar.style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
   listeningFor.textContent = question.listeningFor;
-  transcriptText.textContent = 'Your answer will appear here when voice input is connected. For now, use this room to test the coach voice.';
+  transcriptText.textContent = 'Press Start answer and speak naturally. Your transcript will appear here.';
   answerState.textContent = 'Ready when you are';
   isAnswering = false;
+  answerBuffer = '';
+  isSubmittingAnswer = false;
+  window.clearTimeout(answerPauseTimer);
   micLabel.textContent = 'Start answer';
   micButton.classList.remove('active');
+}
+
+function setListening(listening) {
+  isAnswering = listening;
+  micButton.classList.toggle('active', listening);
+  micLabel.textContent = listening ? 'Stop answer' : 'Start answer';
+  answerState.textContent = listening ? 'Listening for your answer' : 'Ready when you are';
+}
+
+function finishAnswer() {
+  window.clearTimeout(answerPauseTimer);
+  const answer = answerBuffer.trim();
+  answerBuffer = '';
+  if (!answer || isSubmittingAnswer) return;
+  isSubmittingAnswer = true;
+  recognition?.stop();
+  setListening(false);
+  submitAnswer(answer);
+}
+
+async function submitAnswer(answer) {
+  const cleanAnswer = answer.trim();
+  if (!cleanAnswer) {
+    answerState.textContent = 'No answer heard';
+    return;
+  }
+
+  answerState.textContent = 'Thinking about your answer';
+  try {
+    conversationHistory.push({ role: 'assistant', content: questionText.textContent });
+    conversationHistory.push({ role: 'user', content: cleanAnswer });
+    const response = await fetch('/api/interview', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        candidate: {
+          name: 'Amaka Okafor',
+          summary: 'Product designer with three years of fintech experience.'
+        },
+        role: {
+          company: 'GTCO',
+          title: 'Product Designer, Digital Channels',
+          competencies: ['product_thinking', 'customer_empathy', 'business_sense', 'execution', 'influence']
+        },
+        history: conversationHistory
+      })
+    });
+    if (!response.ok) throw new Error('Interview request failed');
+    const result = await response.json();
+    if (result.session_state?.interview_complete) {
+      answerState.textContent = 'Interview complete';
+      showToast('Your interview debrief is ready.');
+      return;
+    }
+
+    const next = result.question?.trim();
+    if (!next) throw new Error('Interview returned no question');
+    questionText.textContent = next;
+    questionType.textContent = result.competency || 'Follow-up';
+    answerState.textContent = 'Next question ready';
+    await speak(next);
+    isSubmittingAnswer = false;
+    setListening(true);
+    recognition?.start();
+  } catch {
+    answerState.textContent = 'Interview unavailable';
+    showToast('Could not reach /api/interview. Check your local server or Vercel function.');
+    isSubmittingAnswer = false;
+  }
+}
+
+function createSpeechRecognition() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) return null;
+
+  const instance = new SpeechRecognition();
+  instance.lang = 'en-NG';
+  instance.continuous = true;
+  instance.interimResults = true;
+  instance.onstart = () => {
+    setListening(true);
+    answerState.textContent = 'Listening...';
+    if (!answerBuffer) transcriptText.textContent = 'Speak now...';
+  };
+  instance.onresult = (event) => {
+    const transcript = Array.from(event.results)
+      .map((result) => result[0].transcript)
+      .join(' ');
+    answerBuffer = transcript;
+    transcriptText.textContent = answerBuffer;
+    if (event.results[event.results.length - 1].isFinal) {
+      window.clearTimeout(answerPauseTimer);
+      answerPauseTimer = window.setTimeout(finishAnswer, 1600);
+    }
+  };
+  instance.onerror = (event) => {
+    setListening(false);
+    answerState.textContent = event.error === 'not-allowed' ? 'Microphone permission denied' : 'Could not hear you';
+    showToast(event.error === 'not-allowed' ? 'Allow microphone access in your browser to answer.' : 'Try speaking again.');
+  };
+  instance.onend = () => {
+    if (isAnswering && !isSubmittingAnswer) {
+      try {
+        instance.start();
+      } catch {
+        setListening(false);
+      }
+    }
+  };
+  return instance;
+}
+
+async function requestMicrophonePermission() {
+  if (!navigator.mediaDevices?.getUserMedia) {
+    throw new Error('Microphone access is unavailable in this browser');
+  }
+  const permissionRequest = navigator.mediaDevices.getUserMedia({ audio: true });
+  const timeout = new Promise((resolve) => window.setTimeout(resolve, 2500));
+  const stream = await Promise.race([permissionRequest, timeout]);
+  if (stream?.getTracks) stream.getTracks().forEach((track) => track.stop());
 }
 
 async function speak(text) {
@@ -86,6 +231,7 @@ async function speak(text) {
     }, { once: true });
     await audio.play();
     playLabel.textContent = 'Playing question';
+    await new Promise((resolve) => audio.addEventListener('ended', resolve, { once: true }));
   } catch {
     playButton.disabled = false;
     playLabel.textContent = 'Voice unavailable';
@@ -106,16 +252,33 @@ nextQuestion.addEventListener('click', () => {
   currentQuestion = (currentQuestion + 1) % questions.length;
   renderQuestion();
 });
-micButton.addEventListener('click', () => {
-  isAnswering = !isAnswering;
-  micButton.classList.toggle('active', isAnswering);
-  micLabel.textContent = isAnswering ? 'Stop answer' : 'Start answer';
-  answerState.textContent = isAnswering ? 'Listening for your answer' : 'Answer paused';
-  if (isAnswering) transcriptText.textContent = 'Voice input is ready to connect. Your response will be transcribed here.';
+micButton.addEventListener('click', async () => {
+  if (!recognition) {
+    showToast('Speech recognition is not supported in this browser. Try Chrome or Edge.');
+    answerState.textContent = 'Speech recognition unavailable';
+    return;
+  }
+  if (isAnswering) {
+    window.clearTimeout(answerPauseTimer);
+    answerBuffer = '';
+    recognition.stop();
+    setListening(false);
+    return;
+  }
+  try {
+    await requestMicrophonePermission();
+    recognition.start();
+  } catch (error) {
+    answerState.textContent = 'Microphone permission required';
+    showToast(error.name === 'NotAllowedError'
+      ? 'Allow microphone access in your browser to answer.'
+      : 'The microphone could not be started. Check your browser settings.');
+  }
 });
 document.querySelector('.close-button').addEventListener('click', () => showToast('Interview room stays open for this local test.'));
 document.querySelector('.leave-button').addEventListener('click', () => showToast('Session ended. Your practice remains private.'));
 
+recognition = createSpeechRecognition();
 renderQuestion();
 const navItems = [...document.querySelectorAll('[data-screen]')];
 const crumb = document.querySelector('#crumb');
