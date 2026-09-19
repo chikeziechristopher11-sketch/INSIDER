@@ -213,6 +213,66 @@ body {
 }
 
 /* =========================
+   TRACK SELECTION
+========================= */
+
+.track-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.track-card {
+  position: relative;
+  text-align: left;
+  padding: 25px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.track-card:hover {
+  border-color: var(--green);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(9, 38, 74, 0.08);
+}
+
+.track-icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: var(--green-light);
+  color: var(--green-dark);
+  font-size: 18px;
+  margin-bottom: 16px;
+}
+
+.track-card h3 {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.track-card p {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+  padding-right: 10px;
+}
+
+.track-arrow {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  color: var(--green);
+  font-size: 17px;
+}
+
+/* =========================
    INTRO SCREEN
 ========================= */
 
@@ -497,6 +557,10 @@ body {
 ========================= */
 
 @media (max-width: 700px) {
+  .track-grid {
+    grid-template-columns: 1fr;
+  }
+
   .mobile-header {
     height: 70px;
     display: flex;

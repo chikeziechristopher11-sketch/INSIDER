@@ -189,6 +189,130 @@ QUESTION_BANK: list[dict[str, Any]] = [
     },
 ]
 
+# Track-specific technical/domain questions, layered on top of the
+# core reasoning categories above (which every track shares).
+TRACK_QUESTIONS: dict[str, list[dict[str, Any]]] = {
+    "software_engineer": [
+        {
+            "id": "sw-1",
+            "category": "technical",
+            "question": "What is the time complexity of binary search on a sorted array of n elements?",
+            "options": ["O(n)", "O(log n)", "O(n log n)", "O(1)"],
+            "correct_index": 1,
+        },
+        {
+            "id": "sw-2",
+            "category": "technical",
+            "question": "Which HTTP status code means 'Not Found'?",
+            "options": ["200", "301", "404", "500"],
+            "correct_index": 2,
+        },
+        {
+            "id": "sw-3",
+            "category": "technical",
+            "question": "In Git, which command creates a new branch and switches to it in one step?",
+            "options": ["git branch new", "git checkout -b new", "git merge new", "git clone new"],
+            "correct_index": 1,
+        },
+        {
+            "id": "sw-4",
+            "category": "technical",
+            "question": "What does a SQL JOIN do?",
+            "options": [
+                "Deletes rows from a table",
+                "Combines rows from two tables based on a related column",
+                "Sorts a table alphabetically",
+                "Creates a database index",
+            ],
+            "correct_index": 1,
+        },
+        {
+            "id": "sw-5",
+            "category": "technical",
+            "question": "A function that calls itself to solve smaller instances of the same problem is called:",
+            "options": ["Iteration", "Recursion", "Polymorphism", "Encapsulation"],
+            "correct_index": 1,
+        },
+        {
+            "id": "sw-6",
+            "category": "technical",
+            "question": "Which data structure follows LIFO (Last In, First Out)?",
+            "options": ["Queue", "Stack", "Array", "Linked list"],
+            "correct_index": 1,
+        },
+    ],
+    "marketer": [
+        {
+            "id": "mk-1",
+            "category": "marketing",
+            "question": "What does CAC stand for in marketing?",
+            "options": [
+                "Customer Acquisition Cost",
+                "Customer Analytics Center",
+                "Content Advertising Cost",
+                "Client Account Code",
+            ],
+            "correct_index": 0,
+        },
+        {
+            "id": "mk-2",
+            "category": "marketing",
+            "question": "In an A/B test, what is the 'control' group?",
+            "options": [
+                "The group that sees the new version",
+                "The group that sees the original, unchanged version",
+                "The group that opts out of the test",
+                "The group with the highest conversion rate",
+            ],
+            "correct_index": 1,
+        },
+        {
+            "id": "mk-3",
+            "category": "marketing",
+            "question": "Which metric measures the percentage of visitors who take a desired action?",
+            "options": ["Bounce rate", "Conversion rate", "Churn rate", "Impression rate"],
+            "correct_index": 1,
+        },
+        {
+            "id": "mk-4",
+            "category": "marketing",
+            "question": "What does CTR stand for?",
+            "options": ["Cost To Revenue", "Click Through Rate", "Customer Trust Rating", "Content Traffic Ratio"],
+            "correct_index": 1,
+        },
+        {
+            "id": "mk-5",
+            "category": "marketing",
+            "question": "If Customer Lifetime Value (LTV) is lower than Customer Acquisition Cost (CAC), what does that generally mean?",
+            "options": [
+                "The business is profitable per customer",
+                "The business is losing money acquiring customers",
+                "The marketing channel should be scaled up immediately",
+                "Nothing meaningful — this is normal",
+            ],
+            "correct_index": 1,
+        },
+        {
+            "id": "mk-6",
+            "category": "marketing",
+            "question": "What is 'organic reach' in social media marketing?",
+            "options": [
+                "Reach gained through paid ads",
+                "Reach gained without paid promotion",
+                "Reach measured only through email",
+                "Reach measured in revenue",
+            ],
+            "correct_index": 1,
+        },
+    ],
+}
+
+TRACK_LABELS = {
+    "general": "General",
+    "software_engineer": "Software Engineer",
+    "marketer": "Marketer",
+}
+
 
 def _public_question(item: dict[str, Any]) -> dict[str, Any]:
     return {
@@ -199,11 +323,31 @@ def _public_question(item: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+async def aptitude_tracks() -> JSONResponse:
+    return JSONResponse({
+        "tracks": [
+            {"id": track_id, "label": label}
+            for track_id, label in TRACK_LABELS.items()
+        ],
+    })
+
+
+def _question_pool(track: str) -> list[dict[str, Any]]:
+    pool = list(QUESTION_BANK)
+    pool.extend(TRACK_QUESTIONS.get(track, []))
+    return pool
+
+
 async def aptitude_start(payload: dict[str, Any]) -> JSONResponse:
-    count = min(int(payload.get("count", 12)), len(QUESTION_BANK))
+    track = payload.get("track") or "general"
+    if track not in TRACK_LABELS:
+        track = "general"
+
+    bank = _question_pool(track)
+    count = min(int(payload.get("count", 12)), len(bank))
 
     categories: dict[str, list[dict[str, Any]]] = {}
-    for item in QUESTION_BANK:
+    for item in bank:
         categories.setdefault(item["category"], []).append(item)
 
     selected: list[dict[str, Any]] = []
@@ -221,6 +365,7 @@ async def aptitude_start(payload: dict[str, Any]) -> JSONResponse:
         "questions": [_public_question(item) for item in selected],
         "duration_seconds": len(selected) * 60,
         "total": len(selected),
+        "track": track,
     })
 
 
@@ -232,7 +377,10 @@ async def aptitude_submit(payload: dict[str, Any]) -> JSONResponse:
             status_code=400,
         )
 
-    lookup = {item["id"]: item for item in QUESTION_BANK}
+    all_questions = list(QUESTION_BANK)
+    for track_items in TRACK_QUESTIONS.values():
+        all_questions.extend(track_items)
+    lookup = {item["id"]: item for item in all_questions}
     results: list[dict[str, Any]] = []
     category_totals: dict[str, dict[str, int]] = {}
 

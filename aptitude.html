@@ -65,23 +65,45 @@
 
     <!-- MAIN -->
     <main class="main-content">
-      <!-- INTRO SCREEN -->
-      <section class="screen active" id="introScreen">
+      <!-- TRACK SELECTION SCREEN -->
+      <section class="screen active" id="trackScreen">
         <div class="screen-heading">
           <p class="small-label">APTITUDE TEST</p>
+
+          <h1>Choose your track.</h1>
+
+          <p>
+            Core reasoning questions are the same for everyone — pick a
+            track to add role-specific questions on top.
+          </p>
+        </div>
+
+        <div class="track-grid" id="trackGrid">
+          <p>Loading tracks...</p>
+        </div>
+      </section>
+
+      <!-- INTRO SCREEN -->
+      <section class="screen hidden" id="introScreen">
+        <button class="button secondary" id="backToTracksBtn" type="button">
+          ← Change track
+        </button>
+
+        <div class="screen-heading">
+          <p class="small-label">APTITUDE TEST · <span id="selectedTrackLabel">General</span></p>
 
           <h1>Show what you can actually do.</h1>
 
           <p>
-            12 timed questions across numerical, logical, verbal reasoning
-            and attention to detail — the same categories most employers
-            screen candidates on.
+            Timed questions across numerical, logical, verbal reasoning and
+            attention to detail — the same categories most employers screen
+            candidates on.
           </p>
         </div>
 
         <div class="intro-card">
           <div class="intro-stat">
-            <strong>12</strong>
+            <strong id="introCount">12</strong>
             <span>Questions</span>
           </div>
 
@@ -91,7 +113,7 @@
           </div>
 
           <div class="intro-stat">
-            <strong>4</strong>
+            <strong id="introCategories">4</strong>
             <span>Categories</span>
           </div>
         </div>

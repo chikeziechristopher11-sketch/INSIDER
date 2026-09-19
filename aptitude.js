@@ -28,12 +28,19 @@ if (logoutBtn) {
 // ELEMENTS
 // =========================================
 
+const trackScreen = document.getElementById("trackScreen");
 const introScreen = document.getElementById("introScreen");
 const testScreen = document.getElementById("testScreen");
 const resultsScreen = document.getElementById("resultsScreen");
 
+const trackGrid = document.getElementById("trackGrid");
+const backToTracksBtn = document.getElementById("backToTracksBtn");
+const selectedTrackLabel = document.getElementById("selectedTrackLabel");
+
 const startTestBtn = document.getElementById("startTestBtn");
 const introDuration = document.getElementById("introDuration");
+const introCount = document.getElementById("introCount");
+const introCategories = document.getElementById("introCategories");
 
 const questionCounter = document.getElementById("questionCounter");
 const categoryPill = document.getElementById("categoryPill");
@@ -58,6 +65,20 @@ const CATEGORY_LABELS = {
   logical: "Logical",
   verbal: "Verbal",
   attention: "Attention to detail",
+  technical: "Technical",
+  marketing: "Marketing",
+};
+
+const TRACK_ICONS = {
+  general: "fa-layer-group",
+  software_engineer: "fa-code",
+  marketer: "fa-bullhorn",
+};
+
+const TRACK_DESCRIPTIONS = {
+  general: "Core reasoning only — numerical, logical, verbal, attention to detail.",
+  software_engineer: "Core reasoning plus technical questions on algorithms, git, SQL and data structures.",
+  marketer: "Core reasoning plus marketing questions on CAC, LTV, conversion and campaign metrics.",
 };
 
 // =========================================
@@ -69,13 +90,56 @@ let answers = {}; // { [questionId]: selectedIndex }
 let currentIndex = 0;
 let secondsRemaining = 0;
 let timerInterval = null;
+let selectedTrack = "general";
 
 function showScreen(screen) {
-  [introScreen, testScreen, resultsScreen].forEach((el) => {
+  [trackScreen, introScreen, testScreen, resultsScreen].forEach((el) => {
     el.classList.toggle("hidden", el !== screen);
     el.classList.toggle("active", el === screen);
   });
 }
+
+// =========================================
+// TRACK SELECTION
+// =========================================
+
+async function loadTracks() {
+  try {
+    const response = await fetch("/api/aptitude/tracks");
+    if (!response.ok) throw new Error("Could not load tracks");
+    const data = await response.json();
+
+    trackGrid.innerHTML = "";
+    data.tracks.forEach((track) => {
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "track-card";
+      card.innerHTML = `
+        <div class="track-icon"><i class="fa-solid ${TRACK_ICONS[track.id] || "fa-layer-group"}"></i></div>
+        <h3>${track.label}</h3>
+        <p>${TRACK_DESCRIPTIONS[track.id] || ""}</p>
+        <span class="track-arrow">→</span>
+      `;
+      card.addEventListener("click", () => selectTrack(track.id, track.label));
+      trackGrid.appendChild(card);
+    });
+  } catch (error) {
+    console.error("Failed to load tracks:", error);
+    trackGrid.innerHTML = "<p>Could not load tracks. Refresh and try again.</p>";
+  }
+}
+
+function selectTrack(trackId, trackLabel) {
+  selectedTrack = trackId;
+  selectedTrackLabel.textContent = trackLabel;
+  showScreen(introScreen);
+}
+
+if (backToTracksBtn) {
+  backToTracksBtn.addEventListener("click", () => showScreen(trackScreen));
+}
+
+loadTracks();
 
 // =========================================
 // START TEST
@@ -89,7 +153,7 @@ async function startTest() {
     const response = await fetch("/api/aptitude/start", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ count: 12 }),
+      body: JSON.stringify({ count: 12, track: selectedTrack }),
     });
 
     if (!response.ok) throw new Error("Could not load the aptitude test");
@@ -99,6 +163,9 @@ async function startTest() {
     secondsRemaining = data.duration_seconds;
     answers = {};
     currentIndex = 0;
+
+    introCount.textContent = questions.length;
+    introCategories.textContent = new Set(questions.map((q) => q.category)).size;
 
     showScreen(testScreen);
     renderQuestion();

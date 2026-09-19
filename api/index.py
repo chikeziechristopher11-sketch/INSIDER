@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from api.aptitude import aptitude_start, aptitude_submit
+from api.aptitude import aptitude_start, aptitude_submit, aptitude_tracks
 from api.interview import interview
 from api.product import (
     health,
@@ -56,6 +56,7 @@ app.add_api_route("/api/opportunities", opportunities, methods=["GET"])
 app.add_api_route("/api/opportunities/{opportunity_id}", opportunity_detail, methods=["GET"])
 app.add_api_route("/api/opportunities/research", opportunity_research, methods=["POST"])
 app.add_api_route("/api/readiness", readiness, methods=["POST"])
+app.add_api_route("/api/aptitude/tracks", aptitude_tracks, methods=["GET"])
 app.add_api_route("/api/aptitude/start", aptitude_start, methods=["POST"])
 app.add_api_route("/api/aptitude/submit", aptitude_submit, methods=["POST"])
 app.mount("/", StaticFiles(directory=Path(__file__).resolve().parent.parent, html=True), name="frontend")
