@@ -648,9 +648,11 @@ body {
 
   background: white;
 
-  border-radius: 16px;
+  border-radius: 20px;
 
-  padding: 28px;
+  padding: 0;
+
+  box-shadow: 0 30px 70px rgba(9, 38, 74, 0.25);
 }
 
 .modal-header {
@@ -659,28 +661,52 @@ body {
   align-items: flex-start;
   justify-content: space-between;
 
-  margin-bottom: 25px;
+  padding: 30px 32px 24px;
+
+  background: linear-gradient(135deg, #09264a, #0f3766);
+
+  border-radius: 20px 20px 0 0;
+
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.modal-header .small-label {
+  color: #5fe0a0;
 }
 
 .modal-header h2 {
   font-size: 23px;
+
+  color: white;
 }
 
 .modal-header button {
   border: none;
 
-  background: #f1f4f7;
+  background: rgba(255, 255, 255, 0.12);
 
   width: 35px;
   height: 35px;
 
   border-radius: 50%;
 
-  font-size: 22px;
+  font-size: 20px;
 
   cursor: pointer;
 
-  color: #617287;
+  color: white;
+
+  transition: 0.2s;
+}
+
+.modal-header button:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.modal form {
+  padding: 28px 32px 32px;
 }
 
 /* =========================
@@ -702,26 +728,34 @@ body {
 .form-group label {
   display: block;
 
-  font-size: 13px;
+  font-size: 12px;
 
   font-weight: 700;
 
-  margin-bottom: 7px;
+  letter-spacing: 0.3px;
+
+  text-transform: uppercase;
+
+  color: #526579;
+
+  margin-bottom: 8px;
 }
 
 .form-group input,
 .form-group textarea {
   width: 100%;
 
-  border: 1px solid #dce4eb;
+  border: 1.5px solid #e5ebf1;
 
-  border-radius: 8px;
+  border-radius: 10px;
 
-  padding: 12px 13px;
+  background: #f8fafc;
+
+  padding: 12px 14px;
 
   font-family: inherit;
 
-  font-size: 13px;
+  font-size: 13.5px;
 
   color: #09264a;
 
@@ -730,11 +764,18 @@ body {
   transition: 0.2s;
 }
 
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #a3b1c2;
+}
+
 .form-group input:focus,
 .form-group textarea:focus {
   border-color: #00a651;
 
-  box-shadow: 0 0 0 3px rgba(0, 166, 81, 0.08);
+  background: white;
+
+  box-shadow: 0 0 0 4px rgba(0, 166, 81, 0.1);
 }
 
 .form-group textarea {
@@ -907,9 +948,15 @@ body {
   }
 
   .modal {
-    padding: 20px;
-
     max-height: 92vh;
+  }
+
+  .modal-header {
+    padding: 24px 22px 20px;
+  }
+
+  .modal form {
+    padding: 22px 22px 26px;
   }
 }
 /* =========================================

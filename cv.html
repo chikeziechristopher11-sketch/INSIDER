@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="icon" type="image/png" href="insider-logo.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="cv.css" />
+
+    <title>My CV | Insider</title>
+  </head>
+
+  <body>
+    <!-- TOOLBAR (hidden when printing) -->
+    <div class="cv-toolbar">
+      <a href="profile.html" class="toolbar-link">
+        <i class="fa-solid fa-arrow-left"></i> Back to Profile
+      </a>
+
+      <button class="toolbar-btn" id="downloadBtn" type="button">
+        <i class="fa-solid fa-download"></i> Download as PDF
+      </button>
+    </div>
+
+    <!-- CV DOCUMENT -->
+    <main class="cv-page" id="cvPage">
+      <header class="cv-header">
+        <h1 id="cvName">Your Name</h1>
+        <p class="cv-role" id="cvRole">Your professional role</p>
+
+        <div class="cv-contact" id="cvContact"></div>
+      </header>
+
+      <section class="cv-section" id="cvAboutSection">
+        <h2>Summary</h2>
+        <p id="cvAbout"></p>
+      </section>
+
+      <section class="cv-section" id="cvSkillsSection">
+        <h2>Skills</h2>
+        <div class="cv-skills" id="cvSkills"></div>
+      </section>
+
+      <section class="cv-section" id="cvExperienceSection">
+        <h2>Experience</h2>
+        <p id="cvExperience"></p>
+      </section>
+
+      <section class="cv-section" id="cvProjectsSection">
+        <h2>Projects</h2>
+        <p id="cvProjects"></p>
+      </section>
+
+      <section class="cv-section" id="cvAchievementsSection">
+        <h2>Achievements</h2>
+        <p id="cvAchievements"></p>
+      </section>
+
+      <section class="cv-section" id="cvEducationSection">
+        <h2>Certifications &amp; Education</h2>
+        <p id="cvEducation"></p>
+      </section>
+
+      <section class="cv-section" id="cvLinksSection">
+        <h2>Links</h2>
+        <div class="cv-links" id="cvLinks"></div>
+      </section>
+
+      <div class="cv-empty-notice hidden" id="cvEmptyNotice">
+        <p>
+          Your profile is mostly empty, so this CV won't have much on it yet.
+          <a href="profile.html">Go build your profile →</a>
+        </p>
+      </div>
+    </main>
+
+    <script src="cv.js"></script>
+  </body>
+</html>
