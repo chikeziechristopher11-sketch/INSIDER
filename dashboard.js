@@ -10,9 +10,9 @@ if (menuBtn && sidebar) {
     menuBtn.addEventListener("click", () => {
         sidebar.classList.toggle("show");
 
-        menuBtn.textContent = sidebar.classList.contains("show")
-            ? "✕"
-            : "☰";
+        menuBtn.innerHTML = sidebar.classList.contains("show")
+            ? '<i class="fa-solid fa-xmark"></i>'
+            : '<i class="fa-solid fa-bars"></i>';
     });
 }
 

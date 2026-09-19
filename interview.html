@@ -7,6 +7,7 @@
 
     <link rel="icon" type="image/png" href="insider-logo.png" />
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <link rel="stylesheet" href="interview.css" />
     <link rel="stylesheet" href="theme.css" />
 
@@ -21,7 +22,7 @@
     <header class="mobile-header">
       <img src="insider-logo.png" alt="Insider" />
 
-      <button id="menuBtn" type="button" aria-label="Open menu">☰</button>
+      <button id="menuBtn" type="button" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
     </header>
 
     <!-- =========================================
@@ -37,33 +38,34 @@
 
       <nav>
         <a href="dashboard.html" class="nav-item">
-          <span>⌂</span>
+          <span><i class="fa-solid fa-house"></i></span>
           Home
         </a>
 
         <a href="profile.html" class="nav-item">
-          <span>👤</span>
+          <span><i class="fa-solid fa-user"></i></span>
           My Profile
         </a>
 
-        
-
         <a href="interview.html" class="nav-item active">
-          <span>🎤</span>
+          <span><i class="fa-solid fa-microphone"></i></span>
           Interview Practice
         </a>
 
-        
+        <a href="aptitude.html" class="nav-item">
+          <span><i class="fa-solid fa-brain"></i></span>
+          Aptitude Test
+        </a>
       </nav>
 
       <div class="sidebar-bottom">
         <a href="settings.html" class="nav-item">
-          <span>⚙</span>
+          <span><i class="fa-solid fa-gear"></i></span>
           Settings
         </a>
 
         <button class="logout-btn" id="logoutBtn" type="button">
-          <span>↪</span>
+          <span><i class="fa-solid fa-arrow-right-from-bracket"></i></span>
 
           Log Out
         </button>
@@ -83,7 +85,7 @@
         <div>
           <p class="small-label">INTERVIEW PRACTICE</p>
 
-          <h1>Prepare for your next opportunity 🎤</h1>
+          <h1>Prepare for your next opportunity</h1>
 
           <p class="top-description">
             Practice a realistic AI-powered interview based on the company and
@@ -93,7 +95,7 @@
 
         <div class="user-area">
           <div class="notification">
-            🔔
+            <i class="fa-regular fa-bell"></i>
 
             <span></span>
           </div>
@@ -287,7 +289,7 @@
                 type="button"
                 title="Hear question"
               >
-                🔊
+                <i class="fa-solid fa-volume-high"></i>
               </button>
             </div>
 
@@ -305,7 +307,7 @@
 
             <div class="listening-card">
               <div class="listening-header">
-                <div class="listening-icon">🎧</div>
+                <div class="listening-icon"><i class="fa-solid fa-headphones"></i></div>
 
                 <div>
                   <h3>What I'm listening for</h3>
@@ -330,7 +332,7 @@
 
               <div class="transcript-box" id="transcriptText">
                 <div class="transcript-placeholder">
-                  🎙️
+                  <i class="fa-solid fa-microphone"></i>
 
                   <span>
                     Your answer will appear here when you start speaking.
@@ -345,7 +347,7 @@
               <button class="voice-answer-btn" id="micButton" type="button">
                 <span class="mic-pulse" id="micPulse"></span>
 
-                <span class="mic-icon"> 🎙️ </span>
+                <span class="mic-icon"> <i class="fa-solid fa-microphone"></i> </span>
               </button>
 
               <strong id="micLabel"> Start Answer </strong>
@@ -355,7 +357,7 @@
               </span>
 
               <button class="type-instead-link" id="typeInsteadBtn" type="button">
-                ⌨ Type my answer instead
+                <i class="fa-solid fa-keyboard"></i> Type my answer instead
               </button>
             </div>
 
@@ -375,7 +377,7 @@
                   id="backToVoiceBtn"
                   type="button"
                 >
-                  🎙️ Use voice instead
+                  <i class="fa-solid fa-microphone"></i> Use voice instead
                 </button>
 
                 <button
@@ -391,7 +393,7 @@
             <!-- LIVE EVIDENCE -->
 
             <div class="live-evidence hidden" id="liveEvidence">
-              <div class="evidence-title">🔎 Evidence detected</div>
+              <div class="evidence-title"><i class="fa-solid fa-magnifying-glass"></i> Evidence detected</div>
 
               <div id="evidenceText"></div>
             </div>
@@ -400,7 +402,7 @@
 
             <div class="voice-controls">
               <button class="control-button" id="muteButton" type="button">
-                🔇 Mute AI
+                <i class="fa-solid fa-volume-xmark"></i> Mute AI
               </button>
 
               <button
@@ -417,7 +419,7 @@
         <!-- TIP -->
 
         <div class="interview-tip">
-          <span> 💡 </span>
+          <span> <i class="fa-solid fa-lightbulb"></i> </span>
 
           <p>
             <strong>Tip:</strong>
@@ -435,7 +437,7 @@
 
       <section class="interview-screen hidden" id="debriefScreen">
         <div class="debrief-header">
-          <div class="debrief-icon">✨</div>
+          <div class="debrief-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
 
           <p class="small-label">INTERVIEW COMPLETE</p>
 
@@ -451,7 +453,7 @@
 
         <div class="debrief-stats">
           <div class="stat-card">
-            <span class="stat-icon"> 🎯 </span>
+            <span class="stat-icon"> <i class="fa-solid fa-bullseye"></i> </span>
 
             <strong id="performanceScore"> — </strong>
 
@@ -459,7 +461,7 @@
           </div>
 
           <div class="stat-card">
-            <span class="stat-icon"> 🔎 </span>
+            <span class="stat-icon"> <i class="fa-solid fa-magnifying-glass"></i> </span>
 
             <strong id="evidenceCount"> 0 </strong>
 
@@ -467,7 +469,7 @@
           </div>
 
           <div class="stat-card">
-            <span class="stat-icon"> 📈 </span>
+            <span class="stat-icon"> <i class="fa-solid fa-chart-line"></i> </span>
 
             <strong id="progressScore"> 0% </strong>
 
@@ -479,7 +481,7 @@
 
         <div class="debrief-summary-card">
           <div class="debrief-card-header">
-            <span> 🧠 </span>
+            <span> <i class="fa-solid fa-brain"></i> </span>
 
             <h3>Overall assessment</h3>
           </div>
@@ -492,7 +494,7 @@
         <div class="debrief-grid">
           <div class="debrief-card">
             <div class="debrief-card-header">
-              <span> 💪 </span>
+              <span> <i class="fa-solid fa-hand-fist"></i> </span>
 
               <h3>Strengths</h3>
             </div>
@@ -504,7 +506,7 @@
 
           <div class="debrief-card">
             <div class="debrief-card-header">
-              <span> 🎯 </span>
+              <span> <i class="fa-solid fa-bullseye"></i> </span>
 
               <h3>Evidence Gaps</h3>
             </div>
@@ -516,7 +518,7 @@
 
           <div class="debrief-card">
             <div class="debrief-card-header">
-              <span> 🧑‍🏫 </span>
+              <span> <i class="fa-solid fa-chalkboard-user"></i> </span>
 
               <h3>Coaching</h3>
             </div>
@@ -561,7 +563,7 @@
 
         <div class="next-steps-card">
           <div class="debrief-card-header">
-            <span> 🚀 </span>
+            <span> <i class="fa-solid fa-rocket"></i> </span>
 
             <h3>Recommended next steps</h3>
           </div>
@@ -589,7 +591,7 @@
 
     <div class="confirm-overlay" id="exitConfirm">
       <div class="confirm-modal">
-        <div class="confirm-icon">⚠️</div>
+        <div class="confirm-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
 
         <h2>End this interview?</h2>
 

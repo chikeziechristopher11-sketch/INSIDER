@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <link rel="icon" type="image/png" href="insider-logo.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <link rel="stylesheet" href="profile.css" />
     <link rel="stylesheet" href="theme.css" />
 
@@ -19,7 +20,7 @@
     <header class="mobile-header">
       <img src="insider-logo.png" alt="Insider" />
 
-      <button id="menuBtn" aria-label="Open menu">☰</button>
+      <button id="menuBtn" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
     </header>
 
     <!-- =========================================
@@ -35,33 +36,34 @@
 
       <nav>
         <a href="dashboard.html" class="nav-item">
-          <span>⌂</span>
+          <span><i class="fa-solid fa-house"></i></span>
           Home
         </a>
 
         <a href="profile.html" class="nav-item active">
-          <span>👤</span>
+          <span><i class="fa-solid fa-user"></i></span>
           My Profile
         </a>
 
-        
-
         <a href="interview.html" class="nav-item">
-          <span>🎤</span>
+          <span><i class="fa-solid fa-microphone"></i></span>
           Interview Practice
         </a>
 
-        
+        <a href="aptitude.html" class="nav-item">
+          <span><i class="fa-solid fa-brain"></i></span>
+          Aptitude Test
+        </a>
       </nav>
 
       <div class="sidebar-bottom">
         <a href="settings.html" class="nav-item">
-          <span>⚙</span>
+          <span><i class="fa-solid fa-gear"></i></span>
           Settings
         </a>
 
         <button class="logout-btn" id="logoutBtn" type="button">
-          <span>↪</span>
+          <span><i class="fa-solid fa-arrow-right-from-bracket"></i></span>
           Log Out
         </button>
       </div>
@@ -90,7 +92,7 @@
 
         <div class="user-area">
           <div class="notification">
-            🔔
+            <i class="fa-regular fa-bell"></i>
             <span></span>
           </div>
 
@@ -112,13 +114,13 @@
             <p id="profileRole">Add your professional role</p>
 
             <span class="location" id="profileLocation">
-              📍 Add your location
+              Add your location
             </span>
           </div>
         </div>
 
         <button class="edit-profile-btn" id="editProfileBtn" type="button">
-          ✏ Edit Profile
+          <i class="fa-solid fa-pen"></i> Edit Profile
         </button>
       </section>
 
@@ -199,7 +201,7 @@
 
           <div id="experienceContent">
             <div class="empty-state">
-              <div>💼</div>
+              <div><i class="fa-solid fa-clipboard"></i></div>
 
               <p>No experience added yet.</p>
             </div>
@@ -219,7 +221,7 @@
 
           <div id="projectsContent">
             <div class="empty-state">
-              <div>🚀</div>
+              <div><i class="fa-solid fa-clipboard"></i></div>
 
               <p>No projects added yet.</p>
             </div>
@@ -239,7 +241,7 @@
 
           <div id="achievementsContent">
             <div class="empty-state">
-              <div>🏆</div>
+              <div><i class="fa-solid fa-clipboard"></i></div>
 
               <p>No achievements added yet.</p>
             </div>
@@ -259,7 +261,7 @@
 
           <div id="educationContent">
             <div class="empty-state">
-              <div>🎓</div>
+              <div><i class="fa-solid fa-clipboard"></i></div>
 
               <p>No certifications added yet.</p>
             </div>
@@ -314,7 +316,7 @@
               target="_blank"
               rel="noopener noreferrer"
             >
-              <span> 🌐 </span>
+              <span> <i class="fa-solid fa-globe"></i> </span>
 
               <div>
                 <strong> Portfolio </strong>
@@ -330,7 +332,7 @@
             ====================================== -->
 
         <section class="profile-card full-width cv-card">
-          <div class="cv-icon">📄</div>
+          <div class="cv-icon"><i class="fa-solid fa-file-lines"></i></div>
 
           <div class="cv-info">
             <h2>Your CV</h2>
@@ -341,7 +343,7 @@
             </p>
 
             <div class="cv-file-info" id="cvFileInfo" style="display: none">
-              <span> 📎 </span>
+              <span> <i class="fa-solid fa-paperclip"></i> </span>
 
               <strong id="cvFileName"> CV uploaded </strong>
             </div>
@@ -529,7 +531,7 @@
 
     <div class="confirm-overlay" id="confirmOverlay">
       <div class="confirm-modal">
-        <div class="confirm-icon">🗑️</div>
+        <div class="confirm-icon"><i class="fa-solid fa-trash"></i></div>
 
         <h2>Remove CV?</h2>
 

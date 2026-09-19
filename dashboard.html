@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <link rel="icon" type="image/png" href="insider-logo.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <link rel="stylesheet" href="dashboard.css" />
     <link rel="stylesheet" href="theme.css" />
 
@@ -16,7 +17,7 @@
     <header class="mobile-header">
       <img src="insider-logo.png" alt="Insider" />
 
-      <button id="menuBtn">☰</button>
+      <button id="menuBtn"><i class="fa-solid fa-bars"></i></button>
     </header>
 
     <!-- SIDEBAR -->
@@ -29,35 +30,34 @@
 
       <nav>
         <a href="#" class="nav-item active">
-          <span>⌂</span>
+          <span><i class="fa-solid fa-house"></i></span>
           Home
         </a>
 
         <a href="profile.html" class="nav-item">
-          <span>👤</span>
+          <span><i class="fa-solid fa-user"></i></span>
           My Profile
         </a>
 
-       
-
         <a href="interview.html" class="nav-item">
-          <span>🎤</span>
+          <span><i class="fa-solid fa-microphone"></i></span>
           Interview Practice
         </a>
 
-        
-
-        
+        <a href="aptitude.html" class="nav-item">
+          <span><i class="fa-solid fa-brain"></i></span>
+          Aptitude Test
+        </a>
       </nav>
 
       <div class="sidebar-bottom">
         <a href="settings.html" class="nav-item">
-          <span>⚙</span>
+          <span><i class="fa-solid fa-gear"></i></span>
           Settings
         </a>
 
         <button class="logout-btn" id="logoutBtn">
-          <span>↪</span>
+          <span><i class="fa-solid fa-arrow-right-from-bracket"></i></span>
           Log Out
         </button>
       </div>
@@ -70,12 +70,12 @@
         <div>
           <p class="small-label">YOUR DASHBOARD</p>
 
-          <h1>Welcome back, <span>Chris</span> 👋</h1>
+          <h1>Welcome back, <span>Chris</span></h1>
         </div>
 
         <div class="user-area">
           <div class="notification">
-            🔔
+            <i class="fa-regular fa-bell"></i>
             <span></span>
           </div>
 
@@ -86,7 +86,7 @@
       <!-- PROFILE COMPLETION -->
       <section class="profile-card">
         <div class="profile-info">
-          <div class="profile-icon">👤</div>
+          <div class="profile-icon"><i class="fa-solid fa-user"></i></div>
 
           <div>
             <h2>Complete your profile</h2>
@@ -124,7 +124,7 @@
 
         <div class="quick-grid">
           <a href="profile.html" class="quick-card">
-            <div class="quick-icon green">👤</div>
+            <div class="quick-icon green"><i class="fa-solid fa-user"></i></div>
 
             <div>
               <h3>Build My Profile</h3>
@@ -136,7 +136,7 @@
           </a>
 
           <a href="interview.html" class="quick-card">
-            <div class="quick-icon blue">🎤</div>
+            <div class="quick-icon blue"><i class="fa-solid fa-microphone"></i></div>
 
             <div>
               <h3>Practice an Interview</h3>
@@ -147,7 +147,17 @@
             <span class="arrow">→</span>
           </a>
 
-          
+          <a href="aptitude.html" class="quick-card">
+            <div class="quick-icon purple"><i class="fa-solid fa-brain"></i></div>
+
+            <div>
+              <h3>Take an Aptitude Test</h3>
+
+              <p>12 timed questions across numerical, logical and verbal reasoning.</p>
+            </div>
+
+            <span class="arrow">→</span>
+          </a>
         </div>
       </section>
 
@@ -205,7 +215,7 @@
 
         <!-- AI CARD -->
         <div class="ai-card">
-          <div class="ai-icon">✨</div>
+          <div class="ai-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
 
           <h2>Your AI Coach</h2>
 

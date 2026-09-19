@@ -288,6 +288,14 @@ body {
   font-size: 12px;
 }
 
+.location::before {
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  content: "\f3c5";
+
+  margin-right: 6px;
+}
+
 .edit-profile-btn {
   border: none;
 

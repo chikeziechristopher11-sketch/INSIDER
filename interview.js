@@ -22,10 +22,10 @@ if (menuBtn && sidebar) {
 
             sidebar.classList.toggle("show");
 
-            menuBtn.textContent =
+            menuBtn.innerHTML =
                 sidebar.classList.contains("show")
-                    ? "✕"
-                    : "☰";
+                    ? '<i class="fa-solid fa-xmark"></i>'
+                    : '<i class="fa-solid fa-bars"></i>';
 
         }
     );
@@ -475,7 +475,7 @@ function showRoleScreen() {
             button.innerHTML = `
 
                 <span class="role-icon">
-                    💼
+                    <i class="fa-solid fa-briefcase"></i>
                 </span>
 
                 <strong>
@@ -906,7 +906,7 @@ async function speakQuestion(
         console.error("Backend voice unavailable, falling back:", error);
 
         voiceStatus.textContent =
-            "Tap 🔊 if you don't hear the question";
+            "Tap the speaker icon if you don't hear the question";
 
         hearQuestionBtn?.classList.add("pulse");
 
@@ -1439,12 +1439,7 @@ function getTranscript() {
     }
 
 
-    return transcriptText.innerText
-        .replace(
-            "🎙️",
-            ""
-        )
-        .trim();
+    return transcriptText.innerText.trim();
 
 }
 
@@ -1606,13 +1601,13 @@ if (muteButton) {
                 window.speechSynthesis.cancel();
 
 
-                muteButton.textContent =
-                    "🔊 Unmute AI";
+                muteButton.innerHTML =
+                    '<i class="fa-solid fa-volume-high"></i> Unmute AI';
 
             } else {
 
-                muteButton.textContent =
-                    "🔇 Mute AI";
+                muteButton.innerHTML =
+                    '<i class="fa-solid fa-volume-xmark"></i> Mute AI';
 
             }
 
