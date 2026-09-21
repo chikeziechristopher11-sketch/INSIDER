@@ -1235,7 +1235,83 @@ body {
 
   color: var(--green);
 
-  margin-bottom: 5px;
+  margin-bottom: 8px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+}
+
+.strength-badge {
+  margin-left: auto;
+
+  padding: 3px 10px;
+
+  border-radius: 20px;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.4px;
+}
+
+.strength-badge.strength-strong {
+  background: #d6f3e1;
+  color: #0a7a3d;
+}
+
+.strength-badge.strength-moderate {
+  background: #fdefd0;
+  color: #9a6b00;
+}
+
+.strength-badge.strength-weak {
+  background: #fbdede;
+  color: #b83030;
+}
+
+.strength-badge.strength-unknown {
+  background: #e4ebe7;
+  color: var(--muted);
+}
+
+.evidence-block {
+  margin-top: 8px;
+}
+
+.evidence-block strong {
+  display: block;
+
+  font-size: 11px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.3px;
+
+  color: var(--dark);
+
+  margin-bottom: 4px;
+}
+
+.evidence-block ul {
+  margin: 0;
+
+  padding-left: 16px;
+}
+
+.evidence-block li {
+  margin-bottom: 3px;
+
+  line-height: 1.5;
+}
+
+#missingEvidenceBlock strong {
+  color: #b8752f;
 }
 
 /* =========================================

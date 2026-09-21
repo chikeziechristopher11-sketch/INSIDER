@@ -210,9 +210,29 @@ const liveEvidence =
         "liveEvidence"
     );
 
-const evidenceText =
+const strengthBadge =
     document.getElementById(
-        "evidenceText"
+        "strengthBadge"
+    );
+
+const evidenceFoundBlock =
+    document.getElementById(
+        "evidenceFoundBlock"
+    );
+
+const evidenceFoundList =
+    document.getElementById(
+        "evidenceFoundList"
+    );
+
+const missingEvidenceBlock =
+    document.getElementById(
+        "missingEvidenceBlock"
+    );
+
+const missingEvidenceList =
+    document.getElementById(
+        "missingEvidenceList"
     );
 
 const muteButton =
@@ -321,6 +341,12 @@ let recognition = null;
 
 let isListening = false;
 
+let accumulatedTranscript = "";
+
+let silenceTimer = null;
+
+const SILENCE_TIMEOUT_MS = 2200;
+
 let isSpeaking = false;
 
 let isMuted = false;
@@ -380,6 +406,21 @@ function buildRole() {
     };
 }
 
+function updateQuestionEstimate() {
+
+    const assessed =
+        (sessionState.competencies_assessed || []).length;
+
+    const remaining =
+        (sessionState.remaining_competencies || []).length;
+
+    const estimate =
+        Math.max(assessed + remaining + 1, currentQuestion + 1);
+
+    totalQuestions.textContent = `~${estimate}`;
+
+}
+
 async function requestInterviewTurn() {
     const response = await fetch("/api/interview", {
         method: "POST",
@@ -399,6 +440,8 @@ async function requestInterviewTurn() {
     }
 
     sessionState = data.session_state || {};
+
+    updateQuestionEstimate();
 
     return data;
 }
@@ -999,6 +1042,43 @@ function showVoiceAnswer() {
 
 }
 
+// =========================================
+// REVIEW TRANSCRIPT BEFORE SUBMIT
+// =========================================
+// Speech recognition mishears things. Route every voice answer through
+// the same editable box as "type instead" so the candidate can fix a
+// bad transcript before it goes to the AI, instead of submitting
+// blind the moment they stop talking.
+
+function reviewTranscriptBeforeSubmit() {
+
+    const transcript =
+        getTranscript();
+
+    if (!transcript) {
+
+        micStatus.textContent =
+            "I didn't hear an answer. Try again.";
+
+        return;
+
+    }
+
+    microphoneArea?.classList.add("hidden");
+
+    typedAnswerArea?.classList.remove("hidden");
+
+    typedAnswerInput.value = transcript;
+
+    typedAnswerInput.focus();
+
+    typedAnswerInput.setSelectionRange(
+        transcript.length,
+        transcript.length
+    );
+
+}
+
 if (typeInsteadBtn) {
 
     typeInsteadBtn.addEventListener(
@@ -1122,7 +1202,7 @@ function setupSpeechRecognition() {
 
 
             micStatus.textContent =
-                "Listening... speak naturally";
+                "Listening... speak naturally, then pause when you're done";
 
 
             answerState.textContent =
@@ -1138,7 +1218,7 @@ function setupSpeechRecognition() {
     recognition.onresult =
         (event) => {
 
-            let finalTranscript =
+            let newFinalTranscript =
                 "";
 
             let interimTranscript =
@@ -1159,8 +1239,8 @@ function setupSpeechRecognition() {
                     result.isFinal
                 ) {
 
-                    finalTranscript +=
-                        result[0].transcript;
+                    newFinalTranscript +=
+                        result[0].transcript + " ";
 
                 } else {
 
@@ -1172,9 +1252,19 @@ function setupSpeechRecognition() {
             }
 
 
+            // Each event only reports NEW results since the last one —
+            // accumulate finalized speech instead of overwriting it, or
+            // everything said before the latest pause gets silently lost.
+            if (newFinalTranscript) {
+
+                accumulatedTranscript +=
+                    newFinalTranscript;
+
+            }
+
+
             const text =
-                finalTranscript ||
-                interimTranscript;
+                (accumulatedTranscript + interimTranscript).trim();
 
 
             if (text) {
@@ -1182,6 +1272,34 @@ function setupSpeechRecognition() {
                 displayTranscript(
                     text
                 );
+
+            }
+
+
+            // Silence-based auto-stop: if the candidate goes quiet for a
+            // beat after saying something, treat that as "done talking"
+            // instead of forcing a manual stop.
+            window.clearTimeout(
+                silenceTimer
+            );
+
+            if (accumulatedTranscript.trim()) {
+
+                silenceTimer =
+                    window.setTimeout(
+                        () => {
+
+                            if (isListening) {
+
+                                stopListening();
+
+                                reviewTranscriptBeforeSubmit();
+
+                            }
+
+                        },
+                        SILENCE_TIMEOUT_MS
+                    );
 
             }
 
@@ -1264,6 +1382,10 @@ function displayTranscript(
 
 function clearTranscript() {
 
+    accumulatedTranscript = "";
+
+    window.clearTimeout(silenceTimer);
+
     if (!transcriptText) {
 
         return;
@@ -1305,6 +1427,8 @@ function escapeHTML(
 
 function startListening() {
 
+    accumulatedTranscript = "";
+
     if (!recognition) {
 
         alert(
@@ -1341,6 +1465,8 @@ function startListening() {
 // =========================================
 
 function stopListening() {
+
+    window.clearTimeout(silenceTimer);
 
     if (!isListening) {
 
@@ -1412,7 +1538,7 @@ if (micButton) {
 
                 stopListening();
 
-                submitVoiceAnswer();
+                reviewTranscriptBeforeSubmit();
 
             } else {
 
@@ -1443,32 +1569,6 @@ function getTranscript() {
 
 }
 
-
-// =========================================
-// SUBMIT VOICE ANSWER
-// =========================================
-
-function submitVoiceAnswer() {
-
-    const answer =
-        getTranscript();
-
-
-    if (!answer) {
-
-        micStatus.textContent =
-            "I didn't hear an answer. Try again.";
-
-        return;
-
-    }
-
-
-    stopListening();
-
-    submitAnswer(answer, micStatus);
-
-}
 
 function submitAnswer(
     answer,
@@ -1553,7 +1653,6 @@ function renderEvidence(
 
     if (
         !liveEvidence ||
-        !evidenceText ||
         !evaluation
     ) {
 
@@ -1562,17 +1661,35 @@ function renderEvidence(
     }
 
 
+    const strength =
+        evaluation.strength || "unknown";
+
+    strengthBadge.textContent =
+        strength;
+
+    strengthBadge.className =
+        `strength-badge strength-${strength}`;
+
+
     const found =
-        evaluation.evidence_found &&
-        evaluation.evidence_found.length
-            ? evaluation.evidence_found
-            : [evaluation.strength ? `Strength: ${evaluation.strength}` : "Evaluating your answer..."];
+        evaluation.evidence_found || [];
+
+    evidenceFoundList.innerHTML =
+        found.length
+            ? found.map((item) => `<li>${escapeHTML(item)}</li>`).join("")
+            : "<li>Nothing concrete yet — try naming a specific action and result.</li>";
 
 
-    evidenceText.textContent =
-        found.join(
-            " • "
-        );
+    const missing =
+        evaluation.missing_evidence || [];
+
+    missingEvidenceBlock.classList.toggle(
+        "hidden",
+        missing.length === 0
+    );
+
+    missingEvidenceList.innerHTML =
+        missing.map((item) => `<li>${escapeHTML(item)}</li>`).join("");
 
 
     liveEvidence.classList.remove(

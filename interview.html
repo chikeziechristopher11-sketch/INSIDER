@@ -393,9 +393,20 @@
             <!-- LIVE EVIDENCE -->
 
             <div class="live-evidence hidden" id="liveEvidence">
-              <div class="evidence-title"><i class="fa-solid fa-magnifying-glass"></i> Evidence detected</div>
+              <div class="evidence-title">
+                <i class="fa-solid fa-magnifying-glass"></i> How the AI read that answer
+                <span class="strength-badge" id="strengthBadge"></span>
+              </div>
 
-              <div id="evidenceText"></div>
+              <div class="evidence-block" id="evidenceFoundBlock">
+                <strong>Evidence found</strong>
+                <ul id="evidenceFoundList"></ul>
+              </div>
+
+              <div class="evidence-block hidden" id="missingEvidenceBlock">
+                <strong>Still needs proof</strong>
+                <ul id="missingEvidenceList"></ul>
+              </div>
             </div>
 
             <!-- CONTROLS -->
