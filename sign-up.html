@@ -182,30 +182,6 @@
                 </button>
             </div>
 
-            <!-- Social Sign In Options -->
-            <div id="social-buttons" class="grid grid-cols-2 gap-4 mb-6">
-                <button type="button" onclick="socialLogin('Google')" class="flex items-center justify-center space-x-2 py-3 px-4 glass-input rounded-xl hover:bg-slate-800/80 transition-all text-sm font-medium text-slate-200">
-                    <svg class="w-4 h-4" viewBox="0 0 24 24">
-                        <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.2 9 5 12 5z"/>
-                        <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.7-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/>
-                        <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 10.8 0 12.5s.7 2.8 1.9 5.2l3.7-2.9z"/>
-                        <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.2-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/>
-                    </svg>
-                    <span>Google</span>
-                </button>
-                <button type="button" onclick="socialLogin('LinkedIn')" class="flex items-center justify-center space-x-2 py-3 px-4 glass-input rounded-xl hover:bg-slate-800/80 transition-all text-sm font-medium text-slate-200">
-                    <i class="fab fa-linkedin text-blue-500 text-lg"></i>
-                    <span>LinkedIn</span>
-                </button>
-            </div>
-
-            <!-- Divider -->
-            <div class="relative flex py-2 items-center mb-6">
-                <div class="flex-grow border-t border-slate-800"></div>
-                <span class="flex-shrink mx-4 text-xs uppercase text-slate-500 font-semibold tracking-wider">Or continue with email</span>
-                <div class="flex-grow border-t border-slate-800"></div>
-            </div>
-
             <!-- Form -->
             <form id="auth-form" onsubmit="handleFormSubmit(event)" class="space-y-4">
                 
@@ -480,20 +456,52 @@
             // Trigger Loading State
             setLoadingState(true);
 
-            // Simulate API Network Delay and Redirect
-            setTimeout(() => {
-                setLoadingState(false);
-                if (currentMode === 'signup') {
-                    showToast('Account Created!', `Welcome aboard, ${fullname || 'User'}! Redirecting...`, 'success');
-                } else {
-                    showToast('Welcome Back!', 'Logging you into your dashboard...', 'success');
+            // Local-only account store (no backend yet — see PROFILE.js
+            // getUser()). One account per browser, keyed by email.
+            const accounts = JSON.parse(localStorage.getItem('insiderAccounts') || '{}');
+
+            if (currentMode === 'signup') {
+                if (accounts[email]) {
+                    setLoadingState(false);
+                    showToast('Account Exists', 'An account with this email already exists. Log in instead.', 'warning');
+                    return;
                 }
 
-                // Redirect to dashboard.html after 1 second
+                const user = {
+                    id: `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+                    name: fullname,
+                    email: email,
+                    role: document.getElementById('role').value,
+                    password: password,
+                    createdAt: new Date().toISOString(),
+                };
+
+                accounts[email] = user;
+                localStorage.setItem('insiderAccounts', JSON.stringify(accounts));
+                localStorage.setItem('insiderUser', JSON.stringify(user));
+
                 setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1000);
-            }, 1800);
+                    setLoadingState(false);
+                    showToast('Account Created!', `Welcome aboard, ${fullname || 'User'}! Redirecting...`, 'success');
+                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+                }, 800);
+            } else {
+                const user = accounts[email];
+
+                if (!user || user.password !== password) {
+                    setLoadingState(false);
+                    showToast('Login Failed', 'Incorrect email or password.', 'error');
+                    return;
+                }
+
+                localStorage.setItem('insiderUser', JSON.stringify(user));
+
+                setTimeout(() => {
+                    setLoadingState(false);
+                    showToast('Welcome Back!', 'Logging you into your dashboard...', 'success');
+                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+                }, 800);
+            }
         }
 
         // Button Loading State
@@ -534,14 +542,6 @@
             setTimeout(() => {
                 toast.classList.add('translate-x-full');
             }, 4000);
-        }
-
-        // Social Login Interaction
-        function socialLogin(provider) {
-            showToast('Connecting...', `Redirecting to ${provider} authentication.`, 'info');
-            setTimeout(() => {
-                window.location.href = 'dashboard.html';
-            }, 1200);
         }
 
         function resetFormState() {

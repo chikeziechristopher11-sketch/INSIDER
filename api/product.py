@@ -4,10 +4,13 @@ from __future__ import annotations
 
 import json
 import os
+from io import BytesIO
 from typing import Any
 
-from fastapi import Request
+import docx
+from fastapi import Request, UploadFile
 from fastapi.responses import JSONResponse
+from pypdf import PdfReader
 
 
 OPPORTUNITIES = [
@@ -103,6 +106,40 @@ async def health() -> dict[str, Any]:
             "rag": "configured",
         },
     }
+
+
+def extract_cv_text(filename: str, content: bytes) -> str:
+    extension = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+    if extension == "pdf":
+        reader = PdfReader(BytesIO(content))
+        return "\n".join(page.extract_text() or "" for page in reader.pages).strip()
+    if extension == "docx":
+        document = docx.Document(BytesIO(content))
+        return "\n".join(paragraph.text for paragraph in document.paragraphs).strip()
+    return content.decode("utf-8", errors="ignore").strip()
+
+
+async def profile_cv_upload(cv: UploadFile) -> JSONResponse:
+    content = await cv.read()
+    if not content:
+        return error("VALIDATION_ERROR", "cv file is required")
+    if len(content) > 10 * 1024 * 1024:
+        return error("VALIDATION_ERROR", "cv file must be smaller than 10MB")
+    try:
+        cv_text = extract_cv_text(cv.filename or "", content)
+    except Exception as exc:
+        return error("VALIDATION_ERROR", f"Could not read this file: {exc}")
+    if not cv_text:
+        return error("VALIDATION_ERROR", "No readable text found in this file")
+    evidence = evidence_from_items([cv_text])
+    profile = build_profile({}, evidence)
+    return JSONResponse({
+        "profile": profile,
+        "evidence": evidence,
+        "cv_text": cv_text,
+        "missing_information": profile_gaps(profile, evidence),
+        "follow_up_questions": ["What part did you personally own?", "What was the result of this work?"],
+    })
 
 
 async def profile_cv(payload: dict[str, Any]) -> JSONResponse:

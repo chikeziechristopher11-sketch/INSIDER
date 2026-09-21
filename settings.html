@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Settings | Insider</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="theme.css">
 
   <style>
@@ -532,7 +533,7 @@
 
 <header class="mobile-header">
   <img src="insider-logo.png" alt="Insider">
-  <button id="menuBtn" aria-label="Open navigation">☰</button>
+  <button id="menuBtn" aria-label="Open navigation"><i class="fa-solid fa-bars"></i></button>
 </header>
 
 <aside class="sidebar" id="sidebar">
@@ -543,22 +544,25 @@
 
   <nav>
     <a href="dashboard.html" class="nav-item">
-      <span>⌂</span> Home
+      <span><i class="fa-solid fa-house"></i></span> Home
     </a>
     <a href="profile.html" class="nav-item">
-      <span>👤</span> My Profile
+      <span><i class="fa-solid fa-user"></i></span> My Profile
     </a>
     <a href="interview.html" class="nav-item">
-      <span>🎤</span> Interview Practice
+      <span><i class="fa-solid fa-microphone"></i></span> Interview Practice
+    </a>
+    <a href="aptitude.html" class="nav-item">
+      <span><i class="fa-solid fa-brain"></i></span> Aptitude Test
     </a>
   </nav>
 
   <div class="sidebar-bottom">
     <a href="settings.html" class="nav-item active">
-      <span>⚙</span> Settings
+      <span><i class="fa-solid fa-gear"></i></span> Settings
     </a>
     <button class="nav-item logout-btn" id="logoutBtn" type="button">
-      <span>↪</span> Log Out
+      <span><i class="fa-solid fa-arrow-right-from-bracket"></i></span> Log Out
     </button>
   </div>
 </aside>
@@ -578,12 +582,12 @@
   <div class="settings-layout">
 
     <aside class="settings-menu">
-      <button class="tab active" data-target="appearance">🎨 Appearance</button>
-      <button class="tab" data-target="account">👤 Account</button>
-      <button class="tab" data-target="notifications">🔔 Notifications</button>
-      <button class="tab" data-target="privacy">🔒 Privacy</button>
-      <button class="tab" data-target="accessibility">♿ Accessibility</button>
-      <button class="tab" data-target="danger">⚠️ Danger Zone</button>
+      <button class="tab active" data-target="appearance"><i class="fa-solid fa-palette"></i> Appearance</button>
+      <button class="tab" data-target="account"><i class="fa-solid fa-user"></i> Account</button>
+      <button class="tab" data-target="notifications"><i class="fa-solid fa-bell"></i> Notifications</button>
+      <button class="tab" data-target="privacy"><i class="fa-solid fa-lock"></i> Privacy</button>
+      <button class="tab" data-target="accessibility"><i class="fa-solid fa-universal-access"></i> Accessibility</button>
+      <button class="tab" data-target="danger"><i class="fa-solid fa-triangle-exclamation"></i> Danger Zone</button>
     </aside>
 
     <div>
@@ -602,9 +606,9 @@
             </div>
 
             <div class="theme-options">
-              <button class="theme-button" data-theme="light">☀️ Light</button>
-              <button class="theme-button" data-theme="dark">🌙 Dark</button>
-              <button class="theme-button" data-theme="system">💻 System</button>
+              <button class="theme-button" data-theme="light"><i class="fa-solid fa-sun"></i> Light</button>
+              <button class="theme-button" data-theme="dark"><i class="fa-solid fa-moon"></i> Dark</button>
+              <button class="theme-button" data-theme="system"><i class="fa-solid fa-desktop"></i> System</button>
             </div>
           </div>
 
@@ -967,13 +971,15 @@ const sidebar = document.getElementById("sidebar");
 if (menuBtn && sidebar) {
   menuBtn.addEventListener("click", () => {
     sidebar.classList.toggle("show");
-    menuBtn.textContent = sidebar.classList.contains("show") ? "✕" : "☰";
+    menuBtn.innerHTML = sidebar.classList.contains("show")
+      ? '<i class="fa-solid fa-xmark"></i>'
+      : '<i class="fa-solid fa-bars"></i>';
   });
 
   sidebar.querySelectorAll("a").forEach(link => {
     link.addEventListener("click", () => {
       sidebar.classList.remove("show");
-      menuBtn.textContent = "☰";
+      menuBtn.innerHTML = '<i class="fa-solid fa-bars"></i>';
     });
   });
 }

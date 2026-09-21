@@ -22,10 +22,10 @@ if (menuBtn && sidebar) {
 
             sidebar.classList.toggle("show");
 
-            menuBtn.textContent =
+            menuBtn.innerHTML =
                 sidebar.classList.contains("show")
-                    ? "✕"
-                    : "☰";
+                    ? '<i class="fa-solid fa-xmark"></i>'
+                    : '<i class="fa-solid fa-bars"></i>';
 
         }
     );
@@ -69,14 +69,6 @@ if (logoutBtn) {
 // =========================================
 
 const companyRoles = {
-    
-  "Stanbic IBTC": [
-    "Software Engineer",
-    "Data Analyst",
-    "Product Manager",
-    "Risk Analyst",
-    "Relationship Manager"
-  ],
 
   "MTN Nigeria": [
     "Sales Representative",
@@ -86,7 +78,7 @@ const companyRoles = {
     "Co-ordinator"
   ],
 
-  "GTB": [
+  "GTCO": [
     "Software Engineer",
     "Data Analyst",
     "Product Manager",
@@ -100,262 +92,7 @@ const companyRoles = {
     "Data Scientist",
     "Product Manager",
     "UX Designer"
-  ],
-
-  "Flutterwave": [
-    "Backend Engineer",
-    "Frontend Engineer",
-    "Product Manager",
-    "Data Analyst",
-    "Risk Analyst"
   ]
-};
-
-
-// =========================================
-// COMPANY QUESTIONS
-// =========================================
-
-const companyQuestions = {
-
-    "Stanbic IBTC": [
-
-        "Why do you want to work at Stanbic IBTC?",
-
-        "What interests you about financial technology and banking?",
-
-        "Tell me about a project that demonstrates your ability for this role.",
-
-        "How would you solve a problem affecting customers of a digital banking platform?",
-
-        "Tell me about a time you worked with a difficult stakeholder."
-
-    ],
-
-
-    "MTN Nigeria": [
-
-        "Why do you want to work at MTN Nigeria?",
-
-        "How would you use technology to improve the experience of MTN customers?",
-
-        "Tell me about a project that demonstrates your technical or professional skills.",
-
-        "Describe a difficult problem you solved and how you approached it.",
-
-        "How do you handle working in a large organization with multiple teams?"
-
-    ],
-
-
-    "GTB": [
-
-        "Why are you interested in working at GTB?",
-
-        "What interests you about digital banking?",
-
-        "Tell me about a project that demonstrates your ability for this role.",
-
-        "How would you improve a digital banking experience for customers?",
-
-        "Tell me about a time you had to make an important decision with limited information."
-
-    ],
-
-
-    "Microsoft": [
-
-        "Why do you want to work at Microsoft?",
-
-        "Which Microsoft product or technology interests you most and why?",
-
-        "Tell me about a technically challenging project you have worked on.",
-
-        "Describe how you approach solving a complex problem.",
-
-        "Tell me about a time you learned a new technology quickly."
-
-    ],
-
-
-    "Flutterwave": [
-
-        "Why do you want to work at Flutterwave?",
-
-        "What interests you about payments and financial technology?",
-
-        "Tell me about a project that demonstrates your ability for this role.",
-
-        "How would you improve a payment experience for users?",
-
-        "Describe a difficult technical or product problem you solved."
-
-    ]
-
-};
-
-
-// =========================================
-// ROLE QUESTIONS
-// =========================================
-
-const roleQuestions = {
-
-    "Software Engineer": [
-
-        "Walk me through a software project you have built.",
-
-        "How do you approach debugging a difficult issue?",
-
-        "How do you ensure your code is maintainable?",
-
-        "Tell me about a technical decision you made and why."
-
-    ],
-
-
-    "Frontend Engineer": [
-
-        "Tell me about a frontend application you have built.",
-
-        "How do you approach responsive web design?",
-
-        "How do you improve frontend performance?",
-
-        "How do you handle state and user interactions in a web application?"
-
-    ],
-
-
-    "Backend Engineer": [
-
-        "Tell me about a backend system or API you have built.",
-
-        "How would you design a scalable REST API?",
-
-        "How do you approach database performance?",
-
-        "How would you secure an API?"
-
-    ],
-
-
-    "Data Analyst": [
-
-        "Tell me about a dataset you have analyzed.",
-
-        "How do you handle missing or inconsistent data?",
-
-        "How would you explain a complex data insight to a non-technical stakeholder?",
-
-        "Which tools do you use for data analysis?"
-
-    ],
-
-
-    "Data Scientist": [
-
-        "Tell me about a machine-learning or data-science project you have worked on.",
-
-        "How do you decide which model to use?",
-
-        "How do you evaluate a machine-learning model?",
-
-        "How would you explain a model's result to a non-technical person?"
-
-    ],
-
-
-    "Product Manager": [
-
-        "How would you prioritize competing product requirements?",
-
-        "Tell me about a product you helped build or improve.",
-
-        "How would you measure whether a product feature is successful?",
-
-        "How do you work with engineering and design teams?"
-
-    ],
-
-
-    "UX Designer": [
-
-        "Walk me through your UX design process.",
-
-        "How do you identify user problems?",
-
-        "Tell me about a design decision you made based on user research.",
-
-        "How do you measure whether a user experience is successful?"
-
-    ],
-
-
-    "Cloud Engineer": [
-
-        "Tell me about your experience with cloud technologies.",
-
-        "How would you design a scalable cloud application?",
-
-        "How do you monitor cloud infrastructure?",
-
-        "How would you troubleshoot a cloud service outage?"
-
-    ],
-
-
-    "Risk Analyst": [
-
-        "How would you identify a potential business risk?",
-
-        "Tell me about a time you analyzed risk.",
-
-        "How would you communicate a significant risk to management?",
-
-        "How do you balance risk and business opportunity?"
-
-    ],
-
-
-    "Relationship Manager": [
-
-        "How would you build a strong relationship with a customer?",
-
-        "Tell me about a time you handled a difficult customer.",
-
-        "How would you identify a customer's needs?",
-
-        "How do you maintain trust with clients?"
-
-    ],
-
-
-    "Digital Banking Specialist": [
-
-        "What makes a good digital banking experience?",
-
-        "How would you improve a banking app?",
-
-        "How would you investigate a customer complaint about digital banking?",
-
-        "How do you balance convenience and security?"
-
-    ],
-
-
-    "DevOps Engineer": [
-
-        "Tell me about your CI/CD experience.",
-
-        "How would you deploy an application safely?",
-
-        "How do you monitor production systems?",
-
-        "How would you respond to a production outage?"
-
-    ]
-
 };
 
 
@@ -488,6 +225,36 @@ const hearQuestionBtn =
         "hearQuestionBtn"
     );
 
+const typeInsteadBtn =
+    document.getElementById(
+        "typeInsteadBtn"
+    );
+
+const typedAnswerArea =
+    document.getElementById(
+        "typedAnswerArea"
+    );
+
+const typedAnswerInput =
+    document.getElementById(
+        "typedAnswerInput"
+    );
+
+const backToVoiceBtn =
+    document.getElementById(
+        "backToVoiceBtn"
+    );
+
+const submitTypedAnswerBtn =
+    document.getElementById(
+        "submitTypedAnswerBtn"
+    );
+
+const microphoneArea =
+    document.querySelector(
+        ".microphone-area"
+    );
+
 
 // =========================================
 // USER PROFILE
@@ -564,6 +331,78 @@ let interviewStartTime = null;
 
 let timer = null;
 
+// =========================================
+// AI INTERVIEW STATE (backed by /api/interview)
+// =========================================
+
+const roleCompetencies = {
+    "Software Engineer": ["problem_solving", "code_quality", "ownership", "communication"],
+    "Frontend Engineer": ["ui_craft", "problem_solving", "ownership", "communication"],
+    "Backend Engineer": ["system_design", "problem_solving", "ownership", "communication"],
+    "Data Analyst": ["analytical_rigor", "communication", "business_sense", "ownership"],
+    "Data Scientist": ["analytical_rigor", "problem_solving", "communication", "ownership"],
+    "Product Manager": ["product_thinking", "prioritization", "influence", "execution"],
+    "UX Designer": ["customer_empathy", "product_thinking", "communication", "execution"],
+    "Cloud Engineer": ["system_design", "problem_solving", "ownership", "communication"],
+    "Risk Analyst": ["analytical_rigor", "judgement", "communication", "ownership"],
+    "Relationship Manager": ["customer_empathy", "communication", "influence", "ownership"],
+    "Digital Banking Specialist": ["customer_empathy", "execution", "communication", "ownership"],
+    "DevOps Engineer": ["system_design", "problem_solving", "ownership", "communication"],
+    "Sales Representative": ["influence", "communication", "ownership", "business_sense"],
+    "Customer Relations": ["customer_empathy", "communication", "ownership", "execution"],
+    "Co-ordinator": ["execution", "communication", "ownership", "business_sense"],
+};
+
+let conversationHistory = [];
+
+let sessionState = {};
+
+let currentAIQuestion = null;
+
+let interviewDebrief = null;
+
+function buildCandidate() {
+    return {
+        name: profile.name || "Candidate",
+        field: profile.field || profile.profession || "",
+        summary: profile.summary || "",
+        goals: profile.goals || [],
+        skills: profile.skills || [],
+        evidence: profile.evidence || [],
+    };
+}
+
+function buildRole() {
+    return {
+        company: selectedCompany,
+        title: selectedRole,
+        competencies: roleCompetencies[selectedRole] || ["ownership", "problem_solving", "communication"],
+    };
+}
+
+async function requestInterviewTurn() {
+    const response = await fetch("/api/interview", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            candidate: buildCandidate(),
+            role: buildRole(),
+            history: conversationHistory,
+            session_state: sessionState,
+        }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.error?.message || "Interview request failed");
+    }
+
+    sessionState = data.session_state || {};
+
+    return data;
+}
+
 
 // =========================================
 // COMPANY SELECTION
@@ -636,7 +475,7 @@ function showRoleScreen() {
             button.innerHTML = `
 
                 <span class="role-icon">
-                    💼
+                    <i class="fa-solid fa-briefcase"></i>
                 </span>
 
                 <strong>
@@ -703,56 +542,64 @@ if (backToCompanies) {
 }
 
 
-// =========================================
-// BUILD QUESTIONS
-// =========================================
-
-function buildQuestions() {
-
-    const companyQs =
-        companyQuestions[
-            selectedCompany
-        ] || [];
-
-
-    const roleQs =
-        roleQuestions[
-            selectedRole
-        ] || [];
-
-
-    const combined = [
-
-        ...companyQs.slice(0, 3),
-
-        ...roleQs.slice(0, 3),
-
-        `Why should ${selectedCompany} hire you for the ${selectedRole} role?`
-
-    ];
-
-
-    return combined.slice(
-        0,
-        7
-    );
-
-}
-
 
 // =========================================
 // START INTERVIEW
 // =========================================
 
+function unlockAudioPlayback() {
+
+    // Browsers only allow programmatic audio.play() later in the session
+    // if a play() call happened synchronously inside a real user gesture.
+    // This "primes" both the Audio element and speechSynthesis so the
+    // question audio isn't silently blocked a moment later.
+
+    try {
+
+        // A minimal, guaranteed-valid silent WAV (zero data bytes) —
+        // safe to decode on every browser, unlike a hand-built MP3 blob.
+        const silence =
+            new Audio(
+                "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA="
+            );
+
+        silence.volume = 0;
+
+        audioUnlockPromise =
+            silence.play().catch(() => {});
+
+    } catch {}
+
+    try {
+
+        if ("speechSynthesis" in window) {
+
+            window.speechSynthesis.speak(
+                new SpeechSynthesisUtterance("")
+            );
+
+        }
+
+    } catch {}
+
+}
+
 function startInterview() {
+
+    unlockAudioPlayback();
 
     currentQuestion =
         0;
 
     answers = [];
 
-    questions =
-        buildQuestions();
+    conversationHistory = [];
+
+    sessionState = {};
+
+    currentAIQuestion = null;
+
+    interviewDebrief = null;
 
 
     roleScreen.classList.add(
@@ -777,7 +624,7 @@ function startInterview() {
 
 
     totalQuestions.textContent =
-        questions.length;
+        "~7";
 
 
     interviewStarted =
@@ -791,7 +638,29 @@ function startInterview() {
     setupSpeechRecognition();
 
 
-    showQuestion();
+    questionText.textContent =
+        "Preparing your first question...";
+
+
+    requestInterviewTurn()
+        .then((data) => {
+
+            currentAIQuestion = data;
+
+            showQuestion();
+
+        })
+        .catch((error) => {
+
+            console.error(
+                "Interview start failed:",
+                error
+            );
+
+            questionText.textContent =
+                "Could not reach the interview service. Check your connection and try again.";
+
+        });
 
 }
 
@@ -803,8 +672,8 @@ function startInterview() {
 function showQuestion() {
 
     if (
-        currentQuestion >=
-        questions.length
+        !currentAIQuestion ||
+        currentAIQuestion.status === "complete"
     ) {
 
         finishInterview();
@@ -815,9 +684,7 @@ function showQuestion() {
 
 
     const question =
-        questions[
-            currentQuestion
-        ];
+        currentAIQuestion.question;
 
 
     questionNumber.textContent =
@@ -837,6 +704,14 @@ function showQuestion() {
 
 
     stopListening();
+
+    showVoiceAnswer();
+
+    if (submitTypedAnswerBtn) {
+
+        submitTypedAnswerBtn.disabled = false;
+
+    }
 
 
     setTimeout(
@@ -916,100 +791,164 @@ function updateListeningCriteria(
 // SPEAK QUESTION
 // =========================================
 
-function speakQuestion(
+let currentQuestionAudio = null;
+
+let audioUnlockPromise = null;
+
+let pendingQuestionText = null;
+
+function markSpeakingStart() {
+
+    isSpeaking = true;
+
+    speakingRing.classList.add("active");
+
+    voiceWave.classList.add("active");
+
+    voiceStatus.textContent = "AI is speaking...";
+
+    speakingStatus.textContent = "Speaking";
+
+}
+
+function markSpeakingEnd() {
+
+    isSpeaking = false;
+
+    speakingRing.classList.remove("active");
+
+    voiceWave.classList.remove("active");
+
+    voiceStatus.textContent = "Your turn";
+
+    speakingStatus.textContent = "Listening";
+
+}
+
+function speakWithBrowserVoice(
     text
 ) {
 
-    if (
-        isMuted ||
-        !("speechSynthesis" in window)
-    ) {
+    if (!("speechSynthesis" in window)) {
 
         return;
 
     }
 
-
     window.speechSynthesis.cancel();
 
-
     const utterance =
-        new SpeechSynthesisUtterance(
-            text
-        );
+        new SpeechSynthesisUtterance(text);
 
+    utterance.rate = 0.92;
+    utterance.pitch = 1;
+    utterance.volume = 1;
 
-    utterance.rate =
-        0.92;
+    utterance.onstart = markSpeakingStart;
+    utterance.onend = markSpeakingEnd;
 
-
-    utterance.pitch =
-        1;
-
-
-    utterance.volume =
-        1;
-
-
-    utterance.onstart =
-        () => {
-
-            isSpeaking =
-                true;
-
-
-            speakingRing.classList.add(
-                "active"
-            );
-
-
-            voiceWave.classList.add(
-                "active"
-            );
-
-
-            voiceStatus.textContent =
-                "AI is speaking...";
-
-
-            speakingStatus.textContent =
-                "Speaking";
-
-        };
-
-
-    utterance.onend =
-        () => {
-
-            isSpeaking =
-                false;
-
-
-            speakingRing.classList.remove(
-                "active"
-            );
-
-
-            voiceWave.classList.remove(
-                "active"
-            );
-
-
-            voiceStatus.textContent =
-                "Your turn";
-
-
-            speakingStatus.textContent =
-                "Listening";
-
-        };
-
-
-    window.speechSynthesis.speak(
-        utterance
-    );
+    window.speechSynthesis.speak(utterance);
 
 }
+
+async function speakQuestion(
+    text
+) {
+
+    if (isMuted) {
+
+        return;
+
+    }
+
+    currentQuestionAudio?.pause();
+
+    pendingQuestionText = text;
+
+    try {
+
+        await audioUnlockPromise;
+
+        const response = await fetch("/api/tts", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text, voice: "female" }),
+        });
+
+        if (!response.ok) throw new Error("TTS request failed");
+
+        const audioUrl = URL.createObjectURL(await response.blob());
+
+        currentQuestionAudio = new Audio(audioUrl);
+
+        currentQuestionAudio.addEventListener("play", markSpeakingStart);
+
+        currentQuestionAudio.addEventListener(
+            "ended",
+            () => {
+
+                markSpeakingEnd();
+
+                URL.revokeObjectURL(audioUrl);
+
+                pendingQuestionText = null;
+
+            },
+            { once: true }
+        );
+
+        await currentQuestionAudio.play();
+
+        pendingQuestionText = null;
+
+    } catch (error) {
+
+        console.error("Backend voice unavailable, falling back:", error);
+
+        voiceStatus.textContent =
+            "Tap the speaker icon if you don't hear the question";
+
+        hearQuestionBtn?.classList.add("pulse");
+
+        try {
+
+            speakWithBrowserVoice(text);
+
+        } catch (fallbackError) {
+
+            console.error("Browser voice also unavailable:", fallbackError);
+
+        }
+
+    }
+
+}
+
+
+// =========================================
+// RETRY BLOCKED AUDIO ON NEXT INTERACTION
+// =========================================
+// If autoplay was blocked, the very next tap/click anywhere on the
+// page is a real user gesture — use it to (re)play the question that
+// never made it out, instead of leaving the candidate stuck silent.
+
+document.addEventListener(
+    "click",
+    () => {
+
+        if (pendingQuestionText && !isSpeaking) {
+
+            const text = pendingQuestionText;
+
+            pendingQuestionText = null;
+
+            speakQuestion(text);
+
+        }
+
+    },
+    { capture: true }
+);
 
 
 // =========================================
@@ -1022,9 +961,105 @@ if (hearQuestionBtn) {
         "click",
         () => {
 
+            hearQuestionBtn.classList.remove("pulse");
+
             speakQuestion(
                 questionText.textContent
             );
+
+        }
+    );
+
+}
+
+
+// =========================================
+// TYPE ANSWER INSTEAD
+// =========================================
+
+function showTypedAnswer() {
+
+    stopListening();
+
+    microphoneArea?.classList.add("hidden");
+
+    typedAnswerArea?.classList.remove("hidden");
+
+    typedAnswerInput.value = "";
+
+    typedAnswerInput.focus();
+
+}
+
+function showVoiceAnswer() {
+
+    typedAnswerArea?.classList.add("hidden");
+
+    microphoneArea?.classList.remove("hidden");
+
+}
+
+if (typeInsteadBtn) {
+
+    typeInsteadBtn.addEventListener(
+        "click",
+        showTypedAnswer
+    );
+
+}
+
+if (backToVoiceBtn) {
+
+    backToVoiceBtn.addEventListener(
+        "click",
+        showVoiceAnswer
+    );
+
+}
+
+if (submitTypedAnswerBtn) {
+
+    submitTypedAnswerBtn.addEventListener(
+        "click",
+        () => {
+
+            const answer =
+                typedAnswerInput.value.trim();
+
+            if (!answer) {
+
+                typedAnswerInput.focus();
+
+                return;
+
+            }
+
+            submitTypedAnswerBtn.disabled = true;
+
+            submitAnswer(
+                answer,
+                null
+            );
+
+        }
+    );
+
+}
+
+if (typedAnswerInput) {
+
+    typedAnswerInput.addEventListener(
+        "keydown",
+        (event) => {
+
+            if (
+                event.key === "Enter" &&
+                (event.metaKey || event.ctrlKey)
+            ) {
+
+                submitTypedAnswerBtn?.click();
+
+            }
 
         }
     );
@@ -1224,6 +1259,24 @@ function displayTranscript(
 
 
 // =========================================
+// CLEAR TRANSCRIPT
+// =========================================
+
+function clearTranscript() {
+
+    if (!transcriptText) {
+
+        return;
+
+    }
+
+    transcriptText.textContent =
+        "Press the mic and start speaking. Your answer will appear here.";
+
+}
+
+
+// =========================================
 // ESCAPE HTML
 // =========================================
 
@@ -1386,12 +1439,7 @@ function getTranscript() {
     }
 
 
-    return transcriptText.innerText
-        .replace(
-            "🎙️",
-            ""
-        )
-        .trim();
+    return transcriptText.innerText.trim();
 
 }
 
@@ -1416,10 +1464,21 @@ function submitVoiceAnswer() {
     }
 
 
+    stopListening();
+
+    submitAnswer(answer, micStatus);
+
+}
+
+function submitAnswer(
+    answer,
+    statusElement
+) {
+
     answers.push({
 
         question:
-            questions[currentQuestion],
+            currentAIQuestion?.question || "",
 
         answer:
             answer,
@@ -1430,48 +1489,72 @@ function submitVoiceAnswer() {
     });
 
 
-    detectEvidence(
-        answer
+    conversationHistory.push(
+        { role: "assistant", content: currentAIQuestion?.question || "" }
+    );
+
+    conversationHistory.push(
+        { role: "user", content: answer }
     );
 
 
-    currentQuestion++;
+    if (statusElement) {
+
+        statusElement.textContent =
+            "Thinking about your answer...";
+
+    }
 
 
-    setTimeout(
-        () => {
+    requestInterviewTurn()
+        .then((data) => {
 
-            if (
-                currentQuestion <
-                questions.length
-            ) {
+            currentAIQuestion = data;
 
-                showQuestion();
+            renderEvidence(data.evaluation);
 
-            } else {
+            if (data.status === "complete") {
 
-                finishInterview();
+                interviewDebrief = data.debrief;
 
             }
 
-        },
-        1200
-    );
+            currentQuestion++;
+
+            showQuestion();
+
+        })
+        .catch((error) => {
+
+            console.error(
+                "Interview turn failed:",
+                error
+            );
+
+            if (statusElement) {
+
+                statusElement.textContent =
+                    "Could not reach the interview service. Try again.";
+
+            }
+
+        });
 
 }
 
 
 // =========================================
-// DETECT EVIDENCE
+// RENDER EVIDENCE (from real /api/interview evaluation)
 // =========================================
 
-function detectEvidence(
-    answer
+function renderEvidence(
+    evaluation
 ) {
 
     if (
         !liveEvidence ||
-        !evidenceText
+        !evidenceText ||
+        !evaluation
     ) {
 
         return;
@@ -1479,73 +1562,15 @@ function detectEvidence(
     }
 
 
-    const lower =
-        answer.toLowerCase();
-
-
-    const evidence = [];
-
-
-    if (
-        lower.includes("built") ||
-        lower.includes("created") ||
-        lower.includes("developed")
-    ) {
-
-        evidence.push(
-            "Project-building experience"
-        );
-
-    }
-
-
-    if (
-        lower.includes("led") ||
-        lower.includes("managed")
-    ) {
-
-        evidence.push(
-            "Leadership experience"
-        );
-
-    }
-
-
-    if (
-        lower.includes("solved") ||
-        lower.includes("fixed")
-    ) {
-
-        evidence.push(
-            "Problem-solving evidence"
-        );
-
-    }
-
-
-    if (
-        lower.includes("team") ||
-        lower.includes("collaborated")
-    ) {
-
-        evidence.push(
-            "Team collaboration"
-        );
-
-    }
-
-
-    if (!evidence.length) {
-
-        evidence.push(
-            "Relevant experience detected in response"
-        );
-
-    }
+    const found =
+        evaluation.evidence_found &&
+        evaluation.evidence_found.length
+            ? evaluation.evidence_found
+            : [evaluation.strength ? `Strength: ${evaluation.strength}` : "Evaluating your answer..."];
 
 
     evidenceText.textContent =
-        evidence.join(
+        found.join(
             " • "
         );
 
@@ -1576,13 +1601,13 @@ if (muteButton) {
                 window.speechSynthesis.cancel();
 
 
-                muteButton.textContent =
-                    "🔊 Unmute AI";
+                muteButton.innerHTML =
+                    '<i class="fa-solid fa-volume-high"></i> Unmute AI';
 
             } else {
 
-                muteButton.textContent =
-                    "🔇 Mute AI";
+                muteButton.innerHTML =
+                    '<i class="fa-solid fa-volume-xmark"></i> Mute AI';
 
             }
 
@@ -1713,16 +1738,11 @@ function finishInterview() {
 
     }
 
+    currentQuestionAudio?.pause();
 
-    const score =
-        questions.length
-            ? Math.round(
-                (
-                    answers.length /
-                    questions.length
-                ) * 100
-            )
-            : 0;
+
+    const debrief =
+        interviewDebrief || {};
 
 
     const interviewData = {
@@ -1733,14 +1753,11 @@ function finishInterview() {
         role:
             selectedRole,
 
-        questions:
-            questions,
-
         answers:
             answers,
 
-        score:
-            score,
+        debrief:
+            debrief,
 
         completedAt:
             new Date().toISOString()
@@ -1817,85 +1834,79 @@ function renderDebrief(
         );
 
 
+    const debrief =
+        data.debrief || {};
+
+    const strengths =
+        debrief.strengths && debrief.strengths.length
+            ? debrief.strengths
+            : ["Completed the interview."];
+
+    const weaknesses =
+        debrief.weaknesses && debrief.weaknesses.length
+            ? debrief.weaknesses
+            : ["No major gaps flagged."];
+
+    const coaching =
+        debrief.specific_coaching && debrief.specific_coaching.length
+            ? debrief.specific_coaching
+            : ["Use the STAR structure for behavioural questions."];
+
+    const evidenceDiscovered =
+        debrief.evidence_discovered && debrief.evidence_discovered.length
+            ? debrief.evidence_discovered.length
+            : data.answers.length;
+
+    const score =
+        Math.round(
+            (
+                strengths.length /
+                (strengths.length + weaknesses.length)
+            ) * 100
+        );
+
+
     performanceScore.textContent =
-        `${data.score}%`;
+        `${score}%`;
 
 
     evidenceCount.textContent =
-        data.answers.length;
+        evidenceDiscovered;
 
 
     progressScore.textContent =
-        `${data.score}%`;
+        `${score}%`;
 
 
     overallSummary.textContent =
 
-        `You completed your ${data.role} interview preparation for ${data.company}. Insider captured ${data.answers.length} answered question${data.answers.length === 1 ? "" : "s"} as evidence. Continue practicing with specific examples, measurable outcomes and clear explanations of your personal contribution.`;
+        debrief.overall_summary ||
+
+        `You completed your ${data.role} interview for ${data.company}. Insider captured ${data.answers.length} answered question${data.answers.length === 1 ? "" : "s"} as evidence.`;
 
 
 
-    strengthsList.innerHTML = `
+    strengthsList.innerHTML =
 
-        <li>
-            Completed a realistic ${data.company}
-            interview simulation.
-        </li>
-
-        <li>
-            Practiced questions relevant to
-            the ${data.role} role.
-        </li>
-
-        <li>
-            Provided ${data.answers.length}
-            answer${data.answers.length === 1 ? "" : "s"}
-            that Insider can use as evidence.
-        </li>
-
-    `;
+        strengths
+            .map((item) => `<li>${escapeHTML(item)}</li>`)
+            .join("");
 
 
 
-    gapsList.innerHTML = `
+    gapsList.innerHTML =
 
-        <li>
-            Add measurable results to your
-            examples where possible.
-        </li>
-
-        <li>
-            Explain your personal contribution
-            clearly when discussing projects.
-        </li>
-
-        <li>
-            Continue practicing company-specific
-            questions.
-        </li>
-
-    `;
+        weaknesses
+            .map((item) => `<li>${escapeHTML(item)}</li>`)
+            .join("");
 
 
 
-    coachingList.innerHTML = `
+    coachingList.innerHTML =
 
-        <li>
-            Use the STAR structure for
-            behavioural questions.
-        </li>
-
-        <li>
-            Give concrete examples instead
-            of general statements.
-        </li>
-
-        <li>
-            Connect your experience directly
-            to the role you're targeting.
-        </li>
-
-    `;
+        coaching
+            .map((item) => `<li>${escapeHTML(item)}</li>`)
+            .join("");
 
 }
 
