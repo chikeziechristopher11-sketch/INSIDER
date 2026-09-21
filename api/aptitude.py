@@ -308,10 +308,11 @@ TRACK_QUESTIONS: dict[str, list[dict[str, Any]]] = {
 }
 
 TRACK_LABELS = {
-    "general": "General",
     "software_engineer": "Software Engineer",
     "marketer": "Marketer",
 }
+
+DEFAULT_TRACK = next(iter(TRACK_LABELS))
 
 
 def _public_question(item: dict[str, Any]) -> dict[str, Any]:
@@ -339,9 +340,9 @@ def _question_pool(track: str) -> list[dict[str, Any]]:
 
 
 async def aptitude_start(payload: dict[str, Any]) -> JSONResponse:
-    track = payload.get("track") or "general"
+    track = payload.get("track") or DEFAULT_TRACK
     if track not in TRACK_LABELS:
-        track = "general"
+        track = DEFAULT_TRACK
 
     bank = _question_pool(track)
     count = min(int(payload.get("count", 12)), len(bank))

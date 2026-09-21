@@ -90,7 +90,7 @@ let answers = {}; // { [questionId]: selectedIndex }
 let currentIndex = 0;
 let secondsRemaining = 0;
 let timerInterval = null;
-let selectedTrack = "general";
+let selectedTrack = "software_engineer";
 
 function showScreen(screen) {
   [trackScreen, introScreen, testScreen, resultsScreen].forEach((el) => {

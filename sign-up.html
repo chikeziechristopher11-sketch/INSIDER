@@ -254,14 +254,6 @@
                     <p id="error-confirm-password" class="text-xs text-red-400 hidden mt-1"><i class="fas fa-exclamation-circle mr-1"></i>Passwords do not match.</p>
                 </div>
 
-                <!-- Terms and Conditions Checkbox (Sign Up Only) -->
-                <div id="field-terms" class="flex items-start space-x-3 pt-2">
-                    <input type="checkbox" id="terms" class="custom-checkbox mt-1 w-4 h-4 rounded border-slate-700 bg-slate-900 focus:ring-0 focus:ring-offset-0 cursor-pointer">
-                    <label for="terms" class="text-xs text-slate-400 leading-relaxed cursor-pointer">
-                        I agree to Insider's <a href="#terms" class="text-emerald-400 hover:underline">Terms of Service</a> and <a href="#privacy" class="text-emerald-400 hover:underline">Privacy Policy</a>.
-                    </label>
-                </div>
-
                 <!-- Forgot Password Link (Log In Only) -->
                 <div id="field-forgot" class="hidden text-right">
                     <a href="#forgot" class="text-xs text-blue-400 hover:text-blue-300 transition-colors">Forgot Password?</a>
@@ -320,7 +312,6 @@
             const fullnameField = document.getElementById('field-fullname');
             const roleField = document.getElementById('field-role');
             const confirmPassField = document.getElementById('field-confirm-password');
-            const termsField = document.getElementById('field-terms');
             const forgotField = document.getElementById('field-forgot');
             const strengthMeter = document.getElementById('password-strength-container');
             const btnText = document.getElementById('btn-text');
@@ -336,7 +327,6 @@
                 fullnameField.classList.remove('hidden');
                 roleField.classList.remove('hidden');
                 confirmPassField.classList.remove('hidden');
-                termsField.classList.remove('hidden');
                 forgotField.classList.add('hidden');
                 
                 btnText.innerText = 'CREATE ACCOUNT';
@@ -351,7 +341,6 @@
                 fullnameField.classList.add('hidden');
                 roleField.classList.add('hidden');
                 confirmPassField.classList.add('hidden');
-                termsField.classList.add('hidden');
                 strengthMeter.classList.add('hidden');
                 forgotField.classList.remove('hidden');
                 
@@ -425,7 +414,6 @@
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirm-password').value;
-            const terms = document.getElementById('terms').checked;
 
             // Simple Client Validation
             let isValid = true;
@@ -443,11 +431,6 @@
                     isValid = false;
                 } else {
                     document.getElementById('error-confirm-password').classList.add('hidden');
-                }
-
-                if (!terms) {
-                    showToast('Action Required', 'Please accept the Terms & Conditions.', 'warning');
-                    return;
                 }
             }
 
