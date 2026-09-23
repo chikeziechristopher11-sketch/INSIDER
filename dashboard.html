@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="icon" type="image/png" href="insider-logo.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="dashboard.css" />
+    <link rel="stylesheet" href="theme.css" />
+
+    <title>Dashboard | Insider</title>
+  </head>
+
+  <body>
+    <!-- MOBILE HEADER -->
+    <header class="mobile-header">
+      <img src="insider-logo.png" alt="Insider" />
+
+      <button id="menuBtn"><i class="fa-solid fa-bars"></i></button>
+    </header>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <img src="insider-logo.png" alt="Insider" />
+
+        <span>Insider</span>
+      </div>
+
+      <nav>
+        <a href="#" class="nav-item active">
+          <span><i class="fa-solid fa-house"></i></span>
+          Home
+        </a>
+
+        <a href="profile.html" class="nav-item">
+          <span><i class="fa-solid fa-user"></i></span>
+          My Profile
+        </a>
+
+        <a href="interview.html" class="nav-item">
+          <span><i class="fa-solid fa-microphone"></i></span>
+          Interview Practice
+        </a>
+
+        <a href="aptitude.html" class="nav-item">
+          <span><i class="fa-solid fa-brain"></i></span>
+          Aptitude Test
+        </a>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <a href="settings.html" class="nav-item">
+          <span><i class="fa-solid fa-gear"></i></span>
+          Settings
+        </a>
+
+        <button class="logout-btn" id="logoutBtn">
+          <span><i class="fa-solid fa-arrow-right-from-bracket"></i></span>
+          Log Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+      <!-- TOP BAR -->
+      <header class="topbar">
+        <div>
+          <p class="small-label">YOUR DASHBOARD</p>
+
+          <h1>Welcome back, <span>Chris</span></h1>
+        </div>
+
+        <div class="user-area">
+          <div class="notification">
+            <i class="fa-regular fa-bell"></i>
+            <span></span>
+          </div>
+
+          <div class="avatar">C</div>
+        </div>
+      </header>
+
+      <!-- PROFILE COMPLETION -->
+      <section class="profile-card">
+        <div class="profile-info">
+          <div class="profile-icon"><i class="fa-solid fa-user"></i></div>
+
+          <div>
+            <h2>Complete your profile</h2>
+
+            <p>
+              A complete profile helps Insider prepare you better for
+              opportunities.
+            </p>
+          </div>
+        </div>
+
+        <div class="profile-progress">
+          <div class="progress-number">
+            <strong>40%</strong>
+            <span>Complete</span>
+          </div>
+
+          <div class="progress-bar">
+            <div></div>
+          </div>
+
+          <a href="profile.html"> Complete Profile → </a>
+        </div>
+      </section>
+
+      <!-- QUICK ACTIONS -->
+      <section class="section">
+        <div class="section-heading">
+          <div>
+            <h2>What do you want to do?</h2>
+
+            <p>Continue building your career with Insider.</p>
+          </div>
+        </div>
+
+        <div class="quick-grid">
+          <a href="profile.html" class="quick-card">
+            <div class="quick-icon green"><i class="fa-solid fa-user"></i></div>
+
+            <div>
+              <h3>Build My Profile</h3>
+
+              <p>Add your skills, projects, experience and achievements.</p>
+            </div>
+
+            <span class="arrow">→</span>
+          </a>
+
+          <a href="interview.html" class="quick-card">
+            <div class="quick-icon blue"><i class="fa-solid fa-microphone"></i></div>
+
+            <div>
+              <h3>Practice an Interview</h3>
+
+              <p>Practice with an AI interviewer tailored to your role.</p>
+            </div>
+
+            <span class="arrow">→</span>
+          </a>
+
+          <a href="aptitude.html" class="quick-card">
+            <div class="quick-icon purple"><i class="fa-solid fa-brain"></i></div>
+
+            <div>
+              <h3>Take an Aptitude Test</h3>
+
+              <p>12 timed questions across numerical, logical and verbal reasoning.</p>
+            </div>
+
+            <span class="arrow">→</span>
+          </a>
+        </div>
+      </section>
+
+      
+
+      <!-- PROGRESS -->
+      <section class="bottom-grid">
+        <div class="progress-card">
+          <div class="section-heading">
+            <div>
+              <h2>Your Progress</h2>
+
+              <p>Keep improving your readiness.</p>
+            </div>
+          </div>
+
+          <div class="progress-items">
+            <div class="progress-item">
+              <span class="check">✓</span>
+
+              <div>
+                <strong>Account created</strong>
+                <small>Completed</small>
+              </div>
+            </div>
+
+            <div class="progress-item">
+              <span class="check">✓</span>
+
+              <div>
+                <strong>Basic profile</strong>
+                <small>Completed</small>
+              </div>
+            </div>
+
+            <div class="progress-item">
+              <span class="pending">○</span>
+
+              <div>
+                <strong>Add your projects</strong>
+                <small>Not completed</small>
+              </div>
+            </div>
+
+            <div class="progress-item">
+              <span class="pending">○</span>
+
+              <div>
+                <strong>Practice an interview</strong>
+                <small>Not completed</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI CARD -->
+        <div class="ai-card">
+          <div class="ai-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+
+          <h2>Your AI Coach</h2>
+
+          <p>
+            Ready to help you understand your strengths, identify gaps and
+            prepare for your next interview.
+          </p>
+
+          <button>Start Coaching →</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="theme.js"></script>
+    <script src="dashboard.js"></script>
+  </body>
+</html>

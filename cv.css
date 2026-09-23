@@ -1,0 +1,198 @@
+:root {
+  --green: #00a651;
+  --ink: #09264a;
+  --muted: #4a5b6e;
+  --border: #dfe6ec;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #eef2f5;
+  color: var(--ink);
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* =========================
+   TOOLBAR
+========================= */
+
+.cv-toolbar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 30px;
+  background: white;
+  border-bottom: 1px solid var(--border);
+  z-index: 10;
+}
+
+.toolbar-link {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.toolbar-link:hover {
+  color: var(--green);
+}
+
+.toolbar-btn {
+  border: none;
+  background: var(--green);
+  color: white;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.toolbar-btn:hover {
+  background: #008f45;
+}
+
+/* =========================
+   CV DOCUMENT
+========================= */
+
+.cv-page {
+  max-width: 780px;
+  margin: 30px auto 60px;
+  background: white;
+  padding: 55px 60px;
+  border-radius: 4px;
+  box-shadow: 0 10px 40px rgba(9, 38, 74, 0.08);
+}
+
+.cv-header {
+  border-bottom: 3px solid var(--green);
+  padding-bottom: 18px;
+  margin-bottom: 24px;
+}
+
+.cv-header h1 {
+  font-size: 30px;
+  letter-spacing: -0.5px;
+  margin-bottom: 4px;
+}
+
+.cv-role {
+  font-size: 15px;
+  color: var(--green);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.cv-contact {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.cv-section {
+  margin-bottom: 22px;
+}
+
+.cv-section h2 {
+  font-size: 12px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--green);
+  margin-bottom: 8px;
+}
+
+.cv-section p {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--ink);
+  white-space: pre-wrap;
+}
+
+.cv-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cv-skill {
+  padding: 5px 12px;
+  background: #eef8f1;
+  color: #008f45;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.cv-links {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.cv-links a {
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.cv-empty-notice {
+  padding: 16px 18px;
+  background: #fff8e8;
+  border: 1px solid #f0dca0;
+  border-radius: 10px;
+  font-size: 13px;
+  color: #7a5c00;
+}
+
+.cv-empty-notice a {
+  color: #7a5c00;
+  font-weight: 700;
+}
+
+/* =========================
+   PRINT
+========================= */
+
+@media print {
+  body {
+    background: white;
+  }
+
+  .cv-toolbar {
+    display: none;
+  }
+
+  .cv-page {
+    box-shadow: none;
+    margin: 0;
+    padding: 0;
+    max-width: 100%;
+  }
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 700px) {
+  .cv-page {
+    padding: 30px 22px;
+    margin: 16px;
+  }
+
+  .cv-toolbar {
+    padding: 14px 18px;
+  }
+}
