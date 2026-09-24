@@ -78,3 +78,11 @@ docs/           API contract and integration reference
 - **Auth is local-only.** Signup/login persist an account in `localStorage`, not a
   real database — accounts don't carry across devices or browsers yet.
 - **Settings page logic hasn't been fully audited** (icons and layout have).
+
+## Team
+
+- **Tumi**: Product Lead and Data Analyst
+- **Marvellous Maduka** ([@marvellousisagoodfriend-tech](https://github.com/marvellousisagoodfriend-tech)): Backend, including the adaptive interview engine, voice and transcription APIs, and the API docs
+- **Jefferson**: Developer
+
+Also built by [@Hephzibah17](https://github.com/Hephzibah17) and [@chikeziechristopher11-sketch](https://github.com/chikeziechristopher11-sketch).
