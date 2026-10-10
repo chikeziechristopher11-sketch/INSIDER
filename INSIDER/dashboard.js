@@ -18,6 +18,21 @@ if (menuBtn && sidebar) {
 
 
 // ========================================
+// AUTH GUARD
+// ========================================
+
+function ensureSignedIn() {
+    const user = JSON.parse(localStorage.getItem("insiderUser") || "null");
+
+    if (!user || !user.email) {
+        window.location.href = "index.html";
+        return false;
+    }
+
+    return true;
+}
+
+// ========================================
 // LOGOUT
 // ========================================
 
@@ -28,6 +43,10 @@ if (logoutBtn) {
         localStorage.removeItem("insiderUser");
         window.location.href = "index.html";
     });
+}
+
+if (!ensureSignedIn()) {
+    throw new Error("User not authenticated.");
 }
 
 

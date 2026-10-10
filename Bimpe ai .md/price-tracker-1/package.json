@@ -1,0 +1,32 @@
+{
+  "name": "price-tracker",
+  "version": "1.0.0",
+  "description": "A web application that tracks real prices from various e-commerce platforms.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "ts-node src/app/page.tsx",
+    "build": "tsc",
+    "test": "jest"
+  },
+  "dependencies": {
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "axios": "^0.21.1"
+  },
+  "devDependencies": {
+    "typescript": "^4.4.3",
+    "ts-node": "^10.4.0",
+    "jest": "^27.0.6",
+    "@types/jest": "^27.0.1",
+    "@types/react": "^17.0.2",
+    "@types/react-dom": "^17.0.2"
+  },
+  "keywords": [
+    "price",
+    "tracker",
+    "e-commerce",
+    "react"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}

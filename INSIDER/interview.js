@@ -565,6 +565,22 @@ let interviewStartTime = null;
 
 let timer = null;
 
+let aiSession = null;
+
+let aiHistory = [];
+
+let aiSessionState = {};
+
+let aiQuestionMode = false;
+
+let aiAudio = null;
+
+let aiAudioUrl = null;
+
+let speechRequestId = 0;
+
+const MAX_AI_QUESTIONS = 7;
+
 
 // =========================================
 // COMPANY SELECTION
@@ -708,6 +724,127 @@ if (backToCompanies) {
 // BUILD QUESTIONS
 // =========================================
 
+function interviewCompetencies(role) {
+
+    const roleMap = {
+        "Software Engineer": ["problem_solving", "execution", "communication", "ownership"],
+        "Frontend Engineer": ["problem_solving", "execution", "customer_empathy", "communication"],
+        "Backend Engineer": ["problem_solving", "execution", "ownership", "communication"],
+        "Data Analyst": ["problem_solving", "business_sense", "communication", "customer_empathy"],
+        "Data Scientist": ["problem_solving", "business_sense", "communication", "execution"],
+        "Product Manager": ["product_thinking", "customer_empathy", "business_sense", "influence"],
+        "UX Designer": ["customer_empathy", "product_thinking", "execution", "influence"],
+        "Risk Analyst": ["problem_solving", "business_sense", "communication", "ownership"],
+        "Relationship Manager": ["customer_empathy", "communication", "negotiation", "ownership"],
+        "Digital Banking Specialist": ["customer_empathy", "product_thinking", "problem_solving", "communication"],
+        "Sales representative": ["communication", "negotiation", "customer_empathy", "ownership"],
+        "Customer relations": ["customer_empathy", "communication", "problem_solving", "ownership"],
+        "Co-ordinator": ["communication", "ownership", "execution", "problem_solving"],
+        "Cloud Engineer": ["problem_solving", "execution", "ownership", "communication"],
+        "DevOps Engineer": ["problem_solving", "execution", "ownership", "communication"],
+    };
+
+    return roleMap[role] || ["communication", "problem_solving", "ownership", "execution"];
+
+}
+
+function candidateForInterview() {
+
+    const storedUser = JSON.parse(localStorage.getItem("insiderUser") || "{}");
+    const experience = Array.isArray(profile.experience)
+        ? profile.experience.filter((item) => typeof item === "string")
+        : [];
+
+    return {
+        name: profile.name || storedUser.name || "Candidate",
+        summary: profile.summary || profile.field || "Professional candidate preparing for an interview.",
+        experience,
+    };
+
+}
+
+function normalizeAiTurn(result) {
+    if (!result || typeof result !== "object") {
+        return null;
+    }
+
+    const question = typeof result.question === "string" ? result.question.trim() : "";
+    if (!question) {
+        return null;
+    }
+
+    return {
+        ...result,
+        question,
+        status: result.status === "complete" ? "complete" : "continue",
+        role: result.role && typeof result.role === "object"
+            ? result.role
+            : { company: selectedCompany, title: selectedRole },
+    };
+}
+
+async function requestAiTurn(answer = "", askedQuestion = "") {
+
+    const storedUser = JSON.parse(localStorage.getItem("insiderUser") || "{}");
+    const candidate = candidateForInterview();
+    const userId = storedUser.id || storedUser.email || candidate.name;
+
+    if (!aiSession) {
+        const sessionResponse = await fetch("/api/interview/session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                user_id: String(userId),
+                session_id: `insider-${Date.now()}`,
+                candidate_name: candidate.name,
+                role_title: selectedRole,
+            }),
+        });
+
+        if (!sessionResponse.ok) {
+            throw new Error("Unable to create interview session");
+        }
+
+        aiSession = (await sessionResponse.json()).session;
+    }
+
+    if (answer) {
+        aiHistory.push({ role: "assistant", content: askedQuestion });
+        aiHistory.push({ role: "user", content: answer });
+    }
+
+    const response = await fetch("/api/interview", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            candidate,
+            role: {
+                company: selectedCompany,
+                title: selectedRole,
+                competencies: interviewCompetencies(selectedRole),
+            },
+            history: aiHistory,
+            session_state: aiSessionState,
+            session: aiSession,
+        }),
+    });
+
+    if (!response.ok) {
+        throw new Error("Unable to generate interview question");
+    }
+
+    const result = await response.json();
+    const normalizedResult = normalizeAiTurn(result);
+
+    if (!normalizedResult) {
+        throw new Error("AI returned an empty question");
+    }
+
+    aiSessionState = normalizedResult.session_state || {};
+    return normalizedResult;
+
+}
+
 function buildQuestions() {
 
     const companyQs =
@@ -745,15 +882,18 @@ function buildQuestions() {
 // START INTERVIEW
 // =========================================
 
-function startInterview() {
+async function startInterview() {
 
     currentQuestion =
         0;
 
     answers = [];
 
-    questions =
-        buildQuestions();
+    questions = [];
+    aiSession = null;
+    aiHistory = [];
+    aiSessionState = {};
+    aiQuestionMode = true;
 
 
     roleScreen.classList.add(
@@ -777,8 +917,8 @@ function startInterview() {
         selectedCompany;
 
 
-    totalQuestions.textContent =
-        questions.length;
+    totalQuestions.textContent = 
+        MAX_AI_QUESTIONS;
 
 
     interviewStarted =
@@ -790,6 +930,18 @@ function startInterview() {
 
 
     setupSpeechRecognition();
+
+    try {
+        const firstTurn = await requestAiTurn();
+        if (!firstTurn.question || firstTurn.status === "complete") {
+            throw new Error("AI returned no opening question");
+        }
+        questions.push(firstTurn.question);
+    } catch {
+        aiQuestionMode = false;
+        questions = buildQuestions();
+        totalQuestions.textContent = questions.length;
+    }
 
 
     showQuestion();
@@ -917,98 +1069,120 @@ function updateListeningCriteria(
 // SPEAK QUESTION
 // =========================================
 
-function speakQuestion(
-    text
-) {
+function updateSpeechStatus(speaking) {
+
+    isSpeaking = speaking;
+
+    speakingRing.classList.toggle("active", speaking);
+    voiceWave.classList.toggle("active", speaking);
+    voiceStatus.textContent = speaking ? "AI is speaking..." : "Your turn";
+    speakingStatus.textContent = speaking ? "Speaking" : "Listening";
+
+}
+
+function stopAiSpeech() {
+
+    speechRequestId += 1;
+
+    if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+    }
+
+    if (aiAudio) {
+        aiAudio.onended = null;
+        aiAudio.onerror = null;
+        aiAudio.pause();
+        aiAudio.src = "";
+        aiAudio = null;
+    }
+
+    if (aiAudioUrl) {
+        URL.revokeObjectURL(aiAudioUrl);
+        aiAudioUrl = null;
+    }
+
+    updateSpeechStatus(false);
+
+}
+
+function speakWithBrowserVoice(text, requestId) {
 
     if (
+        requestId !== speechRequestId ||
         isMuted ||
         !("speechSynthesis" in window)
     ) {
-
         return;
-
     }
 
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "en-NG";
+    utterance.rate = 0.92;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+    utterance.onstart = () => {
+        if (requestId === speechRequestId) {
+            updateSpeechStatus(true);
+        }
+    };
+    utterance.onend = () => {
+        if (requestId === speechRequestId) {
+            updateSpeechStatus(false);
+        }
+    };
+    utterance.onerror = utterance.onend;
 
-    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
 
+}
 
-    const utterance =
-        new SpeechSynthesisUtterance(
-            text
-        );
+async function speakQuestion(text) {
 
+    if (isMuted || !text) {
+        return;
+    }
 
-    utterance.rate =
-        0.92;
+    stopAiSpeech();
+    const requestId = speechRequestId;
 
+    try {
+        const response = await fetch("/api/tts", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text, voice: "female" }),
+        });
 
-    utterance.pitch =
-        1;
+        if (!response.ok) {
+            throw new Error("AI voice service unavailable");
+        }
 
+        const audioUrl = URL.createObjectURL(await response.blob());
+        if (requestId !== speechRequestId || isMuted) {
+            URL.revokeObjectURL(audioUrl);
+            return;
+        }
 
-    utterance.volume =
-        1;
-
-
-    utterance.onstart =
-        () => {
-
-            isSpeaking =
-                true;
-
-
-            speakingRing.classList.add(
-                "active"
-            );
-
-
-            voiceWave.classList.add(
-                "active"
-            );
-
-
-            voiceStatus.textContent =
-                "AI is speaking...";
-
-
-            speakingStatus.textContent =
-                "Speaking";
-
+        aiAudioUrl = audioUrl;
+        aiAudio = new Audio(audioUrl);
+        aiAudio.onplay = () => updateSpeechStatus(true);
+        aiAudio.onended = () => {
+            if (requestId === speechRequestId) {
+                stopAiSpeech();
+            }
+        };
+        aiAudio.onerror = () => {
+            if (requestId === speechRequestId) {
+                stopAiSpeech();
+                speakWithBrowserVoice(text, speechRequestId);
+            }
         };
 
-
-    utterance.onend =
-        () => {
-
-            isSpeaking =
-                false;
-
-
-            speakingRing.classList.remove(
-                "active"
-            );
-
-
-            voiceWave.classList.remove(
-                "active"
-            );
-
-
-            voiceStatus.textContent =
-                "Your turn";
-
-
-            speakingStatus.textContent =
-                "Listening";
-
-        };
-
-
-    window.speechSynthesis.speak(
-        utterance
-    );
+        await aiAudio.play();
+    } catch {
+        if (requestId === speechRequestId && !isMuted) {
+            speakWithBrowserVoice(text, requestId);
+        }
+    }
 
 }
 
@@ -1264,11 +1438,7 @@ function startListening() {
     }
 
 
-    if (isSpeaking) {
-
-        window.speechSynthesis.cancel();
-
-    }
+    stopAiSpeech();
 
 
     try {
@@ -1401,7 +1571,7 @@ function getTranscript() {
 // SUBMIT VOICE ANSWER
 // =========================================
 
-function submitVoiceAnswer() {
+async function submitVoiceAnswer() {
 
     const answer =
         getTranscript();
@@ -1431,12 +1601,38 @@ function submitVoiceAnswer() {
     });
 
 
+    const askedQuestion = questions[currentQuestion];
+
     detectEvidence(
         answer
     );
 
 
     currentQuestion++;
+
+    if (aiQuestionMode) {
+
+        try {
+            const nextTurn = await requestAiTurn(answer, askedQuestion);
+
+            if (nextTurn.status === "complete") {
+                finishInterview();
+                return;
+            }
+
+            if (nextTurn.question && !questions.includes(nextTurn.question) && answers.length < MAX_AI_QUESTIONS) {
+                questions.push(nextTurn.question);
+            } else if (currentQuestion + 1 >= MAX_AI_QUESTIONS) {
+                finishInterview();
+                return;
+            }
+        } catch {
+            aiQuestionMode = false;
+            questions = buildQuestions();
+            totalQuestions.textContent = questions.length;
+        }
+
+    }
 
 
     setTimeout(
@@ -1574,7 +1770,7 @@ if (muteButton) {
 
             if (isMuted) {
 
-                window.speechSynthesis.cancel();
+                stopAiSpeech();
 
 
                 muteButton.textContent =
@@ -1706,13 +1902,7 @@ function finishInterview() {
     stopListening();
 
 
-    if (
-        "speechSynthesis" in window
-    ) {
-
-        window.speechSynthesis.cancel();
-
-    }
+    stopAiSpeech();
 
 
     const score =

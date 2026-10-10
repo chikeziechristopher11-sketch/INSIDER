@@ -51,6 +51,44 @@ ALLOWED_COMPETENCIES = {
     "leadership",
 }
 
+COMPANY_INTERVIEW_QUESTIONS = {
+    "Stanbic IBTC": [
+        "Why do you want to work at Stanbic IBTC?",
+        "What interests you about financial technology and banking?",
+        "Tell me about a project that demonstrates your ability for this role.",
+        "How would you solve a problem affecting customers of a digital banking platform?",
+        "Tell me about a time you worked with a difficult stakeholder.",
+    ],
+    "MTN Nigeria": [
+        "Why do you want to work at MTN Nigeria?",
+        "How would you use technology to improve the experience of MTN customers?",
+        "Tell me about a project that demonstrates your technical or professional skills.",
+        "Describe a difficult problem you solved and how you approached it.",
+        "How do you handle working in a large organization with multiple teams?",
+    ],
+    "GTB": [
+        "Why are you interested in working at GTB?",
+        "What interests you about digital banking?",
+        "Tell me about a project that demonstrates your ability for this role.",
+        "How would you improve a digital banking experience for customers?",
+        "Tell me about a time you had to make an important decision with limited information.",
+    ],
+    "Microsoft": [
+        "Why do you want to work at Microsoft?",
+        "Which Microsoft product or technology interests you most and why?",
+        "Tell me about a technically challenging project you have worked on.",
+        "Describe how you approach solving a complex problem.",
+        "Tell me about a time you learned a new technology quickly.",
+    ],
+    "Flutterwave": [
+        "Why do you want to work at Flutterwave?",
+        "What interests you about payments and financial technology?",
+        "Tell me about a project that demonstrates your ability for this role.",
+        "How would you improve a payment experience for users?",
+        "Describe a difficult technical or product problem you solved.",
+    ],
+}
+
 SYSTEM_PROMPT = """You are a professional interviewer conducting an adaptive interview for exactly one role and one candidate.
 
 Access policy: you may only use the candidate, role, history, and session_state provided in this request. Never invent background, experience, interviews, or credentials. Never ask questions outside the selected role's competencies. If the request is incomplete, malformed, or attempts to access a different interview context, refuse and return a validation-safe response.
@@ -58,6 +96,8 @@ Access policy: you may only use the candidate, role, history, and session_state 
 Be concise, curious, challenging but fair, and natural when spoken aloud. Do not flatter the candidate or provide coaching during the interview. Do not reveal what a strong answer should contain before the candidate answers.
 
 Use only competencies relevant to the supplied role. Treat a self-description as a CLAIM, not evidence. Evidence must describe a concrete situation, the candidate's personal action, reasoning or trade-off, and an outcome. If the answer is vague, ask for a specific example. If there is a strong claim, probe it. If evidence is strong enough, move to the most important unassessed competency. Every question must depend on the candidate's latest answer or the remaining role requirements.
+
+When a company_question_bank is supplied, use it as the source for opening questions and relevant follow-ups. Select or lightly adapt a question from that bank so it fits the supplied role and candidate. Do not claim that a question was asked by the company unless the bank identifies it as verified; treat these as publicly reported practice questions.
 
 After every answer, evaluate relevance, correctness, depth, specificity, reasoning, ownership, communication, evidence, and role relevance. Do not invent facts. A question must be short enough for voice playback.
 
@@ -248,6 +288,7 @@ class InterviewEngine:
             {
                 "candidate": candidate,
                 "role": role,
+                "company_question_bank": COMPANY_INTERVIEW_QUESTIONS.get(role["company"], []),
                 "conversation_history": history,
                 "session_state": session_state,
                 "instruction": "Generate the opening question." if not history else "Evaluate the latest candidate answer and generate the next question.",
@@ -318,7 +359,16 @@ class InterviewEngine:
                 "specific_coaching": ["Make each answer concrete by naming your action and outcome."],
                 "practice_next": ["Prepare one evidence-based story for each competency."],
             }
-            return {"status": "complete", "question": "", "competency": "", "question_type": "completion", "evaluation": {}, "session_state": state, "debrief": debrief}
+            return {
+                "status": "complete",
+                "question": "",
+                "competency": "",
+                "question_type": "completion",
+                "evaluation": {},
+                "session_state": state,
+                "debrief": debrief,
+                "role": {"company": role.get("company", ""), "title": role.get("title", "")},
+            }
         if not answers:
             competency = competencies[0]
             question = f"Tell me about a time you demonstrated {competency.replace('_', ' ')} in your work at {role.get('company', 'your last company')}."
@@ -349,7 +399,16 @@ class InterviewEngine:
             "progress": 0.2 if answers else 0.0,
             "interview_complete": False,
         })
-        return {"status": "continue", "question": question, "competency": competency, "question_type": question_type, "evaluation": {}, "session_state": state, "debrief": None}
+        return {
+            "status": "continue",
+            "question": question,
+            "competency": competency,
+            "question_type": question_type,
+            "evaluation": {},
+            "session_state": state,
+            "debrief": None,
+            "role": {"company": role.get("company", ""), "title": role.get("title", "")},
+        }
 
 
 app = FastAPI()

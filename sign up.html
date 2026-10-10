@@ -196,6 +196,14 @@
                     <i class="fab fa-linkedin text-blue-500 text-lg"></i>
                     <span>LinkedIn</span>
                 </button>
+                <button type="button" onclick="socialLogin('GitHub')" class="flex items-center justify-center space-x-2 py-3 px-4 glass-input rounded-xl hover:bg-slate-800/80 transition-all text-sm font-medium text-slate-200">
+                    <i class="fab fa-github text-white text-lg"></i>
+                    <span>GitHub</span>
+                </button>
+                <button type="button" onclick="socialLogin('Microsoft')" class="flex items-center justify-center space-x-2 py-3 px-4 glass-input rounded-xl hover:bg-slate-800/80 transition-all text-sm font-medium text-slate-200">
+                    <i class="fab fa-microsoft text-cyan-400 text-lg"></i>
+                    <span>Microsoft</span>
+                </button>
             </div>
 
             <!-- Divider -->
@@ -329,13 +337,105 @@
     </footer>
 
     <!-- JavaScript Application Logic -->
-    <script>
-        let currentMode = 'signup';
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+        import {
+            getAuth,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            signInWithPopup,
+            GoogleAuthProvider,
+            GithubAuthProvider,
+            OAuthProvider,
+            updateProfile,
+            onAuthStateChanged
+        } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 
-        // Toggle between Sign Up and Log In modes
+        const FIREBASE_CONFIG = {
+            apiKey: 'YOUR_FIREBASE_API_KEY',
+            authDomain: 'YOUR_PROJECT.firebaseapp.com',
+            projectId: 'YOUR_PROJECT_ID',
+            storageBucket: 'YOUR_PROJECT.appspot.com',
+            messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
+            appId: 'YOUR_APP_ID'
+        };
+
+        const USERS_KEY = 'insiderUsers';
+        const ACTIVE_USER_KEY = 'insiderUser';
+        let currentMode = 'signup';
+        let auth = null;
+        let firebaseReady = false;
+
+        function ensureDemoUsers() {
+            const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+            const hasDemoUser = users.some((user) => user.email === 'demo@insider.app');
+
+            if (!hasDemoUser) {
+                users.push({
+                    id: 'demo-user',
+                    name: 'Demo User',
+                    email: 'demo@insider.app',
+                    passwordHash: btoa(unescape(encodeURIComponent('demo1234'))),
+                    role: 'candidate',
+                    provider: 'email',
+                    photo: ''
+                });
+                localStorage.setItem(USERS_KEY, JSON.stringify(users));
+            }
+        }
+
+        function hashPassword(password) {
+            return btoa(unescape(encodeURIComponent(password)));
+        }
+
+        function getUsers() {
+            return JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+        }
+
+        function storeUsers(users) {
+            localStorage.setItem(USERS_KEY, JSON.stringify(users));
+        }
+
+        function saveActiveUser(user) {
+            localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(user));
+        }
+
+        function getDashboardUrl() {
+            const currentPath = window.location.pathname.toLowerCase();
+            return currentPath.includes('/insider/') ? 'dashboard.html' : 'INSIDER/dashboard.html';
+        }
+
+        function initializeFirebase() {
+            const hasFirebaseConfig = Object.values(FIREBASE_CONFIG).every((value) => typeof value === 'string' && value && !value.includes('YOUR_'));
+
+            if (!hasFirebaseConfig) {
+                firebaseReady = false;
+                return false;
+            }
+
+            const app = initializeApp(FIREBASE_CONFIG);
+            auth = getAuth(app);
+            firebaseReady = true;
+
+            onAuthStateChanged(auth, (user) => {
+                if (!user) return;
+                const profile = {
+                    id: user.uid,
+                    name: user.displayName || 'Insider User',
+                    email: user.email || '',
+                    passwordHash: '',
+                    role: 'candidate',
+                    provider: user.providerData?.[0]?.providerId || 'firebase',
+                    photo: user.photoURL || ''
+                };
+                saveActiveUser(profile);
+            });
+
+            return true;
+        }
+
         function switchMode(mode) {
             currentMode = mode;
-            
             const title = document.getElementById('form-title');
             const subtitle = document.getElementById('form-subtitle');
             const tabSignup = document.getElementById('tab-signup');
@@ -352,42 +452,34 @@
             if (mode === 'signup') {
                 title.innerText = 'Create Your Account';
                 subtitle.innerText = 'Join thousands of professionals getting hired faster with Insider.';
-                
                 tabSignup.className = 'flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all duration-300 bg-slate-800 text-white shadow-lg';
                 tabLogin.className = 'flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all duration-300 text-slate-400 hover:text-white';
-                
                 fullnameField.classList.remove('hidden');
                 roleField.classList.remove('hidden');
                 confirmPassField.classList.remove('hidden');
                 termsField.classList.remove('hidden');
                 forgotField.classList.add('hidden');
-                
                 btnText.innerText = 'CREATE ACCOUNT';
                 bottomText.innerHTML = 'Already have an account? <button onclick="switchMode(\'login\')" class="text-emerald-400 font-semibold hover:underline focus:outline-none ml-1">Log In</button>';
             } else {
                 title.innerText = 'Welcome Back';
                 subtitle.innerText = 'Log in to access your interview prep and applications.';
-                
                 tabLogin.className = 'flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all duration-300 bg-slate-800 text-white shadow-lg';
                 tabSignup.className = 'flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all duration-300 text-slate-400 hover:text-white';
-                
                 fullnameField.classList.add('hidden');
                 roleField.classList.add('hidden');
                 confirmPassField.classList.add('hidden');
                 termsField.classList.add('hidden');
                 strengthMeter.classList.add('hidden');
                 forgotField.classList.remove('hidden');
-                
                 btnText.innerText = 'LOG IN';
                 bottomText.innerHTML = 'Don\'t have an account? <button onclick="switchMode(\'signup\')" class="text-emerald-400 font-semibold hover:underline focus:outline-none ml-1">Sign Up</button>';
             }
         }
 
-        // Password Show/Hide Toggle
         function togglePasswordVisibility(inputId, iconId) {
             const input = document.getElementById(inputId);
             const icon = document.getElementById(iconId);
-            
             if (input.type === 'password') {
                 input.type = 'text';
                 icon.className = 'far fa-eye-slash text-emerald-400';
@@ -397,10 +489,8 @@
             }
         }
 
-        // Live Password Strength Indicator
         function checkPasswordStrength() {
             if (currentMode !== 'signup') return;
-            
             const password = document.getElementById('password').value;
             const container = document.getElementById('password-strength-container');
             const bar = document.getElementById('strength-bar');
@@ -412,7 +502,6 @@
             }
 
             container.classList.remove('hidden');
-
             let strength = 0;
             if (password.length >= 8) strength += 25;
             if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength += 25;
@@ -440,17 +529,165 @@
             }
         }
 
-        // Handle Form Submission
+        function showToast(title, message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastTitle = document.getElementById('toast-title');
+            const toastMessage = document.getElementById('toast-message');
+            toastTitle.innerText = title;
+            toastMessage.innerText = message;
+            toast.classList.remove('translate-x-full');
+            setTimeout(() => toast.classList.add('translate-x-full'), 4000);
+        }
+
+        function setLoadingState(isLoading) {
+            const btnText = document.getElementById('btn-text');
+            const btnIcon = document.getElementById('btn-icon');
+            const btnSpinner = document.getElementById('btn-spinner');
+            const submitBtn = document.getElementById('submit-btn');
+            if (isLoading) {
+                btnText.innerText = 'PROCESSING...';
+                btnIcon.classList.add('hidden');
+                btnSpinner.classList.remove('hidden');
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-80', 'cursor-not-allowed');
+            } else {
+                btnText.innerText = currentMode === 'signup' ? 'CREATE ACCOUNT' : 'LOG IN';
+                btnIcon.classList.remove('hidden');
+                btnSpinner.classList.add('hidden');
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-80', 'cursor-not-allowed');
+            }
+        }
+
+        function handleEmailAuthFallback(email, password, name = '', role = 'candidate') {
+            const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+            const normalizedEmail = String(email).trim().toLowerCase();
+            const authUser = users.find((user) => user.email.toLowerCase() === normalizedEmail);
+
+            if (currentMode === 'signup') {
+                if (!name) {
+                    showToast('Name required', 'Please enter your full name to continue.', 'warning');
+                    return;
+                }
+                if (authUser) {
+                    showToast('Account exists', 'That email already has an account. Please log in instead.', 'warning');
+                    return;
+                }
+                const newUser = {
+                    id: `user-${Date.now()}`,
+                    name,
+                    email: normalizedEmail,
+                    passwordHash: hashPassword(password),
+                    role,
+                    provider: 'email',
+                    photo: ''
+                };
+                users.push(newUser);
+                localStorage.setItem(USERS_KEY, JSON.stringify(users));
+                saveActiveUser(newUser);
+                showToast('Account created!', `Welcome aboard, ${name}! Redirecting...`, 'success');
+                setTimeout(() => window.location.href = getDashboardUrl(), 900);
+                return;
+            }
+
+            if (!authUser || authUser.passwordHash !== hashPassword(password)) {
+                showToast('Login failed', 'Incorrect email or password. Try again or use Google to continue.', 'warning');
+                return;
+            }
+            saveActiveUser(authUser);
+            showToast('Welcome back!', 'Logging you into your dashboard...', 'success');
+            setTimeout(() => window.location.href = getDashboardUrl(), 900);
+        }
+
+        async function handleEmailAuth(email, password, name = '', role = 'candidate') {
+            if (!firebaseReady || !auth) {
+                handleEmailAuthFallback(email, password, name, role);
+                return;
+            }
+
+            try {
+                if (currentMode === 'signup') {
+                    const result = await createUserWithEmailAndPassword(auth, email, password);
+                    if (name) {
+                        await updateProfile(result.user, { displayName: name });
+                    }
+                    const profile = {
+                        id: result.user.uid,
+                        name: name || result.user.displayName || 'Insider User',
+                        email: result.user.email,
+                        passwordHash: '',
+                        role,
+                        provider: 'password',
+                        photo: result.user.photoURL || ''
+                    };
+                    saveActiveUser(profile);
+                    showToast('Account created!', `Welcome aboard, ${profile.name}! Redirecting...`, 'success');
+                    setTimeout(() => window.location.href = getDashboardUrl(), 900);
+                    return;
+                }
+
+                const result = await signInWithEmailAndPassword(auth, email, password);
+                const profile = {
+                    id: result.user.uid,
+                    name: result.user.displayName || 'Insider User',
+                    email: result.user.email,
+                    passwordHash: '',
+                    role: 'candidate',
+                    provider: 'password',
+                    photo: result.user.photoURL || ''
+                };
+                saveActiveUser(profile);
+                showToast('Welcome back!', 'Logging you into your dashboard...', 'success');
+                setTimeout(() => window.location.href = getDashboardUrl(), 900);
+            } catch (error) {
+                showToast('Authentication failed', error?.message || 'Please check your details and try again.', 'warning');
+            }
+        }
+
+        async function handleProviderSignIn(providerName) {
+            if (!firebaseReady || !auth) {
+                showToast('Not configured', 'Add your Firebase project config to enable real OAuth sign-in.', 'warning');
+                return;
+            }
+
+            try {
+                let provider;
+                if (providerName === 'google') {
+                    provider = new GoogleAuthProvider();
+                } else if (providerName === 'github') {
+                    provider = new GithubAuthProvider();
+                } else if (providerName === 'microsoft') {
+                    provider = new OAuthProvider('microsoft.com');
+                } else if (providerName === 'linkedin') {
+                    showToast('LinkedIn not enabled', 'Add a custom OAuth setup for LinkedIn to enable this provider.', 'warning');
+                    return;
+                }
+
+                const result = await signInWithPopup(auth, provider);
+                const profile = {
+                    id: result.user.uid,
+                    name: result.user.displayName || 'Insider User',
+                    email: result.user.email || '',
+                    passwordHash: '',
+                    role: 'candidate',
+                    provider: result.user.providerData?.[0]?.providerId || providerName,
+                    photo: result.user.photoURL || ''
+                };
+                saveActiveUser(profile);
+                showToast('Welcome!', `Signed in with ${providerName.toUpperCase()}.`, 'success');
+                setTimeout(() => window.location.href = getDashboardUrl(), 900);
+            } catch (error) {
+                showToast('Provider sign-in failed', error?.message || 'Could not authenticate with this provider.', 'warning');
+            }
+        }
+
         function handleFormSubmit(event) {
             event.preventDefault();
-
             const fullname = document.getElementById('fullname').value.trim();
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirm-password').value;
             const terms = document.getElementById('terms').checked;
-
-            // Simple Client Validation
             let isValid = true;
 
             if (currentMode === 'signup') {
@@ -475,70 +712,43 @@
             }
 
             if (!isValid) return;
-
-            // Trigger Loading State
             setLoadingState(true);
 
-            // Simulate API Network Delay
-            setTimeout(() => {
+            setTimeout(async () => {
                 setLoadingState(false);
                 if (currentMode === 'signup') {
-                    showToast('Account Created!', `Welcome aboard, ${fullname || 'User'}! Redirecting...`, 'success');
+                    await handleEmailAuth(email, password, fullname, document.getElementById('role').value || 'candidate');
                 } else {
-                    showToast('Welcome Back!', 'Logging you into your dashboard...', 'success');
+                    await handleEmailAuth(email, password);
                 }
-            }, 1800);
+            }, 700);
         }
 
-        // Button Loading State
-        function setLoadingState(isLoading) {
-            const btnText = document.getElementById('btn-text');
-            const btnIcon = document.getElementById('btn-icon');
-            const btnSpinner = document.getElementById('btn-spinner');
-            const submitBtn = document.getElementById('submit-btn');
-
-            if (isLoading) {
-                btnText.innerText = 'PROCESSING...';
-                btnIcon.classList.add('hidden');
-                btnSpinner.classList.remove('hidden');
-                submitBtn.disabled = true;
-                submitBtn.classList.add('opacity-80', 'cursor-not-allowed');
-            } else {
-                btnText.innerText = currentMode === 'signup' ? 'CREATE ACCOUNT' : 'LOG IN';
-                btnIcon.classList.remove('hidden');
-                btnSpinner.classList.add('hidden');
-                submitBtn.disabled = false;
-                submitBtn.classList.remove('opacity-80', 'cursor-not-allowed');
-            }
-        }
-
-        // Display Toast Overlay Notification
-        function showToast(title, message, type = 'success') {
-            const toast = document.getElementById('toast');
-            const toastTitle = document.getElementById('toast-title');
-            const toastMessage = document.getElementById('toast-message');
-
-            toastTitle.innerText = title;
-            toastMessage.innerText = message;
-
-            // Slide in toast
-            toast.classList.remove('translate-x-full');
-
-            // Slide out after 4 seconds
-            setTimeout(() => {
-                toast.classList.add('translate-x-full');
-            }, 4000);
-        }
-
-        // Social Login Placeholder Interaction
         function socialLogin(provider) {
-            showToast('Connecting...', `Redirecting to ${provider} authentication.`, 'info');
+            const providerName = provider.toLowerCase();
+            if (providerName === 'linkedin') {
+                showToast('LinkedIn not enabled', 'Add a custom LinkedIn OAuth client to use this provider.', 'warning');
+                return;
+            }
+            handleProviderSignIn(providerName);
         }
 
         function resetFormState() {
             document.getElementById('auth-form').reset();
             switchMode('signup');
         }
+
+        window.switchMode = switchMode;
+        window.togglePasswordVisibility = togglePasswordVisibility;
+        window.checkPasswordStrength = checkPasswordStrength;
+        window.handleFormSubmit = handleFormSubmit;
+        window.socialLogin = socialLogin;
+        window.resetFormState = resetFormState;
+        window.handleEmailAuth = handleEmailAuth;
+
+        ensureDemoUsers();
+        initializeFirebase();
+        switchMode(currentMode);
     </script>
 </body>
 </html>
