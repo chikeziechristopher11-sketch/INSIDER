@@ -25,7 +25,7 @@ function ensureSignedIn() {
     const user = JSON.parse(localStorage.getItem("insiderUser") || "null");
 
     if (!user || !user.email) {
-        window.location.href = "index.html";
+        window.location.href = "sign up.html?mode=login";
         return false;
     }
 
@@ -41,7 +41,7 @@ const logoutBtn = document.getElementById("logoutBtn");
 if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
         localStorage.removeItem("insiderUser");
-        window.location.href = "index.html";
+        window.location.href = "sign up.html?mode=login";
     });
 }
 

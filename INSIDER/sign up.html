@@ -337,8 +337,10 @@
     </footer>
 
     <!-- JavaScript Application Logic -->
+    <script src="../firebase-config.js"></script>
     <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js';
+        import { getAnalytics, isSupported } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-analytics.js';
         import {
             getAuth,
             createUserWithEmailAndPassword,
@@ -349,9 +351,9 @@
             OAuthProvider,
             updateProfile,
             onAuthStateChanged
-        } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+        } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js';
 
-        const FIREBASE_CONFIG = {
+        const FIREBASE_CONFIG = window.FIREBASE_CONFIG || {
             apiKey: 'YOUR_FIREBASE_API_KEY',
             authDomain: 'YOUR_PROJECT.firebaseapp.com',
             projectId: 'YOUR_PROJECT_ID',
@@ -362,7 +364,7 @@
 
         const USERS_KEY = 'insiderUsers';
         const ACTIVE_USER_KEY = 'insiderUser';
-        let currentMode = 'signup';
+        let currentMode = new URLSearchParams(window.location.search).get('mode') === 'login' ? 'login' : 'signup';
         let auth = null;
         let firebaseReady = false;
 
@@ -415,6 +417,9 @@
 
             const app = initializeApp(FIREBASE_CONFIG);
             auth = getAuth(app);
+            isSupported().then((supported) => {
+                if (supported) getAnalytics(app);
+            }).catch((error) => console.warn('Firebase Analytics unavailable:', error));
             firebaseReady = true;
 
             onAuthStateChanged(auth, (user) => {

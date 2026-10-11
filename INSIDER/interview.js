@@ -56,7 +56,7 @@ if (logoutBtn) {
             );
 
             window.location.href =
-                "login.html";
+                "sign up.html?mode=login";
 
         }
     );
@@ -790,7 +790,7 @@ async function requestAiTurn(answer = "", askedQuestion = "") {
     const userId = storedUser.id || storedUser.email || candidate.name;
 
     if (!aiSession) {
-        const sessionResponse = await fetch("/api/interview/session", {
+        const sessionResponse = await fetch(window.apiUrl("/api/interview/session"), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -813,7 +813,7 @@ async function requestAiTurn(answer = "", askedQuestion = "") {
         aiHistory.push({ role: "user", content: answer });
     }
 
-    const response = await fetch("/api/interview", {
+    const response = await fetch(window.apiUrl("/api/interview"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1146,7 +1146,7 @@ async function speakQuestion(text) {
     const requestId = speechRequestId;
 
     try {
-        const response = await fetch("/api/tts", {
+        const response = await fetch(window.apiUrl("/api/tts"), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ text, voice: "female" }),

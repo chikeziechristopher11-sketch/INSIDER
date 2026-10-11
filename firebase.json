@@ -1,0 +1,24 @@
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "api/**",
+      "tests/**",
+      "docs/**",
+      "Bimpe ai .md/**",
+      "*.py",
+      "*.toml",
+      "*.txt",
+      "*.zip",
+      "README.md",
+      "vercel.json",
+      ".venv/**",
+      "__pycache__/**",
+      ".pytest_cache/**",
+      ".vercel/**"
+    ]
+  }
+}

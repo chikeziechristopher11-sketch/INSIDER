@@ -27,13 +27,13 @@ function ensureSignedIn() {
     const user = JSON.parse(localStorage.getItem("insiderUser") || "null");
 
     if (!user || !user.email) {
-      window.location.href = "index.html";
+      window.location.href = "sign up.html?mode=login";
       return false;
     }
 
     return true;
   } catch (error) {
-    window.location.href = "index.html";
+    window.location.href = "sign up.html?mode=login";
     return false;
   }
 }
@@ -50,7 +50,7 @@ if (logoutBtn) {
 
     localStorage.removeItem("insiderProfile");
 
-    window.location.href = "index.html";
+    window.location.href = "sign up.html?mode=login";
   });
 }
 
@@ -809,7 +809,7 @@ if (cvInput) {
 
         formData.append("cv", file);
 
-        const response = await fetch(`/api/profile/${user.id}/cv`, {
+        const response = await fetch(window.apiUrl(`/api/profile/${user.id}/cv`), {
           method: "POST",
           body: formData,
         });

@@ -131,7 +131,7 @@ async function startMobileRecording() {
     answerState.textContent = 'Transcribing your answer';
     try {
       const audioBlob = new Blob(recordedChunks, { type: mimeType });
-      const response = await fetch('/api/transcribe', {
+      const response = await fetch(window.apiUrl('/api/transcribe'), {
         method: 'POST',
         headers: { 'Content-Type': mimeType },
         body: audioBlob
@@ -161,7 +161,7 @@ async function ensureInterviewSession() {
   localStorage.setItem('bridgework-user-id', userId);
   localStorage.setItem('bridgework-session-id', sessionId);
 
-  const response = await fetch('/api/interview/session', {
+  const response = await fetch(window.apiUrl('/api/interview/session'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -193,7 +193,7 @@ async function submitAnswer(answer) {
     const session = await ensureInterviewSession();
     conversationHistory.push({ role: 'assistant', content: questionText.textContent });
     conversationHistory.push({ role: 'user', content: cleanAnswer });
-    const response = await fetch('/api/interview', {
+    const response = await fetch(window.apiUrl('/api/interview'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -289,7 +289,7 @@ async function speak(text) {
   playButton.disabled = true;
   playLabel.textContent = 'Preparing voice';
   try {
-    const response = await fetch('/api/tts', {
+    const response = await fetch(window.apiUrl('/api/tts'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text, voice: voiceSelect.value })
@@ -441,7 +441,7 @@ if (questionHeading) {
     speakButton.disabled = true;
     speakButton.textContent = '... Preparing voice';
     try {
-      const response = await fetch('/api/tts', {
+      const response = await fetch(window.apiUrl('/api/tts'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: questionHeading.textContent.trim(), voice: 'female' })
