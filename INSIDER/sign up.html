@@ -192,6 +192,10 @@
                     </svg>
                     <span>Google</span>
                 </button>
+                <button type="button" onclick="socialLogin('Facebook')" class="flex items-center justify-center space-x-2 py-3 px-4 glass-input rounded-xl hover:bg-slate-800/80 transition-all text-sm font-medium text-slate-200">
+                    <i class="fab fa-facebook-f text-blue-500 text-lg"></i>
+                    <span>Facebook</span>
+                </button>
                 <button type="button" onclick="socialLogin('LinkedIn')" class="flex items-center justify-center space-x-2 py-3 px-4 glass-input rounded-xl hover:bg-slate-800/80 transition-all text-sm font-medium text-slate-200">
                     <i class="fab fa-linkedin text-blue-500 text-lg"></i>
                     <span>LinkedIn</span>
@@ -310,6 +314,22 @@
                 </button>
             </form>
 
+            <div class="mt-6 border-t border-slate-800 pt-6">
+                <p class="text-xs uppercase text-slate-500 font-semibold tracking-wider mb-4">Or continue with phone</p>
+                <div class="glass-input flex items-center px-4 py-3 rounded-xl">
+                    <i class="fas fa-phone text-slate-400 mr-3"></i>
+                    <input type="tel" id="phone-number" autocomplete="tel" placeholder="+14155552671" class="bg-transparent w-full focus:outline-none text-white placeholder-slate-500 text-sm">
+                </div>
+                <p class="text-xs text-slate-500 mt-2">Enter your number with country code.</p>
+                <div id="recaptcha-container" class="mt-4 flex justify-center"></div>
+                <button type="button" id="sign-in-button" onclick="onPhoneSignInClick()" class="w-full mt-4 py-3 rounded-xl text-white font-semibold text-sm gradient-btn">Send verification code</button>
+                <div id="phone-code-step" class="hidden mt-4 space-y-3">
+                    <label for="phone-code" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">Verification code</label>
+                    <input type="text" id="phone-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code" class="glass-input w-full rounded-xl px-4 py-3 text-white placeholder-slate-500 text-sm focus:outline-none">
+                    <button type="button" onclick="verifyPhoneCode()" class="w-full py-3 rounded-xl text-white font-semibold text-sm gradient-btn">Verify and continue</button>
+                </div>
+            </div>
+
             <!-- Bottom Redirect Link -->
             <div class="mt-8 text-center">
                 <p id="bottom-text" class="text-xs text-slate-400">
@@ -347,8 +367,13 @@
             signInWithEmailAndPassword,
             signInWithPopup,
             GoogleAuthProvider,
+            FacebookAuthProvider,
             GithubAuthProvider,
             OAuthProvider,
+            RecaptchaVerifier,
+            signInWithPhoneNumber,
+            PhoneAuthProvider,
+            signInWithCredential,
             updateProfile,
             onAuthStateChanged
         } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js';
@@ -367,6 +392,7 @@
         let currentMode = new URLSearchParams(window.location.search).get('mode') === 'login' ? 'login' : 'signup';
         let auth = null;
         let firebaseReady = false;
+        let recaptchaVerifier = null;
 
         function ensureDemoUsers() {
             const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
@@ -417,6 +443,15 @@
 
             const app = initializeApp(FIREBASE_CONFIG);
             auth = getAuth(app);
+            auth.languageCode = 'it';
+            recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+                size: 'normal',
+                'expired-callback': () => showToast('Verification expired', 'Please try sending the code again.', 'warning')
+            });
+            window.recaptchaVerifier = recaptchaVerifier;
+            recaptchaVerifier.render().then((widgetId) => {
+                window.recaptchaWidgetId = widgetId;
+            }).catch((error) => console.warn('reCAPTCHA unavailable:', error));
             isSupported().then((supported) => {
                 if (supported) getAnalytics(app);
             }).catch((error) => console.warn('Firebase Analytics unavailable:', error));
@@ -659,8 +694,16 @@
                 let provider;
                 if (providerName === 'google') {
                     provider = new GoogleAuthProvider();
+                } else if (providerName === 'facebook') {
+                    const facebookSettings = window.FIREBASE_PROVIDER_SETTINGS?.facebook;
+                    if (!facebookSettings?.enabled) {
+                        showToast('Facebook sign-in not enabled', facebookSettings?.note || 'Enable Facebook in Firebase Authentication to continue.', 'warning');
+                        return;
+                    }
+                    provider = new FacebookAuthProvider();
                 } else if (providerName === 'github') {
                     provider = new GithubAuthProvider();
+                    provider.addScope('user:email');
                 } else if (providerName === 'microsoft') {
                     provider = new OAuthProvider('microsoft.com');
                 } else if (providerName === 'linkedin') {
@@ -683,6 +726,70 @@
                 setTimeout(() => window.location.href = getDashboardUrl(), 900);
             } catch (error) {
                 showToast('Provider sign-in failed', error?.message || 'Could not authenticate with this provider.', 'warning');
+            }
+        }
+
+        function onPhoneSignInClick() {
+            onSignInSubmit();
+        }
+
+        async function onSignInSubmit() {
+            const phoneNumber = document.getElementById('phone-number').value.trim();
+            if (!/^\+[1-9]\d{7,14}$/.test(phoneNumber)) {
+                showToast('Invalid phone number', 'Use international format, for example +14155552671.', 'warning');
+                return;
+            }
+            if (!firebaseReady || !auth || !recaptchaVerifier) {
+                showToast('Not configured', 'Phone sign-in requires Firebase Authentication to be configured.', 'warning');
+                return;
+            }
+            const recaptchaResponse = window.grecaptcha?.getResponse(window.recaptchaWidgetId);
+            if (!recaptchaResponse) {
+                showToast('Complete reCAPTCHA', 'Please complete the reCAPTCHA challenge before continuing.', 'warning');
+                return;
+            }
+
+            try {
+                window.confirmationResult = null;
+                window.confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
+                document.getElementById('phone-code-step').classList.remove('hidden');
+                document.getElementById('phone-code').focus();
+                showToast('Code sent', 'Check your phone for the verification code.', 'success');
+            } catch (error) {
+                showToast('Could not send code', error?.message || 'Please check the number and try again.', 'warning');
+            } finally {
+                if (window.recaptchaWidgetId !== undefined) {
+                    window.grecaptcha?.reset(window.recaptchaWidgetId);
+                }
+            }
+        }
+
+        async function verifyPhoneCode() {
+            const code = document.getElementById('phone-code').value.trim();
+            if (!window.confirmationResult || !/^\d{6}$/.test(code)) {
+                showToast('Invalid code', 'Enter the 6-digit code sent to your phone.', 'warning');
+                return;
+            }
+
+            try {
+                const credential = PhoneAuthProvider.credential(window.confirmationResult.verificationId, code);
+                const result = await signInWithCredential(auth, credential);
+                const user = result.user;
+                const profile = {
+                    id: user.uid,
+                    name: user.displayName || user.phoneNumber || 'Insider User',
+                    email: user.email || '',
+                    phone: user.phoneNumber || '',
+                    passwordHash: '',
+                    role: 'candidate',
+                    provider: 'phone',
+                    photo: user.photoURL || ''
+                };
+                saveActiveUser(profile);
+                showToast('Welcome!', 'Phone number verified. Redirecting...', 'success');
+                setTimeout(() => window.location.href = getDashboardUrl(), 900);
+            } catch (error) {
+                showToast('Verification failed', error?.message || 'The code is invalid or expired.', 'warning');
             }
         }
 
@@ -747,6 +854,9 @@
         window.togglePasswordVisibility = togglePasswordVisibility;
         window.checkPasswordStrength = checkPasswordStrength;
         window.handleFormSubmit = handleFormSubmit;
+        window.onPhoneSignInClick = onPhoneSignInClick;
+        window.onSignInSubmit = onSignInSubmit;
+        window.verifyPhoneCode = verifyPhoneCode;
         window.socialLogin = socialLogin;
         window.resetFormState = resetFormState;
         window.handleEmailAuth = handleEmailAuth;

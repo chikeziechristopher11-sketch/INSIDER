@@ -26,7 +26,7 @@ function ensureSignedIn() {
   try {
     const user = JSON.parse(localStorage.getItem("insiderUser") || "null");
 
-    if (!user || !user.email) {
+    if (!user || (!user.id && !user.email)) {
       window.location.href = "sign up.html?mode=login";
       return false;
     }
@@ -45,7 +45,12 @@ function ensureSignedIn() {
 const logoutBtn = document.getElementById("logoutBtn");
 
 if (logoutBtn) {
-  logoutBtn.addEventListener("click", () => {
+  logoutBtn.addEventListener("click", async () => {
+    try {
+      await window.signOutFirebaseUser();
+    } catch (error) {
+      console.warn("Firebase sign-out failed:", error);
+    }
     localStorage.removeItem("insiderUser");
 
     localStorage.removeItem("insiderProfile");

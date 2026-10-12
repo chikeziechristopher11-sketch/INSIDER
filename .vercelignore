@@ -1,0 +1,6 @@
+.firebase/**
+.pytest_cache/**
+Bimpe ai .md/**
+docs/**
+tests/**
+INSIDER-settings-linked.zip

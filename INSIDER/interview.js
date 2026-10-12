@@ -45,7 +45,13 @@ if (logoutBtn) {
 
     logoutBtn.addEventListener(
         "click",
-        () => {
+        async () => {
+
+            try {
+                await window.signOutFirebaseUser();
+            } catch (error) {
+                console.warn("Firebase sign-out failed:", error);
+            }
 
             localStorage.removeItem(
                 "insiderUser"
