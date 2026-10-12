@@ -157,6 +157,29 @@ function getProfile() {
 
 let profile = getProfile();
 
+async function syncProfileToFirestore() {
+  if (!window.saveFirestoreProfile) return false;
+  return window.saveFirestoreProfile(profile);
+}
+
+async function hydrateProfileFromFirestore() {
+  if (!window.loadFirestoreProfile) return;
+
+  try {
+    const savedProfile = await window.loadFirestoreProfile();
+    if (!savedProfile) return;
+
+    const { uid, updatedAt, ...profileData } = savedProfile;
+    profile = { ...getProfile(), ...profileData };
+    localStorage.setItem("insiderProfile", JSON.stringify(profile));
+    loadProfile();
+    renderCV();
+  } catch (error) {
+    console.error("Could not load profile from Firestore:", error);
+    showProfileMessage("Could not load your cloud profile. Showing saved local data.");
+  }
+}
+
 // ========================================
 // VALUE CHECK
 // ========================================
@@ -570,7 +593,7 @@ function loadForm() {
 const profileForm = document.getElementById("profileForm");
 
 if (profileForm) {
-  profileForm.addEventListener("submit", (event) => {
+  profileForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const skillsInput = document.getElementById("skills");
@@ -616,11 +639,20 @@ if (profileForm) {
 
     localStorage.setItem("insiderProfile", JSON.stringify(profile));
 
+    let syncedToFirestore = false;
+    try {
+      syncedToFirestore = await syncProfileToFirestore();
+    } catch (error) {
+      console.error("Could not save profile to Firestore:", error);
+    }
+
     loadProfile();
 
     closeEditModal();
 
-    showProfileMessage("Profile updated successfully!");
+    showProfileMessage(syncedToFirestore
+      ? "Profile updated successfully!"
+      : "Profile saved locally; cloud sync is unavailable.");
   });
 }
 
@@ -798,6 +830,13 @@ if (cvInput) {
 
     localStorage.setItem("insiderProfile", JSON.stringify(profile));
 
+    let syncedToFirestore = false;
+    try {
+      syncedToFirestore = await syncProfileToFirestore();
+    } catch (error) {
+      console.error("Could not save CV metadata to Firestore:", error);
+    }
+
     // SHOW UPLOADING
 
     if (cvButton) {
@@ -837,9 +876,9 @@ if (cvInput) {
           cvButton.disabled = false;
         }
 
-        showProfileMessage(
-          "CV saved to your profile, but the server upload failed.",
-        );
+        showProfileMessage(syncedToFirestore
+          ? "CV saved to your profile, but the server upload failed."
+          : "CV saved locally, but cloud sync and server upload failed.");
 
         loadProfile();
 
@@ -859,7 +898,9 @@ if (cvInput) {
 
     renderCV();
 
-    showProfileMessage("CV uploaded successfully!");
+    showProfileMessage(syncedToFirestore
+      ? "CV uploaded successfully!"
+      : "CV uploaded, but its metadata was not synced to the cloud.");
 
     cvInput.value = "";
   });
@@ -914,10 +955,17 @@ if (confirmCancel) {
 // ========================================
 
 if (confirmDelete) {
-  confirmDelete.addEventListener("click", () => {
+  confirmDelete.addEventListener("click", async () => {
     delete profile.cv;
 
     localStorage.setItem("insiderProfile", JSON.stringify(profile));
+
+    let syncedToFirestore = false;
+    try {
+      syncedToFirestore = await syncProfileToFirestore();
+    } catch (error) {
+      console.error("Could not remove CV metadata from Firestore:", error);
+    }
 
     loadProfile();
 
@@ -925,7 +973,9 @@ if (confirmDelete) {
 
     closeConfirmAlert();
 
-    showProfileMessage("CV removed from your profile.");
+    showProfileMessage(syncedToFirestore
+      ? "CV removed from your profile."
+      : "CV removed locally; cloud sync is unavailable.");
   });
 }
 
@@ -960,6 +1010,7 @@ document.addEventListener("keydown", (event) => {
 // ========================================
 
 loadProfile();
+hydrateProfileFromFirestore();
 
 // ========================================
 // REFRESH WHEN RETURNING
@@ -967,4 +1018,5 @@ loadProfile();
 
 window.addEventListener("pageshow", () => {
   loadProfile();
+  hydrateProfileFromFirestore();
 });

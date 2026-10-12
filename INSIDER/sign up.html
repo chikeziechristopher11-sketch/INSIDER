@@ -358,6 +358,7 @@
 
     <!-- JavaScript Application Logic -->
     <script src="../firebase-config.js"></script>
+    <script src="firebase-session.js"></script>
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js';
         import { getAnalytics, isSupported } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-analytics.js';
@@ -426,6 +427,11 @@
 
         function saveActiveUser(user) {
             localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(user));
+        }
+
+        async function saveAuthenticatedProfile(user, profile) {
+            const saved = await window.saveFirestoreProfile(profile, user);
+            if (!saved) throw new Error('Your profile could not be saved to Firestore.');
         }
 
         function getDashboardUrl() {
@@ -661,6 +667,7 @@
                         photo: result.user.photoURL || ''
                     };
                     saveActiveUser(profile);
+                    await saveAuthenticatedProfile(result.user, profile);
                     showToast('Account created!', `Welcome aboard, ${profile.name}! Redirecting...`, 'success');
                     setTimeout(() => window.location.href = getDashboardUrl(), 900);
                     return;
@@ -677,6 +684,7 @@
                     photo: result.user.photoURL || ''
                 };
                 saveActiveUser(profile);
+                await saveAuthenticatedProfile(result.user, profile);
                 showToast('Welcome back!', 'Logging you into your dashboard...', 'success');
                 setTimeout(() => window.location.href = getDashboardUrl(), 900);
             } catch (error) {
@@ -722,6 +730,7 @@
                     photo: result.user.photoURL || ''
                 };
                 saveActiveUser(profile);
+                await saveAuthenticatedProfile(result.user, profile);
                 showToast('Welcome!', `Signed in with ${providerName.toUpperCase()}.`, 'success');
                 setTimeout(() => window.location.href = getDashboardUrl(), 900);
             } catch (error) {
@@ -786,6 +795,7 @@
                     photo: user.photoURL || ''
                 };
                 saveActiveUser(profile);
+                await saveAuthenticatedProfile(user, profile);
                 showToast('Welcome!', 'Phone number verified. Redirecting...', 'success');
                 setTimeout(() => window.location.href = getDashboardUrl(), 900);
             } catch (error) {
