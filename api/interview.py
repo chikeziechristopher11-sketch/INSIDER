@@ -76,7 +76,18 @@ Return valid JSON only with this shape:
   "debrief": null
 }
 
-When enough evidence has been collected across the important competencies, set question_type to completion, interview_complete to true, and question to an empty string. Then include a debrief with: overall_summary, strengths, weaknesses, evidence_discovered, competency_assessments, specific_coaching, and practice_next.
+When enough evidence has been collected across the important competencies, set question_type to completion, interview_complete to true, and question to an empty string. Then include a debrief with: overall_summary, strengths, weaknesses, evidence_discovered, competency_assessments, specific_coaching, practice_next, and performance_score.
+
+performance_score must be an integer from 0 to 100 based on the candidate's actual answers and demonstrated evidence. Never calculate it by counting strengths, weaknesses, bullet points, or questions.
+
+Use this weighted rubric:
+- Relevance and correctness: 25 points
+- Specificity and evidence (concrete situation, personal action, and outcome): 25 points
+- Reasoning and problem-solving: 20 points
+- Ownership and accountability: 15 points
+- Communication and clarity: 15 points
+
+Award only points supported by the conversation. Do not use 50 as a default or fallback. If there is insufficient answer data to assess the candidate fairly, return null for performance_score.
 """
 
 
@@ -90,15 +101,29 @@ def _as_list(value: Any) -> list[Any]:
 
 def _clean_history(history: Any) -> list[dict[str, str]]:
     cleaned: list[dict[str, str]] = []
+
     for item in _as_list(history):
         if not isinstance(item, dict):
             continue
+
         role = str(item.get("role", "")).strip().lower()
-        content = item.get("content", item.get("text", item.get("answer", "")))
+        content = item.get(
+            "content",
+            item.get("text", item.get("answer", ""))
+        )
+
         if role in {"user", "assistant"} and str(content).strip():
-            cleaned.append({"role": role, "content": str(content).strip()})
+            cleaned.append({
+                "role": role,
+                "content": str(content).strip()
+            })
+
         elif "answer" in item and str(content).strip():
-            cleaned.append({"role": "user", "content": str(content).strip()})
+            cleaned.append({
+                "role": "user",
+                "content": str(content).strip()
+            })
+
     return cleaned
 
 
@@ -108,23 +133,56 @@ class InterviewEngine:
     def __init__(self, client: Any = None) -> None:
         if client is not None:
             self.client = client
+
         elif os.environ.get("GROQ_API_KEY"):
             from groq import Groq
 
-            self.client = Groq(api_key=os.environ["GROQ_API_KEY"])
+            self.client = Groq(
+                api_key=os.environ["GROQ_API_KEY"]
+            )
+
         else:
             self.client = None
-        self.model = os.environ.get("GROQ_MODEL", "openai/gpt-oss-20b")
+
+        self.model = os.environ.get(
+            "GROQ_MODEL",
+            "openai/gpt-oss-20b"
+        )
 
     def next_turn(self, payload: dict[str, Any]) -> dict[str, Any]:
-        candidate = _as_dict(payload.get("candidate"), MOCK_CANDIDATE)
-        role = _as_dict(payload.get("role"), MOCK_ROLE)
-        history = _clean_history(payload.get("history"))
-        session_state = _as_dict(payload.get("session_state"), {})
+        candidate = _as_dict(
+            payload.get("candidate"),
+            MOCK_CANDIDATE
+        )
+
+        role = _as_dict(
+            payload.get("role"),
+            MOCK_ROLE
+        )
+
+        history = _clean_history(
+            payload.get("history")
+        )
+
+        session_state = _as_dict(
+            payload.get("session_state"),
+            {}
+        )
+
         if self.client is None:
-            if os.environ.get("INTERVIEW_MOCK_MODE", "").lower() == "true":
-                return self._mock_turn(candidate, role, history, session_state)
-            raise RuntimeError("GROQ_API_KEY is not configured")
+            if os.environ.get(
+                "INTERVIEW_MOCK_MODE", ""
+            ).lower() == "true":
+                return self._mock_turn(
+                    candidate,
+                    role,
+                    history,
+                    session_state
+                )
+
+            raise RuntimeError(
+                "GROQ_API_KEY is not configured"
+            )
 
         user_prompt = json.dumps(
             {
@@ -132,55 +190,195 @@ class InterviewEngine:
                 "role": role,
                 "conversation_history": history,
                 "session_state": session_state,
-                "instruction": "Generate the opening question." if not history else "Evaluate the latest candidate answer and generate the next question.",
+                "instruction": (
+                    "Generate the opening question."
+                    if not history
+                    else
+                    "Evaluate the latest candidate answer and generate the next question."
+                ),
             },
             ensure_ascii=True,
         )
+
         completion = self.client.chat.completions.create(
             model=self.model,
             messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": user_prompt},
+                {
+                    "role": "system",
+                    "content": SYSTEM_PROMPT
+                },
+                {
+                    "role": "user",
+                    "content": user_prompt
+                },
             ],
             temperature=0.35,
             max_tokens=1800,
-            response_format={"type": "json_object"},
+            response_format={
+                "type": "json_object"
+            },
         )
-        raw_content = completion.choices[0].message.content or "{}"
-        result = json.loads(raw_content)
-        return self._normalize_result(result, role, history)
 
-    def _normalize_result(self, result: dict[str, Any], role: dict[str, Any], history: list[dict[str, str]]) -> dict[str, Any]:
-        state = _as_dict(result.get("session_state"), {})
-        state["questions_asked"] = [item["content"] for item in history if item["role"] == "assistant"]
-        state["candidate_answers"] = [item["content"] for item in history if item["role"] == "user"]
-        state["competencies_assessed"] = _as_list(state.get("competencies_assessed"))
-        state["evidence_discovered"] = _as_list(state.get("evidence_discovered"))
-        state["weak_areas"] = _as_list(state.get("weak_areas"))
-        state["claims_needing_follow_up"] = _as_list(state.get("claims_needing_follow_up"))
-        state["remaining_competencies"] = _as_list(state.get("remaining_competencies"))
-        state["interview_complete"] = bool(state.get("interview_complete", False))
-        state["progress"] = max(0.0, min(1.0, float(state.get("progress", 0.0))))
+        raw_content = (
+            completion.choices[0].message.content or "{}"
+        )
+
+        result = json.loads(raw_content)
+
+        return self._normalize_result(
+            result,
+            role,
+            history
+        )
+
+    def _normalize_result(
+        self,
+        result: dict[str, Any],
+        role: dict[str, Any],
+        history: list[dict[str, str]]
+    ) -> dict[str, Any]:
+
+        state = _as_dict(
+            result.get("session_state"),
+            {}
+        )
+
+        state["questions_asked"] = [
+            item["content"]
+            for item in history
+            if item["role"] == "assistant"
+        ]
+
+        state["candidate_answers"] = [
+            item["content"]
+            for item in history
+            if item["role"] == "user"
+        ]
+
+        state["competencies_assessed"] = _as_list(
+            state.get("competencies_assessed")
+        )
+
+        state["evidence_discovered"] = _as_list(
+            state.get("evidence_discovered")
+        )
+
+        state["weak_areas"] = _as_list(
+            state.get("weak_areas")
+        )
+
+        state["claims_needing_follow_up"] = _as_list(
+            state.get("claims_needing_follow_up")
+        )
+
+        state["remaining_competencies"] = _as_list(
+            state.get("remaining_competencies")
+        )
+
+        state["interview_complete"] = bool(
+            state.get("interview_complete", False)
+        )
+
+        state["progress"] = max(
+            0.0,
+            min(1.0, float(state.get("progress", 0.0)))
+        )
+
+        debrief = (
+            self._normalize_debrief(result.get("debrief"))
+            if state["interview_complete"]
+            else None
+        )
+
         return {
-            "status": "complete" if state["interview_complete"] else "continue",
-            "question": str(result.get("question", "")).strip(),
-            "competency": str(result.get("competency", "")).strip(),
-            "question_type": str(result.get("question_type", "follow_up")).strip(),
-            "evaluation": _as_dict(result.get("evaluation"), {}),
+            "status": (
+                "complete"
+                if state["interview_complete"]
+                else "continue"
+            ),
+            "question": str(
+                result.get("question", "")
+            ).strip(),
+            "competency": str(
+                result.get("competency", "")
+            ).strip(),
+            "question_type": str(
+                result.get("question_type", "follow_up")
+            ).strip(),
+            "evaluation": _as_dict(
+                result.get("evaluation"),
+                {}
+            ),
             "session_state": state,
-            "debrief": result.get("debrief") if state["interview_complete"] else None,
-            "role": {"company": role.get("company", ""), "title": role.get("title", "")},
+            "debrief": debrief,
+            "role": {
+                "company": role.get("company", ""),
+                "title": role.get("title", "")
+            },
         }
 
-    def _mock_turn(self, candidate: dict[str, Any], role: dict[str, Any], history: list[dict[str, str]], session_state: dict[str, Any]) -> dict[str, Any]:
+    @staticmethod
+    def _normalize_debrief(
+        value: Any
+    ) -> dict[str, Any] | None:
+        """Validate the evaluator's score without inventing a fallback score."""
+
+        if not isinstance(value, dict):
+            return None
+
+        debrief = dict(value)
+        score = debrief.get("performance_score")
+
+        # bool is a subclass of int in Python, so reject it explicitly.
+        if (
+            isinstance(score, bool)
+            or not isinstance(score, (int, float))
+        ):
+            debrief["performance_score"] = None
+
+        else:
+            debrief["performance_score"] = max(
+                0,
+                min(100, round(score))
+            )
+
+        return debrief
+
+    def _mock_turn(
+        self,
+        candidate: dict[str, Any],
+        role: dict[str, Any],
+        history: list[dict[str, str]],
+        session_state: dict[str, Any]
+    ) -> dict[str, Any]:
+
         del candidate
-        answers = [item["content"] for item in history if item["role"] == "user"]
-        competencies = _as_list(role.get("competencies")) or ["ownership", "problem_solving", "communication"]
+
+        answers = [
+            item["content"]
+            for item in history
+            if item["role"] == "user"
+        ]
+
+        competencies = (
+            _as_list(role.get("competencies"))
+            or [
+                "ownership",
+                "problem_solving",
+                "communication"
+            ]
+        )
+
         if len(answers) >= len(competencies):
             state = dict(session_state)
+
             state.update({
                 "status": "complete",
-                "questions_asked": [item["content"] for item in history if item["role"] == "assistant"],
+                "questions_asked": [
+                    item["content"]
+                    for item in history
+                    if item["role"] == "assistant"
+                ],
                 "candidate_answers": answers,
                 "competencies_assessed": competencies,
                 "evidence_discovered": [],
@@ -191,50 +389,147 @@ class InterviewEngine:
                 "progress": 1.0,
                 "interview_complete": True,
             })
+
             debrief = {
-                "overall_summary": "The candidate completed the evidence-gathering interview.",
-                "strengths": ["Provided answers across the target competencies."],
+                "overall_summary": (
+                    "The candidate completed the evidence-gathering interview. "
+                    "Mock mode does not perform an AI assessment, so no "
+                    "performance score is available."
+                ),
+                "performance_score": None,
+                "strengths": [
+                    "Provided answers across the target competencies."
+                ],
                 "weaknesses": [],
                 "evidence_discovered": [],
-                "competency_assessments": [{"competency": item, "assessment": "Needs review"} for item in competencies],
-                "specific_coaching": ["Make each answer concrete by naming your action and outcome."],
-                "practice_next": ["Prepare one evidence-based story for each competency."],
+                "competency_assessments": [
+                    {
+                        "competency": item,
+                        "assessment": "Needs review"
+                    }
+                    for item in competencies
+                ],
+                "specific_coaching": [
+                    "Make each answer concrete by naming your action and outcome."
+                ],
+                "practice_next": [
+                    "Prepare one evidence-based story for each competency."
+                ],
             }
-            return {"status": "complete", "question": "", "competency": "", "question_type": "completion", "evaluation": {}, "session_state": state, "debrief": debrief}
+
+            return {
+                "status": "complete",
+                "question": "",
+                "competency": "",
+                "question_type": "completion",
+                "evaluation": {},
+                "session_state": state,
+                "debrief": debrief
+            }
+
         if not answers:
             competency = competencies[0]
-            question = f"Tell me about a time you demonstrated {competency.replace('_', ' ')} in your work at {role.get('company', 'your last company')}."
+
+            question = (
+                f"Tell me about a time you demonstrated "
+                f"{competency.replace('_', ' ')} "
+                f"in your work at {role.get('company', 'your last company')}."
+            )
+
             question_type = "opening"
-        elif any(word in answers[-1].lower() for word in ("customer", "user", "research", "interview")) and "customer_empathy" in competencies:
-            question = "What did you personally change after learning that, and how did you know it worked?"
+
+        elif (
+            any(
+                word in answers[-1].lower()
+                for word in (
+                    "customer",
+                    "user",
+                    "research",
+                    "interview"
+                )
+            )
+            and "customer_empathy" in competencies
+        ):
+            question = (
+                "What did you personally change after learning that, "
+                "and how did you know it worked?"
+            )
+
             question_type = "probe"
             competency = "customer_empathy"
-        elif any(word in answers[-1].lower() for word in ("backend", "technical", "system", "code", "architecture")) and "problem_solving" in competencies:
-            question = "What was the hardest technical trade-off you made, and what was the outcome?"
+
+        elif (
+            any(
+                word in answers[-1].lower()
+                for word in (
+                    "backend",
+                    "technical",
+                    "system",
+                    "code",
+                    "architecture"
+                )
+            )
+            and "problem_solving" in competencies
+        ):
+            question = (
+                "What was the hardest technical trade-off you made, "
+                "and what was the outcome?"
+            )
+
             question_type = "probe"
             competency = "problem_solving"
+
         else:
-            question = "What was the specific outcome of that decision, and what would you change now?"
+            question = (
+                "What was the specific outcome of that decision, "
+                "and what would you change now?"
+            )
+
             question_type = "follow_up"
-            competency = competencies[min(len(answers), len(competencies) - 1)]
+
+            competency = competencies[
+                min(len(answers), len(competencies) - 1)
+            ]
+
         state = dict(session_state)
+
         state.update({
             "status": "active",
-            "questions_asked": [item["content"] for item in history if item["role"] == "assistant"],
+            "questions_asked": [
+                item["content"]
+                for item in history
+                if item["role"] == "assistant"
+            ],
             "candidate_answers": answers,
-            "competencies_assessed": [competency] if answers else [],
+            "competencies_assessed": (
+                [competency] if answers else []
+            ),
             "evidence_discovered": [],
             "weak_areas": [],
             "claims_needing_follow_up": [],
             "current_competency": competency,
-            "remaining_competencies": [item for item in competencies if item != competency],
+            "remaining_competencies": [
+                item
+                for item in competencies
+                if item != competency
+            ],
             "progress": 0.2 if answers else 0.0,
             "interview_complete": False,
         })
-        return {"status": "continue", "question": question, "competency": competency, "question_type": question_type, "evaluation": {}, "session_state": state, "debrief": None}
+
+        return {
+            "status": "continue",
+            "question": question,
+            "competency": competency,
+            "question_type": question_type,
+            "evaluation": {},
+            "session_state": state,
+            "debrief": None
+        }
 
 
 app = FastAPI()
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -245,12 +540,24 @@ app.add_middleware(
 
 @app.post("/")
 @app.post("/api/interview")
-async def interview(payload: dict[str, Any]) -> JSONResponse:
+async def interview(
+    payload: dict[str, Any]
+) -> JSONResponse:
+
     try:
         result = InterviewEngine().next_turn(payload)
+
     except Exception as error:
         return JSONResponse(
-            {"error": {"code": "MODEL_FAILURE", "message": "Interview generation failed", "retryable": True, "detail": str(error)}},
+            {
+                "error": {
+                    "code": "MODEL_FAILURE",
+                    "message": "Interview generation failed",
+                    "retryable": True,
+                    "detail": str(error)
+                }
+            },
             status_code=502,
         )
+
     return JSONResponse(result)
