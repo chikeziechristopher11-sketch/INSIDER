@@ -12,18 +12,10 @@ window.FIREBASE_PROVIDER_SETTINGS = {
   google: {
     enabled: true
   },
-  facebook: {
-    enabled: false,
-    note: 'Enable Facebook in Firebase Authentication and configure its Meta app credentials.'
-  },
   github: {
     enabled: true
   },
   microsoft: {
     enabled: true
   },
-  linkedin: {
-    enabled: false,
-    note: 'LinkedIn needs a custom OAuth app and redirect URI.'
-  }
 };

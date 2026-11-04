@@ -192,14 +192,6 @@
                     </svg>
                     <span>Google</span>
                 </button>
-                <button type="button" onclick="socialLogin('Facebook')" class="flex items-center justify-center space-x-2 py-3 px-4 glass-input rounded-xl hover:bg-slate-800/80 transition-all text-sm font-medium text-slate-200">
-                    <i class="fab fa-facebook-f text-blue-500 text-lg"></i>
-                    <span>Facebook</span>
-                </button>
-                <button type="button" onclick="socialLogin('LinkedIn')" class="flex items-center justify-center space-x-2 py-3 px-4 glass-input rounded-xl hover:bg-slate-800/80 transition-all text-sm font-medium text-slate-200">
-                    <i class="fab fa-linkedin text-blue-500 text-lg"></i>
-                    <span>LinkedIn</span>
-                </button>
                 <button type="button" onclick="socialLogin('GitHub')" class="flex items-center justify-center space-x-2 py-3 px-4 glass-input rounded-xl hover:bg-slate-800/80 transition-all text-sm font-medium text-slate-200">
                     <i class="fab fa-github text-white text-lg"></i>
                     <span>GitHub</span>
@@ -368,7 +360,6 @@
             signInWithEmailAndPassword,
             signInWithPopup,
             GoogleAuthProvider,
-            FacebookAuthProvider,
             GithubAuthProvider,
             OAuthProvider,
             RecaptchaVerifier,
@@ -449,7 +440,7 @@
 
             const app = initializeApp(FIREBASE_CONFIG);
             auth = getAuth(app);
-            auth.languageCode = 'it';
+            auth.languageCode = 'en';
             recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
                 size: 'normal',
                 'expired-callback': () => showToast('Verification expired', 'Please try sending the code again.', 'warning')
@@ -692,6 +683,22 @@
             }
         }
 
+        async function completeProviderSignIn(user, providerName) {
+            const profile = {
+                id: user.uid,
+                name: user.displayName || 'Insider User',
+                email: user.email || '',
+                passwordHash: '',
+                role: 'candidate',
+                provider: user.providerData?.[0]?.providerId || providerName,
+                photo: user.photoURL || ''
+            };
+            saveActiveUser(profile);
+            await saveAuthenticatedProfile(user, profile);
+            showToast('Welcome!', `Signed in with ${providerName.toUpperCase()}.`, 'success');
+            setTimeout(() => window.location.href = getDashboardUrl(), 900);
+        }
+
         async function handleProviderSignIn(providerName) {
             if (!firebaseReady || !auth) {
                 showToast('Not configured', 'Add your Firebase project config to enable real OAuth sign-in.', 'warning');
@@ -702,37 +709,18 @@
                 let provider;
                 if (providerName === 'google') {
                     provider = new GoogleAuthProvider();
-                } else if (providerName === 'facebook') {
-                    const facebookSettings = window.FIREBASE_PROVIDER_SETTINGS?.facebook;
-                    if (!facebookSettings?.enabled) {
-                        showToast('Facebook sign-in not enabled', facebookSettings?.note || 'Enable Facebook in Firebase Authentication to continue.', 'warning');
-                        return;
-                    }
-                    provider = new FacebookAuthProvider();
                 } else if (providerName === 'github') {
                     provider = new GithubAuthProvider();
                     provider.addScope('user:email');
                 } else if (providerName === 'microsoft') {
                     provider = new OAuthProvider('microsoft.com');
-                } else if (providerName === 'linkedin') {
-                    showToast('LinkedIn not enabled', 'Add a custom OAuth setup for LinkedIn to enable this provider.', 'warning');
+                } else {
+                    showToast('Provider unavailable', 'Choose another sign-in method.', 'warning');
                     return;
                 }
 
                 const result = await signInWithPopup(auth, provider);
-                const profile = {
-                    id: result.user.uid,
-                    name: result.user.displayName || 'Insider User',
-                    email: result.user.email || '',
-                    passwordHash: '',
-                    role: 'candidate',
-                    provider: result.user.providerData?.[0]?.providerId || providerName,
-                    photo: result.user.photoURL || ''
-                };
-                saveActiveUser(profile);
-                await saveAuthenticatedProfile(result.user, profile);
-                showToast('Welcome!', `Signed in with ${providerName.toUpperCase()}.`, 'success');
-                setTimeout(() => window.location.href = getDashboardUrl(), 900);
+                await completeProviderSignIn(result.user, providerName);
             } catch (error) {
                 showToast('Provider sign-in failed', error?.message || 'Could not authenticate with this provider.', 'warning');
             }
@@ -848,10 +836,6 @@
 
         function socialLogin(provider) {
             const providerName = provider.toLowerCase();
-            if (providerName === 'linkedin') {
-                showToast('LinkedIn not enabled', 'Add a custom LinkedIn OAuth client to use this provider.', 'warning');
-                return;
-            }
             handleProviderSignIn(providerName);
         }
 
