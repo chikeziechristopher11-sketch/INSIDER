@@ -13,23 +13,15 @@ const menuBtn =
 const sidebar =
     document.getElementById("sidebar");
 
-
 if (menuBtn && sidebar) {
+    menuBtn.addEventListener("click", () => {
+        sidebar.classList.toggle("show");
 
-    menuBtn.addEventListener(
-        "click",
-        () => {
-
-            sidebar.classList.toggle("show");
-
-            menuBtn.innerHTML =
-                sidebar.classList.contains("show")
-                    ? '<i class="fa-solid fa-xmark"></i>'
-                    : '<i class="fa-solid fa-bars"></i>';
-
-        }
-    );
-
+        menuBtn.innerHTML =
+            sidebar.classList.contains("show")
+                ? '<i class="fa-solid fa-xmark"></i>'
+                : '<i class="fa-solid fa-bars"></i>';
+    });
 }
 
 
@@ -40,27 +32,12 @@ if (menuBtn && sidebar) {
 const logoutBtn =
     document.getElementById("logoutBtn");
 
-
 if (logoutBtn) {
-
-    logoutBtn.addEventListener(
-        "click",
-        () => {
-
-            localStorage.removeItem(
-                "insiderUser"
-            );
-
-            localStorage.removeItem(
-                "insiderProfile"
-            );
-
-            window.location.href =
-                "sign-up.html";
-
-        }
-    );
-
+    logoutBtn.addEventListener("click", () => {
+        localStorage.removeItem("insiderUser");
+        localStorage.removeItem("insiderProfile");
+        window.location.href = "sign-up.html";
+    });
 }
 
 
@@ -69,30 +46,29 @@ if (logoutBtn) {
 // =========================================
 
 const companyRoles = {
+    "MTN Nigeria": [
+        "Sales Representative",
+        "Customer Relations",
+        "Data Analyst",
+        "Product Manager",
+        "Co-ordinator"
+    ],
 
-  "MTN Nigeria": [
-    "Sales Representative",
-    "Customer Relations",
-    "Data Analyst",
-    "Product Manager",
-    "Co-ordinator"
-  ],
+    "GTCO": [
+        "Software Engineer",
+        "Data Analyst",
+        "Product Manager",
+        "Risk Analyst",
+        "Digital Banking Specialist"
+    ],
 
-  "GTCO": [
-    "Software Engineer",
-    "Data Analyst",
-    "Product Manager",
-    "Risk Analyst",
-    "Digital Banking Specialist"
-  ],
-
-  "Microsoft": [
-    "Software Engineer",
-    "Cloud Engineer",
-    "Data Scientist",
-    "Product Manager",
-    "UX Designer"
-  ]
+    "Microsoft": [
+        "Software Engineer",
+        "Cloud Engineer",
+        "Data Scientist",
+        "Product Manager",
+        "UX Designer"
+    ]
 };
 
 
@@ -100,180 +76,41 @@ const companyRoles = {
 // ELEMENTS
 // =========================================
 
-const companyScreen =
-    document.getElementById(
-        "companyScreen"
-    );
-
-const roleScreen =
-    document.getElementById(
-        "roleScreen"
-    );
-
-const interviewScreen =
-    document.getElementById(
-        "interviewScreen"
-    );
-
-const debriefScreen =
-    document.getElementById(
-        "debriefScreen"
-    );
-
-const roleGrid =
-    document.getElementById(
-        "roleGrid"
-    );
-
-const selectedCompanyName =
-    document.getElementById(
-        "selectedCompanyName"
-    );
-
-const interviewTitle =
-    document.getElementById(
-        "interviewTitle"
-    );
-
-const interviewCompany =
-    document.getElementById(
-        "interviewCompany"
-    );
-
-const questionNumber =
-    document.getElementById(
-        "questionNumber"
-    );
-
-const totalQuestions =
-    document.getElementById(
-        "totalQuestions"
-    );
-
-const questionText =
-    document.getElementById(
-        "questionText"
-    );
-
-const transcriptText =
-    document.getElementById(
-        "transcriptText"
-    );
-
-const answerState =
-    document.getElementById(
-        "answerState"
-    );
-
-const micButton =
-    document.getElementById(
-        "micButton"
-    );
-
-const micLabel =
-    document.getElementById(
-        "micLabel"
-    );
-
-const micStatus =
-    document.getElementById(
-        "micStatus"
-    );
-
-const speakingRing =
-    document.getElementById(
-        "speakingRing"
-    );
-
-const voiceWave =
-    document.getElementById(
-        "voiceWave"
-    );
-
-const voiceStatus =
-    document.getElementById(
-        "voiceStatus"
-    );
-
-const speakingStatus =
-    document.getElementById(
-        "speakingStatus"
-    );
-
-const listeningFor =
-    document.getElementById(
-        "listeningFor"
-    );
-
-const liveEvidence =
-    document.getElementById(
-        "liveEvidence"
-    );
-
-const strengthBadge =
-    document.getElementById(
-        "strengthBadge"
-    );
-
-const evidenceFoundBlock =
-    document.getElementById(
-        "evidenceFoundBlock"
-    );
-
-const evidenceFoundList =
-    document.getElementById(
-        "evidenceFoundList"
-    );
-
-const missingEvidenceBlock =
-    document.getElementById(
-        "missingEvidenceBlock"
-    );
-
-const missingEvidenceList =
-    document.getElementById(
-        "missingEvidenceList"
-    );
-
-const muteButton =
-    document.getElementById(
-        "muteButton"
-    );
-
-const hearQuestionBtn =
-    document.getElementById(
-        "hearQuestionBtn"
-    );
-
-const typeInsteadBtn =
-    document.getElementById(
-        "typeInsteadBtn"
-    );
-
-const typedAnswerArea =
-    document.getElementById(
-        "typedAnswerArea"
-    );
-
-const typedAnswerInput =
-    document.getElementById(
-        "typedAnswerInput"
-    );
-
-const backToVoiceBtn =
-    document.getElementById(
-        "backToVoiceBtn"
-    );
-
-const submitTypedAnswerBtn =
-    document.getElementById(
-        "submitTypedAnswerBtn"
-    );
-
-const microphoneArea =
-    document.querySelector(
-        ".microphone-area"
-    );
+const companyScreen = document.getElementById("companyScreen");
+const roleScreen = document.getElementById("roleScreen");
+const interviewScreen = document.getElementById("interviewScreen");
+const debriefScreen = document.getElementById("debriefScreen");
+const roleGrid = document.getElementById("roleGrid");
+const selectedCompanyName = document.getElementById("selectedCompanyName");
+const interviewTitle = document.getElementById("interviewTitle");
+const interviewCompany = document.getElementById("interviewCompany");
+const questionNumber = document.getElementById("questionNumber");
+const totalQuestions = document.getElementById("totalQuestions");
+const questionText = document.getElementById("questionText");
+const transcriptText = document.getElementById("transcriptText");
+const answerState = document.getElementById("answerState");
+const micButton = document.getElementById("micButton");
+const micLabel = document.getElementById("micLabel");
+const micStatus = document.getElementById("micStatus");
+const speakingRing = document.getElementById("speakingRing");
+const voiceWave = document.getElementById("voiceWave");
+const voiceStatus = document.getElementById("voiceStatus");
+const speakingStatus = document.getElementById("speakingStatus");
+const listeningFor = document.getElementById("listeningFor");
+const liveEvidence = document.getElementById("liveEvidence");
+const strengthBadge = document.getElementById("strengthBadge");
+const evidenceFoundBlock = document.getElementById("evidenceFoundBlock");
+const evidenceFoundList = document.getElementById("evidenceFoundList");
+const missingEvidenceBlock = document.getElementById("missingEvidenceBlock");
+const missingEvidenceList = document.getElementById("missingEvidenceList");
+const muteButton = document.getElementById("muteButton");
+const hearQuestionBtn = document.getElementById("hearQuestionBtn");
+const typeInsteadBtn = document.getElementById("typeInsteadBtn");
+const typedAnswerArea = document.getElementById("typedAnswerArea");
+const typedAnswerInput = document.getElementById("typedAnswerInput");
+const backToVoiceBtn = document.getElementById("backToVoiceBtn");
+const submitTypedAnswerBtn = document.getElementById("submitTypedAnswerBtn");
+const microphoneArea = document.querySelector(".microphone-area");
 
 
 // =========================================
@@ -283,18 +120,11 @@ const microphoneArea =
 let profile = {};
 
 try {
-
-    profile =
-        JSON.parse(
-            localStorage.getItem(
-                "insiderProfile"
-            ) || "{}"
-        );
-
+    profile = JSON.parse(
+        localStorage.getItem("insiderProfile") || "{}"
+    );
 } catch {
-
     profile = {};
-
 }
 
 
@@ -302,24 +132,11 @@ try {
 // USER AVATAR
 // =========================================
 
-const userAvatar =
-    document.getElementById(
-        "userAvatar"
-    );
-
+const userAvatar = document.getElementById("userAvatar");
 
 if (userAvatar) {
-
-    const name =
-        profile.name ||
-        "User";
-
-
-    userAvatar.textContent =
-        name
-            .charAt(0)
-            .toUpperCase();
-
+    const name = profile.name || "User";
+    userAvatar.textContent = name.charAt(0).toUpperCase();
 }
 
 
@@ -328,37 +145,24 @@ if (userAvatar) {
 // =========================================
 
 let selectedCompany = "";
-
 let selectedRole = "";
-
 let currentQuestion = 0;
-
 let questions = [];
-
 let answers = [];
-
 let recognition = null;
-
 let isListening = false;
-
 let accumulatedTranscript = "";
-
 let silenceTimer = null;
-
 const SILENCE_TIMEOUT_MS = 2200;
-
 let isSpeaking = false;
-
 let isMuted = false;
-
 let interviewStarted = false;
-
 let interviewStartTime = null;
-
 let timer = null;
 
+
 // =========================================
-// AI INTERVIEW STATE (backed by /api/interview)
+// AI INTERVIEW STATE
 // =========================================
 
 const roleCompetencies = {
@@ -376,16 +180,14 @@ const roleCompetencies = {
     "DevOps Engineer": ["system_design", "problem_solving", "ownership", "communication"],
     "Sales Representative": ["influence", "communication", "ownership", "business_sense"],
     "Customer Relations": ["customer_empathy", "communication", "ownership", "execution"],
-    "Co-ordinator": ["execution", "communication", "ownership", "business_sense"],
+    "Co-ordinator": ["execution", "communication", "ownership", "business_sense"]
 };
 
 let conversationHistory = [];
-
 let sessionState = {};
-
 let currentAIQuestion = null;
-
 let interviewDebrief = null;
+
 
 function buildCandidate() {
     return {
@@ -394,20 +196,22 @@ function buildCandidate() {
         summary: profile.summary || "",
         goals: profile.goals || [],
         skills: profile.skills || [],
-        evidence: profile.evidence || [],
+        evidence: profile.evidence || []
     };
 }
+
 
 function buildRole() {
     return {
         company: selectedCompany,
         title: selectedRole,
-        competencies: roleCompetencies[selectedRole] || ["ownership", "problem_solving", "communication"],
+        competencies: roleCompetencies[selectedRole] ||
+            ["ownership", "problem_solving", "communication"]
     };
 }
 
-function updateQuestionEstimate() {
 
+function updateQuestionEstimate() {
     const assessed =
         (sessionState.competencies_assessed || []).length;
 
@@ -418,29 +222,32 @@ function updateQuestionEstimate() {
         Math.max(assessed + remaining + 1, currentQuestion + 1);
 
     totalQuestions.textContent = `~${estimate}`;
-
 }
+
 
 async function requestInterviewTurn() {
     const response = await fetch("/api/interview", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json"
+        },
         body: JSON.stringify({
             candidate: buildCandidate(),
             role: buildRole(),
             history: conversationHistory,
-            session_state: sessionState,
-        }),
+            session_state: sessionState
+        })
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-        throw new Error(data.error?.message || "Interview request failed");
+        throw new Error(
+            data.error?.message || "Interview request failed"
+        );
     }
 
     sessionState = data.session_state || {};
-
     updateQuestionEstimate();
 
     return data;
@@ -451,23 +258,12 @@ async function requestInterviewTurn() {
 // COMPANY SELECTION
 // =========================================
 
-document
-    .querySelectorAll(".company-card")
-    .forEach((card) => {
-
-        card.addEventListener(
-            "click",
-            () => {
-
-                selectedCompany =
-                    card.dataset.company;
-
-                showRoleScreen();
-
-            }
-        );
-
+document.querySelectorAll(".company-card").forEach((card) => {
+    card.addEventListener("click", () => {
+        selectedCompany = card.dataset.company;
+        showRoleScreen();
     });
+});
 
 
 // =========================================
@@ -475,675 +271,145 @@ document
 // =========================================
 
 function showRoleScreen() {
+    companyScreen.classList.add("hidden");
+    roleScreen.classList.remove("hidden");
 
-    companyScreen.classList.add(
-        "hidden"
-    );
-
-    roleScreen.classList.remove(
-        "hidden"
-    );
-
-
-    selectedCompanyName.textContent =
-        selectedCompany;
-
-
+    selectedCompanyName.textContent = selectedCompany;
     roleGrid.innerHTML = "";
 
+    const roles = companyRoles[selectedCompany] || [];
 
-    const roles =
-        companyRoles[
-            selectedCompany
-        ] || [];
+    roles.forEach((role) => {
+        const button = document.createElement("button");
+        button.className = "role-card";
+        button.textContent = role;
 
+        button.addEventListener("click", () => {
+            selectedRole = role;
+            startInterview();
+        });
 
-    roles.forEach(
-        (role) => {
-
-            const button =
-                document.createElement(
-                    "button"
-                );
-
-
-            button.type =
-                "button";
-
-
-            button.className =
-                "role-card";
-
-
-            button.innerHTML = `
-
-                <span class="role-icon">
-                    <i class="fa-solid fa-briefcase"></i>
-                </span>
-
-                <strong>
-                    ${role}
-                </strong>
-
-                <span class="role-arrow">
-                    →
-                </span>
-
-            `;
-
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    selectedRole =
-                        role;
-
-                    startInterview();
-
-                }
-            );
-
-
-            roleGrid.appendChild(
-                button
-            );
-
-        }
-    );
-
+        roleGrid.appendChild(button);
+    });
 }
-
-
-// =========================================
-// BACK TO COMPANIES
-// =========================================
-
-const backToCompanies =
-    document.getElementById(
-        "backToCompanies"
-    );
-
-
-if (backToCompanies) {
-
-    backToCompanies.addEventListener(
-        "click",
-        () => {
-
-            roleScreen.classList.add(
-                "hidden"
-            );
-
-            companyScreen.classList.remove(
-                "hidden"
-            );
-
-        }
-    );
-
-}
-
 
 
 // =========================================
 // START INTERVIEW
 // =========================================
 
-function unlockAudioPlayback() {
+async function startInterview() {
+    selectedRole = selectedRole || "";
 
-    // Browsers only allow programmatic audio.play() later in the session
-    // if a play() call happened synchronously inside a real user gesture.
-    // This "primes" both the Audio element and speechSynthesis so the
-    // question audio isn't silently blocked a moment later.
+    roleScreen.classList.add("hidden");
+    interviewScreen.classList.remove("hidden");
 
-    try {
+    interviewTitle.textContent = selectedRole;
+    interviewCompany.textContent = selectedCompany;
 
-        // A minimal, guaranteed-valid silent WAV (zero data bytes) —
-        // safe to decode on every browser, unlike a hand-built MP3 blob.
-        const silence =
-            new Audio(
-                "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA="
-            );
-
-        silence.volume = 0;
-
-        audioUnlockPromise =
-            silence.play().catch(() => {});
-
-    } catch {}
-
-    try {
-
-        if ("speechSynthesis" in window) {
-
-            window.speechSynthesis.speak(
-                new SpeechSynthesisUtterance("")
-            );
-
-        }
-
-    } catch {}
-
-}
-
-function startInterview() {
-
-    unlockAudioPlayback();
-
-    currentQuestion =
-        0;
-
+    currentQuestion = 0;
     answers = [];
-
     conversationHistory = [];
-
     sessionState = {};
-
+    interviewDebrief = null;
     currentAIQuestion = null;
 
-    interviewDebrief = null;
+    interviewStarted = true;
+    interviewStartTime = Date.now();
 
+    try {
+        const data = await requestInterviewTurn();
 
-    roleScreen.classList.add(
-        "hidden"
-    );
+        currentAIQuestion = data;
+        showQuestion();
+    } catch (error) {
+        console.error("Could not start interview:", error);
 
-    companyScreen.classList.add(
-        "hidden"
-    );
-
-    interviewScreen.classList.remove(
-        "hidden"
-    );
-
-
-    interviewTitle.textContent =
-        selectedRole;
-
-
-    interviewCompany.textContent =
-        selectedCompany;
-
-
-    totalQuestions.textContent =
-        "~7";
-
-
-    interviewStarted =
-        true;
-
-
-    interviewStartTime =
-        Date.now();
-
-
-    setupSpeechRecognition();
-
-
-    questionText.textContent =
-        "Preparing your first question...";
-
-
-    requestInterviewTurn()
-        .then((data) => {
-
-            currentAIQuestion = data;
-
-            showQuestion();
-
-        })
-        .catch((error) => {
-
-            console.error(
-                "Interview start failed:",
-                error
-            );
-
-            questionText.textContent =
-                "Could not reach the interview service. Check your connection and try again.";
-
-        });
-
+        questionText.textContent =
+            "Unable to start the interview. Please try again.";
+    }
 }
 
 
 // =========================================
-// SHOW QUESTION
+// QUESTION DISPLAY
 // =========================================
 
 function showQuestion() {
+    if (!currentAIQuestion) return;
 
-    if (
-        !currentAIQuestion ||
-        currentAIQuestion.status === "complete"
-    ) {
-
+    if (currentAIQuestion.status === "complete") {
+        interviewDebrief = currentAIQuestion.debrief;
         finishInterview();
-
         return;
-
     }
-
 
     const question =
-        currentAIQuestion.question;
+        currentAIQuestion.question || "";
 
-
-    questionNumber.textContent =
-        currentQuestion + 1;
-
-
-    questionText.textContent =
-        question;
-
-
-    updateListeningCriteria(
-        question
-    );
-
-
-    clearTranscript();
-
-
-    stopListening();
-
-    showVoiceAnswer();
-
-    if (submitTypedAnswerBtn) {
-
-        submitTypedAnswerBtn.disabled = false;
-
-    }
-
-
-    setTimeout(
-        () => {
-
-            speakQuestion(
-                question
-            );
-
-        },
-        400
-    );
-
-}
-
-
-// =========================================
-// LISTENING CRITERIA
-// =========================================
-
-function updateListeningCriteria(
-    question
-) {
-
-    if (!listeningFor) {
+    if (!question) {
+        questionText.textContent =
+            "Waiting for the next interview question...";
         return;
     }
 
+    currentQuestion++;
 
-    let text =
-        "A clear answer, a specific example, and evidence of what you personally contributed.";
+    questionNumber.textContent = currentQuestion;
+    questionText.textContent = question;
 
-
-    if (
-        question
-            .toLowerCase()
-            .includes("project")
-    ) {
-
-        text =
-            "Your role, what you built, the problem you solved, your decisions, and the result.";
-
+    if (transcriptText) {
+        transcriptText.textContent = "";
     }
 
-
-    if (
-        question
-            .toLowerCase()
-            .includes("why")
-    ) {
-
-        text =
-            "Your motivation, understanding of the company, and connection between your experience and the role.";
-
+    if (typedAnswerInput) {
+        typedAnswerInput.value = "";
     }
 
-
-    if (
-        question
-            .toLowerCase()
-            .includes("difficult")
-    ) {
-
-        text =
-            "The problem, your actions, how you handled the situation, and the outcome.";
-
+    if (!isMuted) {
+        speakQuestion(question);
     }
-
-
-    listeningFor.textContent =
-        text;
-
 }
 
 
 // =========================================
-// SPEAK QUESTION
+// TEXT TO SPEECH
 // =========================================
 
 let currentQuestionAudio = null;
 
-let audioUnlockPromise = null;
-
-let pendingQuestionText = null;
-
-function markSpeakingStart() {
-
-    isSpeaking = true;
-
-    speakingRing.classList.add("active");
-
-    voiceWave.classList.add("active");
-
-    voiceStatus.textContent = "AI is speaking...";
-
-    speakingStatus.textContent = "Speaking";
-
-}
-
-function markSpeakingEnd() {
-
-    isSpeaking = false;
-
-    speakingRing.classList.remove("active");
-
-    voiceWave.classList.remove("active");
-
-    voiceStatus.textContent = "Your turn";
-
-    speakingStatus.textContent = "Listening";
-
-}
-
-function speakWithBrowserVoice(
-    text
-) {
-
-    if (!("speechSynthesis" in window)) {
-
+function speakQuestion(text) {
+    if (!("speechSynthesis" in window) || isMuted) {
         return;
-
     }
 
     window.speechSynthesis.cancel();
 
-    const utterance =
-        new SpeechSynthesisUtterance(text);
+    const utterance = new SpeechSynthesisUtterance(text);
 
-    utterance.rate = 0.92;
+    utterance.rate = 0.95;
     utterance.pitch = 1;
-    utterance.volume = 1;
+    utterance.onstart = () => {
+        isSpeaking = true;
 
-    utterance.onstart = markSpeakingStart;
-    utterance.onend = markSpeakingEnd;
+        if (speakingStatus) {
+            speakingStatus.textContent = "Insider is speaking...";
+        }
+    };
+
+    utterance.onend = () => {
+        isSpeaking = false;
+
+        if (speakingStatus) {
+            speakingStatus.textContent = "Your turn to answer";
+        }
+    };
+
+    utterance.onerror = () => {
+        isSpeaking = false;
+    };
 
     window.speechSynthesis.speak(utterance);
-
-}
-
-async function speakQuestion(
-    text
-) {
-
-    if (isMuted) {
-
-        return;
-
-    }
-
-    currentQuestionAudio?.pause();
-
-    pendingQuestionText = text;
-
-    try {
-
-        await audioUnlockPromise;
-
-        const response = await fetch("/api/tts", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text, voice: "female" }),
-        });
-
-        if (!response.ok) throw new Error("TTS request failed");
-
-        const audioUrl = URL.createObjectURL(await response.blob());
-
-        currentQuestionAudio = new Audio(audioUrl);
-
-        currentQuestionAudio.addEventListener("play", markSpeakingStart);
-
-        currentQuestionAudio.addEventListener(
-            "ended",
-            () => {
-
-                markSpeakingEnd();
-
-                URL.revokeObjectURL(audioUrl);
-
-                pendingQuestionText = null;
-
-            },
-            { once: true }
-        );
-
-        await currentQuestionAudio.play();
-
-        pendingQuestionText = null;
-
-    } catch (error) {
-
-        console.error("Backend voice unavailable, falling back:", error);
-
-        voiceStatus.textContent =
-            "Tap the speaker icon if you don't hear the question";
-
-        hearQuestionBtn?.classList.add("pulse");
-
-        try {
-
-            speakWithBrowserVoice(text);
-
-        } catch (fallbackError) {
-
-            console.error("Browser voice also unavailable:", fallbackError);
-
-        }
-
-    }
-
-}
-
-
-// =========================================
-// RETRY BLOCKED AUDIO ON NEXT INTERACTION
-// =========================================
-// If autoplay was blocked, the very next tap/click anywhere on the
-// page is a real user gesture — use it to (re)play the question that
-// never made it out, instead of leaving the candidate stuck silent.
-
-document.addEventListener(
-    "click",
-    () => {
-
-        if (pendingQuestionText && !isSpeaking) {
-
-            const text = pendingQuestionText;
-
-            pendingQuestionText = null;
-
-            speakQuestion(text);
-
-        }
-
-    },
-    { capture: true }
-);
-
-
-// =========================================
-// HEAR QUESTION AGAIN
-// =========================================
-
-if (hearQuestionBtn) {
-
-    hearQuestionBtn.addEventListener(
-        "click",
-        () => {
-
-            hearQuestionBtn.classList.remove("pulse");
-
-            speakQuestion(
-                questionText.textContent
-            );
-
-        }
-    );
-
-}
-
-
-// =========================================
-// TYPE ANSWER INSTEAD
-// =========================================
-
-function showTypedAnswer() {
-
-    stopListening();
-
-    microphoneArea?.classList.add("hidden");
-
-    typedAnswerArea?.classList.remove("hidden");
-
-    typedAnswerInput.value = "";
-
-    typedAnswerInput.focus();
-
-}
-
-function showVoiceAnswer() {
-
-    typedAnswerArea?.classList.add("hidden");
-
-    microphoneArea?.classList.remove("hidden");
-
-}
-
-// =========================================
-// REVIEW TRANSCRIPT BEFORE SUBMIT
-// =========================================
-// Speech recognition mishears things. Route every voice answer through
-// the same editable box as "type instead" so the candidate can fix a
-// bad transcript before it goes to the AI, instead of submitting
-// blind the moment they stop talking.
-
-function reviewTranscriptBeforeSubmit() {
-
-    const transcript =
-        getTranscript();
-
-    if (!transcript) {
-
-        micStatus.textContent =
-            "I didn't hear an answer. Try again.";
-
-        return;
-
-    }
-
-    microphoneArea?.classList.add("hidden");
-
-    typedAnswerArea?.classList.remove("hidden");
-
-    typedAnswerInput.value = transcript;
-
-    typedAnswerInput.focus();
-
-    typedAnswerInput.setSelectionRange(
-        transcript.length,
-        transcript.length
-    );
-
-}
-
-if (typeInsteadBtn) {
-
-    typeInsteadBtn.addEventListener(
-        "click",
-        showTypedAnswer
-    );
-
-}
-
-if (backToVoiceBtn) {
-
-    backToVoiceBtn.addEventListener(
-        "click",
-        showVoiceAnswer
-    );
-
-}
-
-if (submitTypedAnswerBtn) {
-
-    submitTypedAnswerBtn.addEventListener(
-        "click",
-        () => {
-
-            const answer =
-                typedAnswerInput.value.trim();
-
-            if (!answer) {
-
-                typedAnswerInput.focus();
-
-                return;
-
-            }
-
-            submitTypedAnswerBtn.disabled = true;
-
-            submitAnswer(
-                answer,
-                null
-            );
-
-        }
-    );
-
-}
-
-if (typedAnswerInput) {
-
-    typedAnswerInput.addEventListener(
-        "keydown",
-        (event) => {
-
-            if (
-                event.key === "Enter" &&
-                (event.metaKey || event.ctrlKey)
-            ) {
-
-                submitTypedAnswerBtn?.click();
-
-            }
-
-        }
-    );
-
 }
 
 
@@ -1151,369 +417,136 @@ if (typedAnswerInput) {
 // SPEECH RECOGNITION
 // =========================================
 
-function setupSpeechRecognition() {
+const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
 
-    const SpeechRecognition =
-        window.SpeechRecognition ||
-        window.webkitSpeechRecognition;
+if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
 
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = "en-US";
 
-    if (!SpeechRecognition) {
+    recognition.onresult = (event) => {
+        let interimTranscript = "";
 
-        console.warn(
-            "Speech recognition is not supported."
-        );
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
 
-        return;
+            if (event.results[i].isFinal) {
+                accumulatedTranscript += transcript + " ";
+            } else {
+                interimTranscript += transcript;
+            }
+        }
 
-    }
+        if (transcriptText) {
+            transcriptText.textContent =
+                accumulatedTranscript + interimTranscript;
+        }
 
+        clearTimeout(silenceTimer);
 
-    recognition =
-        new SpeechRecognition();
+        silenceTimer = setTimeout(() => {
+            if (isListening) {
+                stopListening();
+                reviewTranscriptBeforeSubmit();
+            }
+        }, SILENCE_TIMEOUT_MS);
+    };
 
+    recognition.onerror = (event) => {
+        console.error("Speech recognition error:", event.error);
 
-    recognition.continuous =
-        true;
-
-
-    recognition.interimResults =
-        true;
-
-
-    recognition.lang =
-        "en-NG";
-
-
-    recognition.onstart =
-        () => {
-
-            isListening =
-                true;
-
-
-            micButton.classList.add(
-                "listening"
-            );
-
-
-            micLabel.textContent =
-                "Stop Answer";
-
-
+        if (micStatus) {
             micStatus.textContent =
-                "Listening... speak naturally, then pause when you're done";
+                "Microphone error. You can type your answer instead.";
+        }
 
+        isListening = false;
+    };
 
-            answerState.textContent =
-                "Listening";
+    recognition.onend = () => {
+        isListening = false;
 
-
-            answerState.style.color =
-                "#e24b4b";
-
-        };
-
-
-    recognition.onresult =
-        (event) => {
-
-            let newFinalTranscript =
-                "";
-
-            let interimTranscript =
-                "";
-
-
-            for (
-                let i = event.resultIndex;
-                i < event.results.length;
-                i++
-            ) {
-
-                const result =
-                    event.results[i];
-
-
-                if (
-                    result.isFinal
-                ) {
-
-                    newFinalTranscript +=
-                        result[0].transcript + " ";
-
-                } else {
-
-                    interimTranscript +=
-                        result[0].transcript;
-
-                }
-
-            }
-
-
-            // Each event only reports NEW results since the last one —
-            // accumulate finalized speech instead of overwriting it, or
-            // everything said before the latest pause gets silently lost.
-            if (newFinalTranscript) {
-
-                accumulatedTranscript +=
-                    newFinalTranscript;
-
-            }
-
-
-            const text =
-                (accumulatedTranscript + interimTranscript).trim();
-
-
-            if (text) {
-
-                displayTranscript(
-                    text
-                );
-
-            }
-
-
-            // Silence-based auto-stop: if the candidate goes quiet for a
-            // beat after saying something, treat that as "done talking"
-            // instead of forcing a manual stop.
-            window.clearTimeout(
-                silenceTimer
-            );
-
-            if (accumulatedTranscript.trim()) {
-
-                silenceTimer =
-                    window.setTimeout(
-                        () => {
-
-                            if (isListening) {
-
-                                stopListening();
-
-                                reviewTranscriptBeforeSubmit();
-
-                            }
-
-                        },
-                        SILENCE_TIMEOUT_MS
-                    );
-
-            }
-
-        };
-
-
-    recognition.onerror =
-        (event) => {
-
-            console.warn(
-                "Speech recognition:",
-                event.error
-            );
-
-
-            if (
-                event.error ===
-                "not-allowed"
-            ) {
-
-                micStatus.textContent =
-                    "Microphone permission was denied.";
-
-            }
-
-
-            stopListening();
-
-        };
-
-
-    recognition.onend =
-        () => {
-
-            if (
-                isListening
-            ) {
-
-                try {
-
-                    recognition.start();
-
-                } catch {
-
-                    // Already running.
-
-                }
-
-            }
-
-        };
-
+        if (micLabel) {
+            micLabel.textContent = "Start speaking";
+        }
+    };
 }
 
 
 // =========================================
-// DISPLAY TRANSCRIPT
-// =========================================
-
-function displayTranscript(
-    text
-) {
-
-    transcriptText.innerHTML = `
-
-        <div class="transcript-live">
-
-            ${escapeHTML(text)}
-
-        </div>
-
-    `;
-
-}
-
-
-// =========================================
-// CLEAR TRANSCRIPT
-// =========================================
-
-function clearTranscript() {
-
-    accumulatedTranscript = "";
-
-    window.clearTimeout(silenceTimer);
-
-    if (!transcriptText) {
-
-        return;
-
-    }
-
-    transcriptText.textContent =
-        "Press the mic and start speaking. Your answer will appear here.";
-
-}
-
-
-// =========================================
-// ESCAPE HTML
-// =========================================
-
-function escapeHTML(
-    text
-) {
-
-    const element =
-        document.createElement(
-            "div"
-        );
-
-
-    element.textContent =
-        text;
-
-
-    return element.innerHTML;
-
-}
-
-
-// =========================================
-// START LISTENING
+// MICROPHONE CONTROLS
 // =========================================
 
 function startListening() {
+    if (!recognition) {
+        if (micStatus) {
+            micStatus.textContent =
+                "Speech recognition is not supported. Please type your answer.";
+        }
+        return;
+    }
 
     accumulatedTranscript = "";
 
-    if (!recognition) {
-
-        alert(
-            "Voice recognition is not available in this browser. Please use Chrome or Edge and allow microphone access."
-        );
-
-        return;
-
+    if (transcriptText) {
+        transcriptText.textContent = "";
     }
-
-
-    if (isSpeaking) {
-
-        window.speechSynthesis.cancel();
-
-    }
-
 
     try {
-
         recognition.start();
+        isListening = true;
 
-    } catch {
+        if (micLabel) {
+            micLabel.textContent = "Stop recording";
+        }
 
-        // Already started.
-
+        if (micStatus) {
+            micStatus.textContent = "Listening...";
+        }
+    } catch (error) {
+        console.error("Could not start microphone:", error);
     }
-
 }
 
 
-// =========================================
-// STOP LISTENING
-// =========================================
-
 function stopListening() {
+    clearTimeout(silenceTimer);
 
-    window.clearTimeout(silenceTimer);
-
-    if (!isListening) {
-
-        return;
-
-    }
-
-
-    isListening =
-        false;
-
-
-    micButton.classList.remove(
-        "listening"
-    );
-
-
-    micLabel.textContent =
-        "Start Answer";
-
-
-    micStatus.textContent =
-        "Answer recorded";
-
-
-    answerState.textContent =
-        "Answer recorded";
-
-
-    answerState.style.color =
-        "#00a651";
-
-
-    if (recognition) {
-
+    if (recognition && isListening) {
         try {
-
             recognition.stop();
-
-        } catch {
-
-            // Already stopped.
-
+        } catch (error) {
+            console.warn("Recognition already stopped:", error);
         }
-
     }
 
+    isListening = false;
+
+    if (micLabel) {
+        micLabel.textContent = "Start speaking";
+    }
+}
+
+
+function reviewTranscriptBeforeSubmit() {
+    const answer = getTranscript();
+
+    if (!answer.trim()) {
+        if (answerState) {
+            answerState.textContent =
+                "No answer detected. Please try again or type your answer.";
+        }
+        return;
+    }
+
+    if (answerState) {
+        answerState.textContent = "Answer recorded";
+        answerState.style.color = "#00a651";
+    }
 }
 
 
@@ -1522,33 +555,16 @@ function stopListening() {
 // =========================================
 
 if (micButton) {
+    micButton.addEventListener("click", () => {
+        if (!interviewStarted) return;
 
-    micButton.addEventListener(
-        "click",
-        () => {
-
-            if (!interviewStarted) {
-
-                return;
-
-            }
-
-
-            if (isListening) {
-
-                stopListening();
-
-                reviewTranscriptBeforeSubmit();
-
-            } else {
-
-                startListening();
-
-            }
-
+        if (isListening) {
+            stopListening();
+            reviewTranscriptBeforeSubmit();
+        } else {
+            startListening();
         }
-    );
-
+    });
 }
 
 
@@ -1557,145 +573,123 @@ if (micButton) {
 // =========================================
 
 function getTranscript() {
-
-    if (!transcriptText) {
-
-        return "";
-
-    }
-
-
+    if (!transcriptText) return "";
     return transcriptText.innerText.trim();
-
 }
 
 
-function submitAnswer(
-    answer,
-    statusElement
-) {
+// =========================================
+// SUBMIT ANSWER
+// =========================================
 
-    answers.push({
-
-        question:
-            currentAIQuestion?.question || "",
-
-        answer:
-            answer,
-
-        timestamp:
-            new Date().toISOString()
-
-    });
-
-
-    conversationHistory.push(
-        { role: "assistant", content: currentAIQuestion?.question || "" }
-    );
-
-    conversationHistory.push(
-        { role: "user", content: answer }
-    );
-
-
-    if (statusElement) {
-
-        statusElement.textContent =
-            "Thinking about your answer...";
-
+function submitAnswer(answer, statusElement) {
+    if (!answer || !answer.trim()) {
+        if (statusElement) {
+            statusElement.textContent = "Please provide an answer first.";
+        }
+        return;
     }
 
+    answers.push({
+        question: currentAIQuestion?.question || "",
+        answer: answer,
+        timestamp: new Date().toISOString()
+    });
+
+    conversationHistory.push({
+        role: "assistant",
+        content: currentAIQuestion?.question || ""
+    });
+
+    conversationHistory.push({
+        role: "user",
+        content: answer
+    });
+
+    if (statusElement) {
+        statusElement.textContent =
+            "Thinking about your answer...";
+    }
 
     requestInterviewTurn()
         .then((data) => {
-
             currentAIQuestion = data;
 
             renderEvidence(data.evaluation);
 
             if (data.status === "complete") {
-
                 interviewDebrief = data.debrief;
-
             }
-
-            currentQuestion++;
 
             showQuestion();
-
         })
         .catch((error) => {
-
-            console.error(
-                "Interview turn failed:",
-                error
-            );
+            console.error("Interview turn failed:", error);
 
             if (statusElement) {
-
                 statusElement.textContent =
                     "Could not reach the interview service. Try again.";
-
             }
-
         });
-
 }
 
 
 // =========================================
-// RENDER EVIDENCE (from real /api/interview evaluation)
+// RENDER EVIDENCE
 // =========================================
 
-function renderEvidence(
-    evaluation
-) {
+function renderEvidence(evaluation) {
+    if (!liveEvidence || !evaluation) return;
 
-    if (
-        !liveEvidence ||
-        !evaluation
-    ) {
+    const strength = evaluation.strength || "unknown";
 
-        return;
-
+    if (strengthBadge) {
+        strengthBadge.textContent = strength;
+        strengthBadge.className =
+            `strength-badge strength-${strength}`;
     }
 
+    const found = evaluation.evidence_found || [];
 
-    const strength =
-        evaluation.strength || "unknown";
-
-    strengthBadge.textContent =
-        strength;
-
-    strengthBadge.className =
-        `strength-badge strength-${strength}`;
-
-
-    const found =
-        evaluation.evidence_found || [];
-
-    evidenceFoundList.innerHTML =
-        found.length
-            ? found.map((item) => `<li>${escapeHTML(item)}</li>`).join("")
+    if (evidenceFoundList) {
+        evidenceFoundList.innerHTML = found.length
+            ? found.map((item) =>
+                `<li>${escapeHTML(item)}</li>`
+            ).join("")
             : "<li>Nothing concrete yet — try naming a specific action and result.</li>";
+    }
+
+    const missing = evaluation.missing_evidence || [];
+
+    if (missingEvidenceBlock) {
+        missingEvidenceBlock.classList.toggle(
+            "hidden",
+            missing.length === 0
+        );
+    }
+
+    if (missingEvidenceList) {
+        missingEvidenceList.innerHTML =
+            missing.map((item) =>
+                `<li>${escapeHTML(item)}</li>`
+            ).join("");
+    }
+
+    liveEvidence.classList.remove("hidden");
+}
 
 
-    const missing =
-        evaluation.missing_evidence || [];
+// =========================================
+// HTML ESCAPING
+// =========================================
 
-    missingEvidenceBlock.classList.toggle(
-        "hidden",
-        missing.length === 0
-    );
-
-    missingEvidenceList.innerHTML =
-        missing.map((item) => `<li>${escapeHTML(item)}</li>`).join("");
-
-
-    liveEvidence.classList.remove(
-        "hidden"
-    );
-
+function escapeHTML(value) {
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
 
@@ -1704,33 +698,107 @@ function renderEvidence(
 // =========================================
 
 if (muteButton) {
+    muteButton.addEventListener("click", () => {
+        isMuted = !isMuted;
 
-    muteButton.addEventListener(
-        "click",
-        () => {
+        if (isMuted) {
+            window.speechSynthesis.cancel();
 
-            isMuted =
-                !isMuted;
-
-
-            if (isMuted) {
-
-                window.speechSynthesis.cancel();
-
-
-                muteButton.innerHTML =
-                    '<i class="fa-solid fa-volume-high"></i> Unmute AI';
-
-            } else {
-
-                muteButton.innerHTML =
-                    '<i class="fa-solid fa-volume-xmark"></i> Mute AI';
-
-            }
-
+            muteButton.innerHTML =
+                '<i class="fa-solid fa-volume-high"></i> Unmute AI';
+        } else {
+            muteButton.innerHTML =
+                '<i class="fa-solid fa-volume-xmark"></i> Mute AI';
         }
-    );
+    });
+}
 
+
+// =========================================
+// HEAR QUESTION AGAIN
+// =========================================
+
+if (hearQuestionBtn) {
+    hearQuestionBtn.addEventListener("click", () => {
+        if (currentAIQuestion?.question) {
+            speakQuestion(currentAIQuestion.question);
+        }
+    });
+}
+
+
+// =========================================
+// TYPE ANSWER INSTEAD
+// =========================================
+
+if (typeInsteadBtn) {
+    typeInsteadBtn.addEventListener("click", () => {
+        if (microphoneArea) {
+            microphoneArea.classList.add("hidden");
+        }
+
+        if (typedAnswerArea) {
+            typedAnswerArea.classList.remove("hidden");
+        }
+
+        if (typedAnswerInput) {
+            typedAnswerInput.focus();
+        }
+    });
+}
+
+
+if (backToVoiceBtn) {
+    backToVoiceBtn.addEventListener("click", () => {
+        if (typedAnswerArea) {
+            typedAnswerArea.classList.add("hidden");
+        }
+
+        if (microphoneArea) {
+            microphoneArea.classList.remove("hidden");
+        }
+    });
+}
+
+
+if (submitTypedAnswerBtn) {
+    submitTypedAnswerBtn.addEventListener("click", () => {
+        const answer = typedAnswerInput?.value.trim() || "";
+
+        if (!answer) {
+            if (answerState) {
+                answerState.textContent =
+                    "Please type your answer first.";
+            }
+            return;
+        }
+
+        submitAnswer(answer, answerState);
+    });
+}
+
+
+// =========================================
+// SUBMIT VOICE ANSWER
+// =========================================
+
+const submitVoiceAnswerBtn =
+    document.getElementById("submitVoiceAnswerBtn");
+
+if (submitVoiceAnswerBtn) {
+    submitVoiceAnswerBtn.addEventListener("click", () => {
+        const answer = getTranscript();
+
+        if (!answer) {
+            if (answerState) {
+                answerState.textContent =
+                    "Please record an answer first.";
+            }
+            return;
+        }
+
+        submitAnswer(answer, answerState);
+    });
 }
 
 
@@ -1738,99 +806,50 @@ if (muteButton) {
 // CUSTOM EXIT ALERT
 // =========================================
 
-const exitConfirm =
-    document.getElementById(
-        "exitConfirm"
-    );
-
-const cancelExit =
-    document.getElementById(
-        "cancelExit"
-    );
-
-const confirmExit =
-    document.getElementById(
-        "confirmExit"
-    );
-
-const endInterviewBtn =
-    document.getElementById(
-        "endInterviewBtn"
-    );
+const exitConfirm = document.getElementById("exitConfirm");
+const cancelExit = document.getElementById("cancelExit");
+const confirmExit = document.getElementById("confirmExit");
+const endInterviewBtn = document.getElementById("endInterviewBtn");
 
 
 function openExitConfirm() {
-
-    exitConfirm.classList.add(
-        "show"
-    );
-
+    if (exitConfirm) {
+        exitConfirm.classList.add("show");
+    }
 }
 
 
 function closeExitConfirm() {
-
-    exitConfirm.classList.remove(
-        "show"
-    );
-
+    if (exitConfirm) {
+        exitConfirm.classList.remove("show");
+    }
 }
 
 
 if (endInterviewBtn) {
-
-    endInterviewBtn.addEventListener(
-        "click",
-        openExitConfirm
-    );
-
+    endInterviewBtn.addEventListener("click", openExitConfirm);
 }
 
 
 if (cancelExit) {
-
-    cancelExit.addEventListener(
-        "click",
-        closeExitConfirm
-    );
-
+    cancelExit.addEventListener("click", closeExitConfirm);
 }
 
 
 if (confirmExit) {
-
-    confirmExit.addEventListener(
-        "click",
-        () => {
-
-            closeExitConfirm();
-
-            finishInterview();
-
-        }
-    );
-
+    confirmExit.addEventListener("click", () => {
+        closeExitConfirm();
+        finishInterview();
+    });
 }
 
 
 if (exitConfirm) {
-
-    exitConfirm.addEventListener(
-        "click",
-        (event) => {
-
-            if (
-                event.target ===
-                exitConfirm
-            ) {
-
-                closeExitConfirm();
-
-            }
-
+    exitConfirm.addEventListener("click", (event) => {
+        if (event.target === exitConfirm) {
+            closeExitConfirm();
         }
-    );
-
+    });
 }
 
 
@@ -1839,71 +858,35 @@ if (exitConfirm) {
 // =========================================
 
 function finishInterview() {
-
-    interviewStarted =
-        false;
-
+    interviewStarted = false;
 
     stopListening();
 
-
-    if (
-        "speechSynthesis" in window
-    ) {
-
+    if ("speechSynthesis" in window) {
         window.speechSynthesis.cancel();
-
     }
 
     currentQuestionAudio?.pause();
 
-
-    const debrief =
-        interviewDebrief || {};
-
+    const debrief = interviewDebrief || {};
 
     const interviewData = {
-
-        company:
-            selectedCompany,
-
-        role:
-            selectedRole,
-
-        answers:
-            answers,
-
-        debrief:
-            debrief,
-
-        completedAt:
-            new Date().toISOString()
-
+        company: selectedCompany,
+        role: selectedRole,
+        answers: answers,
+        debrief: debrief,
+        completedAt: new Date().toISOString()
     };
-
 
     localStorage.setItem(
         "insiderInterview",
-        JSON.stringify(
-            interviewData
-        )
+        JSON.stringify(interviewData)
     );
 
+    renderDebrief(interviewData);
 
-    renderDebrief(
-        interviewData
-    );
-
-
-    interviewScreen.classList.add(
-        "hidden"
-    );
-
-
-    debriefScreen.classList.remove(
-        "hidden"
-    );
-
+    interviewScreen.classList.add("hidden");
+    debriefScreen.classList.remove("hidden");
 }
 
 
@@ -1911,48 +894,29 @@ function finishInterview() {
 // DEBRIEF
 // =========================================
 
-function renderDebrief(
-    data
-) {
-
+function renderDebrief(data) {
     const performanceScore =
-        document.getElementById(
-            "performanceScore"
-        );
+        document.getElementById("performanceScore");
 
     const evidenceCount =
-        document.getElementById(
-            "evidenceCount"
-        );
+        document.getElementById("evidenceCount");
 
     const progressScore =
-        document.getElementById(
-            "progressScore"
-        );
+        document.getElementById("progressScore");
 
     const overallSummary =
-        document.getElementById(
-            "overallSummary"
-        );
+        document.getElementById("overallSummary");
 
     const strengthsList =
-        document.getElementById(
-            "strengthsList"
-        );
+        document.getElementById("strengthsList");
 
     const gapsList =
-        document.getElementById(
-            "gapsList"
-        );
+        document.getElementById("gapsList");
 
     const coachingList =
-        document.getElementById(
-            "coachingList"
-        );
+        document.getElementById("coachingList");
 
-
-    const debrief =
-        data.debrief || {};
+    const debrief = data.debrief || {};
 
     const strengths =
         debrief.strengths && debrief.strengths.length
@@ -1970,61 +934,63 @@ function renderDebrief(
             : ["Use the STAR structure for behavioural questions."];
 
     const evidenceDiscovered =
-        debrief.evidence_discovered && debrief.evidence_discovered.length
+        debrief.evidence_discovered &&
+        debrief.evidence_discovered.length
             ? debrief.evidence_discovered.length
             : data.answers.length;
 
-    const score =
-        Math.round(
-            (
-                strengths.length /
-                (strengths.length + weaknesses.length)
-            ) * 100
-        );
+    // Use only the score supplied by the interview evaluator.
+    // Never calculate a score by counting strengths or weaknesses.
+    const rawScore = debrief.performance_score;
 
+    const hasValidScore =
+        typeof rawScore === "number" &&
+        Number.isFinite(rawScore) &&
+        rawScore >= 0 &&
+        rawScore <= 100;
 
-    performanceScore.textContent =
-        `${score}%`;
+    if (performanceScore) {
+        performanceScore.textContent =
+            hasValidScore
+                ? `${Math.round(rawScore)}%`
+                : "Not scored";
+    }
 
+    if (evidenceCount) {
+        evidenceCount.textContent = evidenceDiscovered;
+    }
 
-    evidenceCount.textContent =
-        evidenceDiscovered;
+    // Reaching the debrief means the interview itself is complete.
+    if (progressScore) {
+        progressScore.textContent = "100%";
+    }
 
+    if (overallSummary) {
+        overallSummary.textContent =
+            debrief.overall_summary ||
+            `You completed your ${data.role} interview for ${data.company}. Insider captured ${data.answers.length} answered question${data.answers.length === 1 ? "" : "s"} as evidence.`;
+    }
 
-    progressScore.textContent =
-        `${score}%`;
+    if (strengthsList) {
+        strengthsList.innerHTML =
+            strengths.map((item) =>
+                `<li>${escapeHTML(item)}</li>`
+            ).join("");
+    }
 
+    if (gapsList) {
+        gapsList.innerHTML =
+            weaknesses.map((item) =>
+                `<li>${escapeHTML(item)}</li>`
+            ).join("");
+    }
 
-    overallSummary.textContent =
-
-        debrief.overall_summary ||
-
-        `You completed your ${data.role} interview for ${data.company}. Insider captured ${data.answers.length} answered question${data.answers.length === 1 ? "" : "s"} as evidence.`;
-
-
-
-    strengthsList.innerHTML =
-
-        strengths
-            .map((item) => `<li>${escapeHTML(item)}</li>`)
-            .join("");
-
-
-
-    gapsList.innerHTML =
-
-        weaknesses
-            .map((item) => `<li>${escapeHTML(item)}</li>`)
-            .join("");
-
-
-
-    coachingList.innerHTML =
-
-        coaching
-            .map((item) => `<li>${escapeHTML(item)}</li>`)
-            .join("");
-
+    if (coachingList) {
+        coachingList.innerHTML =
+            coaching.map((item) =>
+                `<li>${escapeHTML(item)}</li>`
+            ).join("");
+    }
 }
 
 
@@ -2033,42 +999,22 @@ function renderDebrief(
 // =========================================
 
 const anotherInterviewBtn =
-    document.getElementById(
-        "anotherInterviewBtn"
-    );
-
+    document.getElementById("anotherInterviewBtn");
 
 if (anotherInterviewBtn) {
+    anotherInterviewBtn.addEventListener("click", () => {
+        debriefScreen.classList.add("hidden");
+        companyScreen.classList.remove("hidden");
 
-    anotherInterviewBtn.addEventListener(
-        "click",
-        () => {
-
-            debriefScreen.classList.add(
-                "hidden"
-            );
-
-
-            companyScreen.classList.remove(
-                "hidden"
-            );
-
-
-            selectedCompany =
-                "";
-
-            selectedRole =
-                "";
-
-            answers =
-                [];
-
-            currentQuestion =
-                0;
-
-        }
-    );
-
+        selectedCompany = "";
+        selectedRole = "";
+        answers = [];
+        currentQuestion = 0;
+        conversationHistory = [];
+        sessionState = {};
+        interviewDebrief = null;
+        currentAIQuestion = null;
+    });
 }
 
 
@@ -2076,20 +1022,12 @@ if (anotherInterviewBtn) {
 // ESCAPE KEY
 // =========================================
 
-document.addEventListener(
-    "keydown",
-    (event) => {
-
-        if (
-            event.key === "Escape" &&
-            exitConfirm.classList.contains(
-                "show"
-            )
-        ) {
-
-            closeExitConfirm();
-
-        }
-
+document.addEventListener("keydown", (event) => {
+    if (
+        event.key === "Escape" &&
+        exitConfirm &&
+        exitConfirm.classList.contains("show")
+    ) {
+        closeExitConfirm();
     }
-);
+});
