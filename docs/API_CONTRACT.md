@@ -112,6 +112,18 @@ Response:
 
 One Groq request per live turn. The browser never calls Groq directly.
 
+### `POST /api/interview_session`
+
+Creates the signed session token required by `POST /api/interview`.
+
+Request:
+
+```json
+{"user_id":"user-123","session_id":"session-456","candidate_name":"Amina","role_title":"Operations Lead"}
+```
+
+Response: `{ "session": { "user_id": "...", "session_id": "...", "token": "..." } }`.
+
 Request:
 
 ```json
@@ -126,15 +138,17 @@ Active response:
 
 For the next turn, append the assistant question and user answer to `history`, then send the returned `session_state` back. The next question uses the latest answer and remaining competencies. Completed interviews return `status: "complete"` and `debrief`.
 
-### `POST /api/interview/debrief`
+### `POST /api/interview_debrief` (also `/api/interview/debrief`)
+
+Generates a strict, evidence-based assessment from the complete interview transcript. Requires the same signed session as live interview turns.
 
 Request:
 
 ```json
-{"candidate":{},"role":{"competencies":["ownership"]},"history":[{"role":"user","content":"I improved the process."}],"session_state":{"competencies_assessed":["ownership"],"evidence_discovered":[]}}
+{"candidate":{"name":"Amina","summary":"Operations professional","experience":[]},"role":{"company":"Example Co","title":"Operations Lead","competencies":["ownership"]},"history":[{"role":"assistant","content":"Tell me about a process you improved."},{"role":"user","content":"I redesigned the intake steps and reduced processing time by two days."}],"session_state":{},"session":{"user_id":"user-123","session_id":"session-456","token":"signed-session-token"}}
 ```
 
-Response fields: `competencies`, `evidence`, `strengths`, `gaps`, `coaching`, `next_steps`, `profile_updates`.
+Response fields: `overall_summary`, `performance_score` (0-100 from competency scores), `strengths`, `weaknesses`, `evidence_discovered` (answer quotes only), `competency_assessments` (0-4 per role competency, with rationale and verified quote), `specific_coaching`, and `practice_next`. Scores above 2 require a quote present verbatim in the candidate's transcript. Competencies with no assessment are scored 0.
 
 ## Voice
 

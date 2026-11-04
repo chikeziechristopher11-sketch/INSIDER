@@ -567,6 +567,8 @@ let isMuted = false;
 
 let interviewStarted = false;
 
+let interviewFinishing = false;
+
 let interviewStartTime = null;
 
 let timer = null;
@@ -796,7 +798,7 @@ async function requestAiTurn(answer = "", askedQuestion = "") {
     const userId = storedUser.id || storedUser.email || candidate.name;
 
     if (!aiSession) {
-        const sessionResponse = await fetch(window.apiUrl("/api/interview/session"), {
+        const sessionResponse = await fetch(window.apiUrl("/api/interview_session"), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -808,10 +810,14 @@ async function requestAiTurn(answer = "", askedQuestion = "") {
         });
 
         if (!sessionResponse.ok) {
-            throw new Error("Unable to create interview session");
+            throw new Error(`Unable to create interview session (HTTP ${sessionResponse.status})`);
         }
 
-        aiSession = (await sessionResponse.json()).session;
+        const sessionResult = await sessionResponse.json();
+        if (!sessionResult.session || typeof sessionResult.session !== "object") {
+            throw new Error("Interview session response was invalid");
+        }
+        aiSession = sessionResult.session;
     }
 
     if (answer) {
@@ -819,24 +825,26 @@ async function requestAiTurn(answer = "", askedQuestion = "") {
         aiHistory.push({ role: "user", content: answer });
     }
 
+    const requestBody = {
+        candidate,
+        role: {
+            company: selectedCompany,
+            title: selectedRole,
+            competencies: interviewCompetencies(selectedRole),
+        },
+        history: aiHistory,
+        session_state: aiSessionState,
+        session: aiSession,
+    };
+
     const response = await fetch(window.apiUrl("/api/interview"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            candidate,
-            role: {
-                company: selectedCompany,
-                title: selectedRole,
-                competencies: interviewCompetencies(selectedRole),
-            },
-            history: aiHistory,
-            session_state: aiSessionState,
-            session: aiSession,
-        }),
+        body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {
-        throw new Error("Unable to generate interview question");
+        throw new Error(`Unable to generate interview question (HTTP ${response.status})`);
     }
 
     const result = await response.json();
@@ -900,6 +908,7 @@ async function startInterview() {
     aiHistory = [];
     aiSessionState = {};
     aiQuestionMode = true;
+    interviewFinishing = false;
 
 
     roleScreen.classList.add(
@@ -943,7 +952,9 @@ async function startInterview() {
             throw new Error("AI returned no opening question");
         }
         questions.push(firstTurn.question);
-    } catch {
+    } catch (error) {
+        console.error("AI interview opening question could not be generated.");
+        micStatus.textContent = "AI question generation failed. Continuing with built-in questions.";
         aiQuestionMode = false;
         questions = buildQuestions();
         totalQuestions.textContent = questions.length;
@@ -1632,10 +1643,19 @@ async function submitVoiceAnswer() {
                 finishInterview();
                 return;
             }
-        } catch {
+        } catch (error) {
+            console.error("AI interview follow-up question could not be generated.");
+            micStatus.textContent = "AI follow-up generation failed. Continuing with built-in questions.";
             aiQuestionMode = false;
             questions = buildQuestions();
             totalQuestions.textContent = questions.length;
+        }
+
+    } else if (aiSession) {
+        const alreadyRecorded = aiHistory[aiHistory.length - 1];
+        if (alreadyRecorded?.role !== "user" || alreadyRecorded.content !== answer) {
+            aiHistory.push({ role: "assistant", content: askedQuestion });
+            aiHistory.push({ role: "user", content: answer });
         }
 
     }
@@ -1899,7 +1919,41 @@ if (exitConfirm) {
 // FINISH INTERVIEW
 // =========================================
 
-function finishInterview() {
+async function requestAiDebrief() {
+    const candidate = candidateForInterview();
+    const response = await fetch(window.apiUrl("/api/interview_debrief"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            candidate,
+            role: {
+                company: selectedCompany,
+                title: selectedRole,
+                competencies: interviewCompetencies(selectedRole),
+            },
+            history: aiHistory,
+            session_state: aiSessionState,
+            session: aiSession,
+        }),
+    });
+
+    if (!response.ok) {
+        throw new Error(`Unable to generate interview debrief (HTTP ${response.status})`);
+    }
+
+    const result = await response.json();
+    if (!result || typeof result.overall_summary !== "string") {
+        throw new Error("AI returned an invalid interview debrief");
+    }
+    return result;
+}
+
+async function finishInterview() {
+
+    if (interviewFinishing) {
+        return;
+    }
+    interviewFinishing = true;
 
     interviewStarted =
         false;
@@ -1909,17 +1963,6 @@ function finishInterview() {
 
 
     stopAiSpeech();
-
-
-    const score =
-        questions.length
-            ? Math.round(
-                (
-                    answers.length /
-                    questions.length
-                ) * 100
-            )
-            : 0;
 
 
     const interviewData = {
@@ -1936,8 +1979,9 @@ function finishInterview() {
         answers:
             answers,
 
-        score:
-            score,
+        score: null,
+
+        debrief: null,
 
         completedAt:
             new Date().toISOString()
@@ -1953,11 +1997,6 @@ function finishInterview() {
     );
 
 
-    renderDebrief(
-        interviewData
-    );
-
-
     interviewScreen.classList.add(
         "hidden"
     );
@@ -1967,6 +2006,22 @@ function finishInterview() {
         "hidden"
     );
 
+    renderDebrief(interviewData, true);
+
+    try {
+        if (!aiSession || !aiHistory.some((item) => item.role === "user")) {
+            throw new Error("A signed AI interview session and at least one answer are required.");
+        }
+        interviewData.debrief = await requestAiDebrief();
+        interviewData.score = interviewData.debrief.performance_score;
+    } catch (error) {
+        console.error("Strict AI interview debrief could not be generated.");
+        interviewData.debriefError = true;
+    }
+
+    localStorage.setItem("insiderInterview", JSON.stringify(interviewData));
+    renderDebrief(interviewData);
+
 }
 
 
@@ -1975,7 +2030,8 @@ function finishInterview() {
 // =========================================
 
 function renderDebrief(
-    data
+    data,
+    isLoading = false
 ) {
 
     const performanceScore =
@@ -2013,86 +2069,103 @@ function renderDebrief(
             "coachingList"
         );
 
+    const evidenceList =
+        document.getElementById("evidenceList");
 
     performanceScore.textContent =
-        `${data.score}%`;
+        Number.isFinite(data.score) ? `${data.score}%` : "N/A";
 
 
     evidenceCount.textContent =
-        data.answers.length;
+        data.debrief?.evidence_discovered?.length || 0;
 
 
     progressScore.textContent =
-        `${data.score}%`;
+        questions.length
+            ? `${Math.round((data.answers.length / questions.length) * 100)}%`
+            : "0%";
 
+    const debrief = data.debrief;
+    overallSummary.textContent = isLoading
+        ? "Reviewing each answer against the role competencies and checking that every assessment is supported by evidence..."
+        : debrief?.overall_summary
+            || "A strict AI assessment could not be generated. Your answers have not been scored or treated as evidence.";
 
-    overallSummary.textContent =
+    const replaceList = (element, items, emptyMessage) => {
+        element.replaceChildren();
+        const values = Array.isArray(items) && items.length ? items : [emptyMessage];
+        values.forEach((value) => {
+            const item = document.createElement("li");
+            item.textContent = value;
+            element.appendChild(item);
+        });
+    };
 
-        `You completed your ${data.role} interview preparation for ${data.company}. Insider captured ${data.answers.length} answered question${data.answers.length === 1 ? "" : "s"} as evidence. Continue practicing with specific examples, measurable outcomes and clear explanations of your personal contribution.`;
+    replaceList(
+        strengthsList,
+        debrief?.strengths,
+        isLoading
+            ? "Assessment in progress..."
+            : debrief
+                ? "No strengths were substantiated by the answers."
+                : "Unavailable because the AI assessment failed."
+    );
+    replaceList(
+        gapsList,
+        debrief?.weaknesses,
+        isLoading
+            ? "Assessment in progress..."
+            : debrief
+                ? "No material evidence gaps were identified."
+                : "Unavailable because the AI assessment failed."
+    );
+    replaceList(
+        coachingList,
+        debrief?.specific_coaching,
+        isLoading ? "Assessment in progress..." : "Coaching is unavailable because the AI assessment failed."
+    );
+    replaceList(
+        document.getElementById("nextStepsList"),
+        debrief?.practice_next,
+        isLoading ? "Assessment in progress..." : "Next steps are unavailable because the AI assessment failed."
+    );
 
+    evidenceList.replaceChildren();
+    const evidence = debrief?.evidence_discovered || [];
+    if (!evidence.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty-evidence";
+        empty.textContent = isLoading
+            ? "Checking the transcript for verifiable evidence..."
+            : "No concrete evidence was verified in the answers.";
+        evidenceList.appendChild(empty);
+    } else {
+        evidence.forEach((item) => {
+            const card = document.createElement("div");
+            card.className = "empty-evidence";
+            card.textContent = `${String(item.competency || "Competency").replace(/_/g, " ")}: ${item.evidence_quote || ""}`;
+            evidenceList.appendChild(card);
+        });
+    }
 
-
-    strengthsList.innerHTML = `
-
-        <li>
-            Completed a realistic ${data.company}
-            interview simulation.
-        </li>
-
-        <li>
-            Practiced questions relevant to
-            the ${data.role} role.
-        </li>
-
-        <li>
-            Provided ${data.answers.length}
-            answer${data.answers.length === 1 ? "" : "s"}
-            that Insider can use as evidence.
-        </li>
-
-    `;
-
-
-
-    gapsList.innerHTML = `
-
-        <li>
-            Add measurable results to your
-            examples where possible.
-        </li>
-
-        <li>
-            Explain your personal contribution
-            clearly when discussing projects.
-        </li>
-
-        <li>
-            Continue practicing company-specific
-            questions.
-        </li>
-
-    `;
-
-
-
-    coachingList.innerHTML = `
-
-        <li>
-            Use the STAR structure for
-            behavioural questions.
-        </li>
-
-        <li>
-            Give concrete examples instead
-            of general statements.
-        </li>
-
-        <li>
-            Connect your experience directly
-            to the role you're targeting.
-        </li>
-
-    `;
+    const competencyList = document.getElementById("competencyList");
+    competencyList.replaceChildren();
+    (debrief?.competency_assessments || []).forEach((item) => {
+        const card = document.createElement("div");
+        card.className = "empty-evidence";
+        const heading = document.createElement("strong");
+        heading.textContent = `${String(item.competency || "Competency").replace(/_/g, " ")} — ${item.score}/4 (${item.rating || "unrated"})`;
+        card.appendChild(heading);
+        const rationale = document.createElement("p");
+        rationale.textContent = item.rationale || "";
+        card.appendChild(rationale);
+        if (item.evidence_quote) {
+            const quote = document.createElement("p");
+            quote.textContent = `Candidate quote: “${item.evidence_quote}”`;
+            card.appendChild(quote);
+        }
+        competencyList.appendChild(card);
+    });
 
 }
 

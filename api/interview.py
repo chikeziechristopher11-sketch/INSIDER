@@ -136,6 +136,27 @@ Return valid JSON only with this shape:
 When enough evidence has been collected across the important competencies, set question_type to completion, interview_complete to true, and question to an empty string. Then include a debrief with: overall_summary, strengths, weaknesses, evidence_discovered, competency_assessments, specific_coaching, and practice_next.
 """
 
+DEBRIEF_PROMPT = """You are a rigorous, fair interview assessor. Assess the candidate only from the supplied question-and-answer transcript and selected role competencies.
+
+Be strict: a claim is not proof; distinguish team results from the candidate's personal contribution; require a clear action, reasoning, and outcome before calling an answer strong. Credit evidence that is genuinely present, but do not infer missing details or punish a candidate for facts they were never asked to provide. Treat unanswered questions as no evidence, not proof of inability. Do not invent quotes, results, metrics, or context. Cite short exact quotes from the candidate's answers when explaining a competency rating. If the transcript has no support for a strength, return no strengths rather than generic praise.
+
+Every listed strength, weakness, and coaching point must be tied to a specific answer quote or identify the exact unanswered interview question. Do not give generic interview advice unrelated to this transcript.
+
+For every selected competency, return one assessment with a score from 0 to 4: 0 = no answer/evidence, 1 = unsupported or largely irrelevant, 2 = relevant but vague or incomplete, 3 = specific personal action and sound reasoning with a credible outcome, 4 = compelling, role-relevant evidence with clear ownership, trade-offs, and outcome. Cite an exact candidate quote for every score above 0. If you cannot cite a matching quote, score 0 and state that no verifiable evidence was supplied. Keep scores conservative and explain each score using transcript evidence. The overall performance score is the rounded average of competency scores expressed as a percentage (score / 4 * 100); do not grade interview completion.
+
+Return valid JSON only:
+{
+  "overall_summary": "Direct overall assessment grounded in the transcript.",
+  "performance_score": 0,
+  "strengths": ["Only substantiated strengths, with the evidence."],
+  "weaknesses": ["Specific, material evidence gaps or answer problems."],
+  "evidence_discovered": [{"competency": "role competency", "evidence": "Exact or faithful concise account of stated evidence."}],
+  "competency_assessments": [{"competency": "role competency", "score": 0, "rating": "not_demonstrated|weak|developing|strong|exceptional", "rationale": "Evidence-based explanation.", "evidence_quote": "Exact short quote or empty string when none."}],
+  "specific_coaching": ["Concrete changes tied to the candidate's actual answer."],
+  "practice_next": ["Focused practice tasks for the most important gaps."]
+}
+"""
+
 
 def _as_dict(value: Any, fallback: dict[str, Any]) -> dict[str, Any]:
     return value if isinstance(value, dict) else fallback
@@ -309,6 +330,111 @@ class InterviewEngine:
         result = json.loads(raw_content)
         return self._normalize_result(result, role, history)
 
+    def generate_debrief(self, payload: dict[str, Any]) -> dict[str, Any]:
+        candidate, role, history, _, _ = _validate_payload(payload)
+        if not any(item["role"] == "user" for item in history):
+            raise ValueError("VALIDATION_ERROR: at least one candidate answer is required")
+        if self.client is None:
+            raise RuntimeError("AI debrief is unavailable without GROQ_API_KEY")
+
+        user_prompt = json.dumps(
+            {
+                "candidate": candidate,
+                "role": role,
+                "conversation_history": history,
+                "instruction": "Strictly assess every selected competency against only the candidate answers in this transcript.",
+            },
+            ensure_ascii=True,
+        )
+        completion = self.client.chat.completions.create(
+            model=self.model,
+            messages=[
+                {"role": "system", "content": DEBRIEF_PROMPT},
+                {"role": "user", "content": user_prompt},
+            ],
+            temperature=0.1,
+            max_tokens=1800,
+            response_format={"type": "json_object"},
+        )
+        raw_content = completion.choices[0].message.content or "{}"
+        result = json.loads(raw_content)
+        return self._normalize_debrief(result, role, history)
+
+    def _normalize_debrief(
+        self,
+        result: dict[str, Any],
+        role: dict[str, Any],
+        history: list[dict[str, str]],
+    ) -> dict[str, Any]:
+        candidate_answers = [item["content"] for item in history if item["role"] == "user"]
+        assessments_by_competency: dict[str, dict[str, Any]] = {}
+        for item in _as_list(result.get("competency_assessments")):
+            if not isinstance(item, dict) or item.get("competency") not in role["competencies"]:
+                continue
+            try:
+                assessment_score = max(0, min(4, round(float(item.get("score")))))
+            except (TypeError, ValueError):
+                assessment_score = 0
+            quote = str(item.get("evidence_quote", "")).strip()
+            if not quote or not any(quote in answer for answer in candidate_answers):
+                quote = ""
+                assessment_score = 0
+                rationale = "No verifiable candidate quote supports evidence for this competency."
+            else:
+                rationale = str(item.get("rationale", "")).strip()
+            assessments_by_competency[item["competency"]] = {
+                "competency": item["competency"],
+                "score": assessment_score,
+                "rating": str(item.get("rating", "not_demonstrated")).strip(),
+                "rationale": rationale,
+                "evidence_quote": quote,
+            }
+
+        assessments = [
+            assessments_by_competency.get(competency, {
+                "competency": competency,
+                "score": 0,
+                "rationale": "No answer provided evidence for this competency.",
+                "evidence_quote": "",
+            })
+            for competency in role["competencies"]
+        ]
+        rating_by_score = {
+            0: "not_demonstrated",
+            1: "weak",
+            2: "developing",
+            3: "strong",
+            4: "exceptional",
+        }
+        for item in assessments:
+            item["rating"] = rating_by_score[item["score"]]
+
+        performance_score = round(
+            sum(item["score"] for item in assessments) / (len(assessments) * 4) * 100
+        )
+
+        evidence = [
+            {
+                "competency": item["competency"],
+                "evidence_quote": str(item.get("evidence_quote", "")).strip(),
+            }
+            for item in _as_list(result.get("evidence_discovered"))
+            if isinstance(item, dict)
+            and item.get("competency") in role["competencies"]
+            and str(item.get("evidence_quote", "")).strip()
+            and any(str(item.get("evidence_quote", "")).strip() in answer for answer in candidate_answers)
+        ]
+        return {
+            "overall_summary": str(result.get("overall_summary", "")).strip(),
+            "performance_score": performance_score,
+            "strengths": [str(item).strip() for item in _as_list(result.get("strengths")) if str(item).strip()],
+            "weaknesses": [str(item).strip() for item in _as_list(result.get("weaknesses")) if str(item).strip()],
+            "evidence_discovered": evidence,
+            "competency_assessments": assessments,
+            "specific_coaching": [str(item).strip() for item in _as_list(result.get("specific_coaching")) if str(item).strip()],
+            "practice_next": [str(item).strip() for item in _as_list(result.get("practice_next")) if str(item).strip()],
+        }
+
     def _normalize_result(self, result: dict[str, Any], role: dict[str, Any], history: list[dict[str, str]]) -> dict[str, Any]:
         state = _as_dict(result.get("session_state"), {})
         state["questions_asked"] = [item["content"] for item in history if item["role"] == "assistant"]
@@ -461,6 +587,23 @@ async def interview(payload: dict[str, Any]) -> JSONResponse:
     except Exception as error:
         return JSONResponse(
             {"error": {"code": "MODEL_FAILURE", "message": "Interview generation failed", "retryable": True, "detail": str(error)}},
+            status_code=502,
+        )
+    return JSONResponse(result)
+
+
+@app.post("/api/interview/debrief")
+async def interview_debrief(payload: dict[str, Any]) -> JSONResponse:
+    try:
+        result = InterviewEngine().generate_debrief(payload)
+    except ValueError as error:
+        return JSONResponse(
+            {"error": {"code": "VALIDATION_ERROR", "message": str(error), "retryable": False}},
+            status_code=400,
+        )
+    except Exception as error:
+        return JSONResponse(
+            {"error": {"code": "MODEL_FAILURE", "message": "Interview debrief generation failed", "retryable": True, "detail": str(error)}},
             status_code=502,
         )
     return JSONResponse(result)
