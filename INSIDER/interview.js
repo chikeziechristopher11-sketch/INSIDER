@@ -559,6 +559,8 @@ let answers = [];
 
 let recognition = null;
 
+let finalizedTranscript = "";
+
 let isListening = false;
 
 let isSpeaking = false;
@@ -1295,9 +1297,6 @@ function setupSpeechRecognition() {
     recognition.onresult =
         (event) => {
 
-            let finalTranscript =
-                "";
-
             let interimTranscript =
                 "";
 
@@ -1316,7 +1315,7 @@ function setupSpeechRecognition() {
                     result.isFinal
                 ) {
 
-                    finalTranscript +=
+                    finalizedTranscript +=
                         result[0].transcript;
 
                 } else {
@@ -1330,8 +1329,7 @@ function setupSpeechRecognition() {
 
 
             const text =
-                finalTranscript ||
-                interimTranscript;
+                `${finalizedTranscript}${interimTranscript}`.trim();
 
 
             if (text) {
@@ -1397,6 +1395,26 @@ function setupSpeechRecognition() {
 // =========================================
 // DISPLAY TRANSCRIPT
 // =========================================
+
+function clearTranscript() {
+
+    finalizedTranscript = "";
+
+    transcriptText.innerHTML = `
+
+        <div class="transcript-placeholder">
+            🎙️
+            <span>
+                Your answer will appear here when you start speaking.
+            </span>
+        </div>
+
+    `;
+
+    answerState.textContent = "Ready when you are";
+    answerState.style.color = "";
+
+}
 
 function displayTranscript(
     text
