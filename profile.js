@@ -14,28 +14,10 @@ if (menuBtn && sidebar) {
   menuBtn.addEventListener("click", () => {
     sidebar.classList.toggle("show");
 
-    menuBtn.textContent = sidebar.classList.contains("show") ? "✕" : "☰";
+    menuBtn.innerHTML = sidebar.classList.contains("show")
+      ? '<i class="fa-solid fa-xmark"></i>'
+      : '<i class="fa-solid fa-bars"></i>';
   });
-}
-
-// ========================================
-// AUTH GUARD
-// ========================================
-
-function ensureSignedIn() {
-  try {
-    const user = JSON.parse(localStorage.getItem("insiderUser") || "null");
-
-    if (!user || (!user.id && !user.email)) {
-      window.location.href = "sign up.html?mode=login";
-      return false;
-    }
-
-    return true;
-  } catch (error) {
-    window.location.href = "sign up.html?mode=login";
-    return false;
-  }
 }
 
 // ========================================
@@ -45,22 +27,13 @@ function ensureSignedIn() {
 const logoutBtn = document.getElementById("logoutBtn");
 
 if (logoutBtn) {
-  logoutBtn.addEventListener("click", async () => {
-    try {
-      await window.signOutFirebaseUser();
-    } catch (error) {
-      console.warn("Firebase sign-out failed:", error);
-    }
+  logoutBtn.addEventListener("click", () => {
     localStorage.removeItem("insiderUser");
 
     localStorage.removeItem("insiderProfile");
 
-    window.location.href = "sign up.html?mode=login";
+    window.location.href = "index.html";
   });
-}
-
-if (!ensureSignedIn()) {
-  throw new Error("User not authenticated.");
 }
 
 // ========================================
@@ -156,29 +129,6 @@ function getProfile() {
 }
 
 let profile = getProfile();
-
-async function syncProfileToFirestore() {
-  if (!window.saveFirestoreProfile) return false;
-  return window.saveFirestoreProfile(profile);
-}
-
-async function hydrateProfileFromFirestore() {
-  if (!window.loadFirestoreProfile) return;
-
-  try {
-    const savedProfile = await window.loadFirestoreProfile();
-    if (!savedProfile) return;
-
-    const { uid, updatedAt, ...profileData } = savedProfile;
-    profile = { ...getProfile(), ...profileData };
-    localStorage.setItem("insiderProfile", JSON.stringify(profile));
-    loadProfile();
-    renderCV();
-  } catch (error) {
-    console.error("Could not load profile from Firestore:", error);
-    showProfileMessage("Could not load your cloud profile. Showing saved local data.");
-  }
-}
 
 // ========================================
 // VALUE CHECK
@@ -356,9 +306,7 @@ function loadProfile() {
   const profileLocation = document.getElementById("profileLocation");
 
   if (profileLocation) {
-    profileLocation.textContent = profile.location
-      ? `📍 ${profile.location}`
-      : "📍 Add your location";
+    profileLocation.textContent = profile.location || "Add your location";
   }
 
   // AVATARS
@@ -508,7 +456,7 @@ function renderTextSection(elementId, value, emptyMessage) {
     empty.className = "empty-state";
 
     empty.innerHTML = `
-            <div>📋</div>
+            <div><i class="fa-solid fa-clipboard"></i></div>
             <p>${emptyMessage}</p>
         `;
 
@@ -593,7 +541,7 @@ function loadForm() {
 const profileForm = document.getElementById("profileForm");
 
 if (profileForm) {
-  profileForm.addEventListener("submit", async (event) => {
+  profileForm.addEventListener("submit", (event) => {
     event.preventDefault();
 
     const skillsInput = document.getElementById("skills");
@@ -639,20 +587,11 @@ if (profileForm) {
 
     localStorage.setItem("insiderProfile", JSON.stringify(profile));
 
-    let syncedToFirestore = false;
-    try {
-      syncedToFirestore = await syncProfileToFirestore();
-    } catch (error) {
-      console.error("Could not save profile to Firestore:", error);
-    }
-
     loadProfile();
 
     closeEditModal();
 
-    showProfileMessage(syncedToFirestore
-      ? "Profile updated successfully!"
-      : "Profile saved locally; cloud sync is unavailable.");
+    showProfileMessage("Profile updated successfully!");
   });
 }
 
@@ -830,13 +769,6 @@ if (cvInput) {
 
     localStorage.setItem("insiderProfile", JSON.stringify(profile));
 
-    let syncedToFirestore = false;
-    try {
-      syncedToFirestore = await syncProfileToFirestore();
-    } catch (error) {
-      console.error("Could not save CV metadata to Firestore:", error);
-    }
-
     // SHOW UPLOADING
 
     if (cvButton) {
@@ -846,46 +778,48 @@ if (cvInput) {
     }
 
     // BACKEND UPLOAD
+    // PDF/DOCX/TXT text extraction runs server-side (pypdf/python-docx).
 
-    if (user.id) {
+    try {
+      const formData = new FormData();
+      formData.append("cv", file);
+
+      const response = await fetch("/api/profile/cv/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      let data = {};
+
       try {
-        const formData = new FormData();
-
-        formData.append("cv", file);
-
-        const response = await fetch(window.apiUrl(`/api/profile/${user.id}/cv`), {
-          method: "POST",
-          body: formData,
-        });
-
-        let data = {};
-
-        try {
-          data = await response.json();
-        } catch {
-          data = {};
-        }
-
-        if (!response.ok) {
-          throw new Error(data.message || "CV upload failed.");
-        }
-      } catch (error) {
-        console.error("CV upload error:", error);
-
-        if (cvButton) {
-          cvButton.disabled = false;
-        }
-
-        showProfileMessage(syncedToFirestore
-          ? "CV saved to your profile, but the server upload failed."
-          : "CV saved locally, but cloud sync and server upload failed.");
-
-        loadProfile();
-
-        cvInput.value = "";
-
-        return;
+        data = await response.json();
+      } catch {
+        data = {};
       }
+
+      if (!response.ok) {
+        throw new Error(data.error?.message || "CV upload failed.");
+      }
+
+      profile.cv.text = data.cv_text || "";
+      profile.evidence = data.evidence || profile.evidence;
+      localStorage.setItem("insiderProfile", JSON.stringify(profile));
+    } catch (error) {
+      console.error("CV upload error:", error);
+
+      if (cvButton) {
+        cvButton.disabled = false;
+      }
+
+      showProfileMessage(
+        "CV saved to your profile, but the server upload failed.",
+      );
+
+      loadProfile();
+
+      cvInput.value = "";
+
+      return;
     }
 
     // FINISH
@@ -898,9 +832,7 @@ if (cvInput) {
 
     renderCV();
 
-    showProfileMessage(syncedToFirestore
-      ? "CV uploaded successfully!"
-      : "CV uploaded, but its metadata was not synced to the cloud.");
+    showProfileMessage("CV uploaded successfully!");
 
     cvInput.value = "";
   });
@@ -955,17 +887,10 @@ if (confirmCancel) {
 // ========================================
 
 if (confirmDelete) {
-  confirmDelete.addEventListener("click", async () => {
+  confirmDelete.addEventListener("click", () => {
     delete profile.cv;
 
     localStorage.setItem("insiderProfile", JSON.stringify(profile));
-
-    let syncedToFirestore = false;
-    try {
-      syncedToFirestore = await syncProfileToFirestore();
-    } catch (error) {
-      console.error("Could not remove CV metadata from Firestore:", error);
-    }
 
     loadProfile();
 
@@ -973,9 +898,7 @@ if (confirmDelete) {
 
     closeConfirmAlert();
 
-    showProfileMessage(syncedToFirestore
-      ? "CV removed from your profile."
-      : "CV removed locally; cloud sync is unavailable.");
+    showProfileMessage("CV removed from your profile.");
   });
 }
 
@@ -1010,7 +933,6 @@ document.addEventListener("keydown", (event) => {
 // ========================================
 
 loadProfile();
-hydrateProfileFromFirestore();
 
 // ========================================
 // REFRESH WHEN RETURNING
@@ -1018,5 +940,4 @@ hydrateProfileFromFirestore();
 
 window.addEventListener("pageshow", () => {
   loadProfile();
-  hydrateProfileFromFirestore();
 });

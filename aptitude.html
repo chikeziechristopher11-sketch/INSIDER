@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="icon" type="image/png" href="insider-logo.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="aptitude.css" />
+    <link rel="stylesheet" href="theme.css" />
+
+    <title>Aptitude Test | Insider</title>
+  </head>
+
+  <body>
+    <!-- MOBILE HEADER -->
+    <header class="mobile-header">
+      <img src="insider-logo.png" alt="Insider" />
+
+      <button id="menuBtn"><i class="fa-solid fa-bars"></i></button>
+    </header>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <img src="insider-logo.png" alt="Insider" />
+
+        <span>Insider</span>
+      </div>
+
+      <nav>
+        <a href="dashboard.html" class="nav-item">
+          <span><i class="fa-solid fa-house"></i></span>
+          Home
+        </a>
+
+        <a href="profile.html" class="nav-item">
+          <span><i class="fa-solid fa-user"></i></span>
+          My Profile
+        </a>
+
+        <a href="interview.html" class="nav-item">
+          <span><i class="fa-solid fa-microphone"></i></span>
+          Interview Practice
+        </a>
+
+        <a href="aptitude.html" class="nav-item active">
+          <span><i class="fa-solid fa-brain"></i></span>
+          Aptitude Test
+        </a>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <a href="settings.html" class="nav-item">
+          <span><i class="fa-solid fa-gear"></i></span>
+          Settings
+        </a>
+
+        <button class="logout-btn" id="logoutBtn">
+          <span><i class="fa-solid fa-arrow-right-from-bracket"></i></span>
+          Log Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+      <!-- TRACK SELECTION SCREEN -->
+      <section class="screen active" id="trackScreen">
+        <div class="screen-heading">
+          <p class="small-label">APTITUDE TEST</p>
+
+          <h1>Choose your track.</h1>
+
+          <p>
+            Core reasoning questions are the same for everyone — pick a
+            track to add role-specific questions on top.
+          </p>
+        </div>
+
+        <div class="track-grid" id="trackGrid">
+          <p>Loading tracks...</p>
+        </div>
+      </section>
+
+      <!-- INTRO SCREEN -->
+      <section class="screen hidden" id="introScreen">
+        <button class="button secondary" id="backToTracksBtn" type="button">
+          ← Change track
+        </button>
+
+        <div class="screen-heading">
+          <p class="small-label">APTITUDE TEST · <span id="selectedTrackLabel">General</span></p>
+
+          <h1>Show what you can actually do.</h1>
+
+          <p>
+            Timed questions across numerical, logical, verbal reasoning and
+            attention to detail — the same categories most employers screen
+            candidates on.
+          </p>
+        </div>
+
+        <div class="intro-card">
+          <div class="intro-stat">
+            <strong id="introCount">12</strong>
+            <span>Questions</span>
+          </div>
+
+          <div class="intro-stat">
+            <strong id="introDuration">12</strong>
+            <span>Minutes</span>
+          </div>
+
+          <div class="intro-stat">
+            <strong id="introCategories">4</strong>
+            <span>Categories</span>
+          </div>
+        </div>
+
+        <ul class="intro-rules">
+          <li>One question at a time — you can go back before submitting.</li>
+          <li>The timer starts as soon as you click Start and cannot be paused.</li>
+          <li>Auto-submits when time runs out, using whatever you've answered.</li>
+        </ul>
+
+        <button class="button primary" id="startTestBtn" type="button">
+          Start Test →
+        </button>
+      </section>
+
+      <!-- TEST SCREEN -->
+      <section class="screen hidden" id="testScreen">
+        <div class="test-top">
+          <div class="test-progress-info">
+            <span id="questionCounter">Question 1 / 12</span>
+
+            <span class="category-pill" id="categoryPill">Numerical</span>
+          </div>
+
+          <div class="timer" id="timer">12:00</div>
+        </div>
+
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="question-card">
+          <h2 id="questionText">Loading question...</h2>
+
+          <div class="options-list" id="optionsList"></div>
+        </div>
+
+        <div class="test-nav">
+          <button class="button secondary" id="prevBtn" type="button">
+            ← Back
+          </button>
+
+          <button class="button primary" id="nextBtn" type="button">
+            Next →
+          </button>
+
+          <button class="button primary hidden" id="submitBtn" type="button">
+            Submit Test ✓
+          </button>
+        </div>
+      </section>
+
+      <!-- RESULTS SCREEN -->
+      <section class="screen hidden" id="resultsScreen">
+        <div class="screen-heading">
+          <p class="small-label">RESULTS</p>
+
+          <h1 id="resultsHeadline">Here's how you did.</h1>
+        </div>
+
+        <div class="score-hero">
+          <div class="score-ring">
+            <span id="scoreValue">0</span>
+            <small>/ 100</small>
+          </div>
+
+          <p id="scoreSummary">
+            You answered <strong id="scoreCorrect">0</strong> of
+            <strong id="scoreTotal">0</strong> questions correctly.
+          </p>
+        </div>
+
+        <div class="category-breakdown" id="categoryBreakdown"></div>
+
+        <div class="results-actions">
+          <button class="button secondary" id="retryBtn" type="button">
+            Try Again
+          </button>
+
+          <a class="button primary" href="dashboard.html">
+            Back to Dashboard →
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <script src="theme.js"></script>
+    <script src="aptitude.js"></script>
+  </body>
+</html>
